@@ -10,40 +10,38 @@ Checkmate is a web-based tool designed to make it easy to administer competition
 
 ## Features
 
-Here are the key features of your **Editing Competition (Editathon) Web Application**:
-
-### **1. User Authentication & Authorization**
+#### **1. User Authentication & Authorization**
 
 - **MediaWiki OAuth integration** for secure login.
 - **Session-based authentication** using Passport.js.
 - **User roles** (participants, judges, and admins).
 
-### **2. Editathon Participation**
+#### **2. Editathon Participation**
 
 - **Dashboard** for participants to track progress.
 - **Submission system** for users to submit their edits.
 - **Query feature** to fetch relevant Wiki articles.
 
-### **3. Judging System**
+#### **3. Judging System**
 
 - **Judging panel** to review submissions.
 - **Commenting system** for judges to provide feedback.
 - **Elimination process** for invalid submissions.
 - **Result generation** to determine winners.
 
-### **4. Admin Panel**
+#### **4. Admin Panel**
 
 - **User management** (approve/restrict participation).
 - **Logging system** to track user activities.
 - **Permission controls** for role-based access.
 
-### **5. Additional Tools**
+#### **5. Additional Tools**
 
 - **Translation support** for multilingual participation.
 - **Editing tools** to assist users in refining their submissions.
 - **Template system** for structured submissions.
 
-### **6. Error Handling & Security**
+#### **6. Error Handling & Security**
 
 - **Session encryption** for enhanced security.
 - **404 error page** with a user-friendly message.
