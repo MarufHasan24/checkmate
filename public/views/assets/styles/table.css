@@ -1,0 +1,131 @@
+tr:nth-child(odd) a {
+    color: #b9dcff;
+    border-bottom: none;
+}
+
+tr:nth-child(even) a {
+    color: #104e8b;
+}
+
+@font-face {
+    font-family: "banTable";
+    src: url("../fonts/AnekTable2.ttf");
+}
+
+table {
+    border-collapse: collapse;
+    width: 94%;
+    margin: 2%;
+    padding: 2%;
+    font-size: 14px;
+    font-family: "banTable", "exo", "Arial", sans-serif;
+    ;
+}
+
+th,
+td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    cursor: pointer;
+    background-color: var(--tilt);
+}
+
+th div.sort-icon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+th span {
+    margin-left: 8px;
+}
+
+th img {
+    height: 30px;
+    width: 30px;
+    left: 0;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(odd) {
+    background-color: rgb(var(--tilt-dark));
+    color: #f4f4f9;
+}
+
+table a {
+    color: var(--tilt);
+    text-decoration: none;
+    transition: color 0.3s, border-bottom 0.3s;
+    border-bottom: 1px solid transparent;
+    font-weight: 550;
+    font-family: "bana", "exo", "Arial", sans-serif;
+}
+
+table a:hover {
+    color: #45a049;
+    border-bottom: 1px solid #45a049;
+}
+
+.willhide {
+    text-align: right;
+}
+
+@media (max-width: 600px) {
+    table {
+        width: 98%;
+        margin: 1%;
+        padding: 0;
+        border: #a3d1ff 2px solid;
+        margin-bottom: 30px;
+    }
+
+    .willhide {
+        display: none;
+    }
+
+    thead {
+        display: none;
+    }
+
+
+    tbody,
+    tr,
+    td {
+        display: block;
+        width: 100%;
+    }
+
+    tr {
+        margin-bottom: 15px;
+    }
+
+    td {
+        display: grid;
+        grid-template-columns: 1fr 5fr;
+        border: none;
+    }
+
+    td:before {
+        content: attr(data-label);
+        padding-right: 10px;
+        font-weight: bold;
+        color: #400071;
+
+    }
+
+    tr:nth-child(odd) td::before {
+        color: #dbadff;
+    }
+
+    td a {
+        inline-size: 250px;
+        overflow-wrap: break-word
+    }
+}

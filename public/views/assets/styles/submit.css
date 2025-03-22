@@ -1,0 +1,168 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+label {
+    grid-column: span 12;
+    /* Labels span the full width */
+    color: var(--tilt);
+    font-size: 1em;
+}
+
+div.rcont,
+div.container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    /* 12 equal columns */
+    gap: 10px;
+    width: min(800px, 100%);
+    padding: 10px;
+    margin: 20px auto;
+    background-color: #ffffffaa;
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--tilt);
+    border-radius: 5px;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+div.container div.lebel {
+    grid-column: span 12;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+}
+
+input#devider,
+input#limit,
+input#Submitter {
+    padding: 10px;
+    border: 2px solid var(--tilt);
+    border-radius: 5px;
+    text-align: center;
+    max-width: 30px;
+    font-weight: 700;
+}
+
+input#limit {
+    text-align: left;
+    max-width: 70px;
+}
+
+input#Submitter {
+    text-align: center;
+    min-width: 250px;
+    font-family: 'anam';
+}
+
+/* Neumorphic Soft Design */
+#loader-container {
+    display: none;
+    width: 80%;
+    background: #e0e0e0;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 6px 6px 12px #b8b8b8, -6px -6px 12px #ffffff;
+    text-align: center;
+    margin: 20px auto;
+}
+
+#estime {
+    font-size: 14px;
+    color: #555;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#loader {
+    height: 8px;
+    width: 0%;
+    background-color: var(--tilt);
+    border-radius: 50px;
+    transition: width 0.2s linear;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+textarea {
+    grid-column: span 12;
+    /* Textarea takes the remaining 11 columns */
+    padding: 10px;
+    border: 2px solid var(--tilt);
+    border-radius: 5px;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+    resize: vertical;
+    font-size: 1em;
+    font-family: Arial, sans-serif;
+    min-height: 30px;
+    max-height: 40vh;
+}
+
+input[type="submit"],
+button {
+    grid-column: -4/-1;
+    /* Submit button takes 2 columns */
+    padding: 10px;
+    background-color: var(--tilt);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.7);
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover,
+button:hover {
+    background-color: #4a9a88;
+}
+
+div.rcont {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    flex-direction: column;
+}
+
+div.rcont div.result {
+    width: calc(100% - 26px);
+    padding: 5px 8px;
+    margin: 3px;
+    border: 2px solid;
+    border-radius: 5px;
+    display: inline-grid;
+    grid-template-columns: 80px auto;
+}
+
+.suggestion-box {
+    display: none;
+    border: 1px solid #000;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    grid-column: 1/6;
+}
+
+.suggestion-box ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suggestion-box li {
+    padding: 8px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    border-bottom: 1px solid #ddd;
+}
+
+.suggestion-box li:last-child {
+    border-bottom: none;
+}
+
+.suggestion-box li:hover {
+    background-color: #f0f0f0;
+}

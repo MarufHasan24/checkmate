@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/assets/scripts/tools.js"></script>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/table.css">
+    <link rel="stylesheet" href="/assets/styles/editathon.css">
+    <header>
+        <% if(key) { %>
+            <ul class="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
+                <li><a href="/editathon?key=<%= key %>">Editathon</a></li>
+                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+            </ul>
+            <% } else { %>
+                <p>Enter key first</p>
+                <ul class="menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                </ul>
+                <% } %>
+    </header>
+    <style>
+        tr.deleted {
+            background-color: rgb(255, 87, 87);
+        }
+
+        tr:nth-child(odd).deleted {
+            background-color: rgb(191, 37, 3);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="settings">
+        <button id="deleteBtn" onclick="deleteSelected()">Delete Selected</button>
+        <button id="cancelBtn" onclick="cancelDelete()">Cancel</button>
+    </div>
+    <table>
+        <thead>
+            <tr id="headerRow">
+                <!-- Dynamic headers will be appended here -->
+            </tr>
+        </thead>
+        <tbody id="table">
+            <!-- Table body rows -->
+        </tbody>
+    </table>
+    <div id="pagination">
+        <button id="prevPageBtn" disabled>Prev</button>
+        <span id="pageNumbers"><span>1</span><span>2</span><span>3</span></span>
+        <button id="nextPageBtn" disabled>Next</button>
+    </div>
+</body>
+<script>
+    const key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+    let storedData = JSON.parse(localStorage.getItem(key));
+    const userdata = JSON.parse(validateStr('<%= jsondata %>'));
+    init(userdata.trns);
+    const mkey = "<%=key%>";
+    function loadTable(currentPage, startindex, callback) {
+        proxyFetch(
+            "get-rows",
+            { key: mkey, startindex: startindex, currentPage },
+            (data) => {
+                callback(data);
+            }
+        );
+    }
+    function deleteSelected() {
+        const rows = document.querySelectorAll("tr");
+        const deletedRows = [];
+        rows.forEach((row) => {
+            if (row.classList.contains("deleted")) {
+                deletedRows.push(row.id);
+            }
+        });
+        if (deletedRows.length > 0) {
+            proxyFetch(
+                "delete",
+                { key: mkey, rows: deletedRows },
+                (data) => {
+                    if (data.status === "success") {
+                        location.reload();
+                    }
+                }
+            );
+        }
+    }
+</script>
+<script src="/assets/scripts/editathon.js"></script>
+<script>
+    function makeRowCollapsible() { return 0; }//Empty function to prevent error
+    let list = {}
+    function deleteRow(row) {
+        console.log(row);
+        // make the row red on onclick and make normal on second click
+        row.classList.toggle("deleted");
+        //onclick store the row serial number in list
+        let name = row.querySelectorAll("td")[0].innerText;
+        if (list[name]) {
+            delete list[name];
+        } else {
+            list[name] = row.querySelectorAll("td")[1].innerText;
+        }
+    }
+</script>
+
+</html>

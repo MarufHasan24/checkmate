@@ -1,0 +1,468 @@
+:root {
+    --tilt-rgb: 118, 107, 157;
+    --tilt-dark: 103, 96, 128;
+    --tilt: rgb(154, 143, 191);
+}
+
+* {
+    overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+    font-family: "bangla-bold", "anam", "Arial", sans-serif;
+    font-weight: 700;
+}
+
+p,
+div {
+    font-size: 1rem;
+    font-family: "bangla", "exo", "Arial", sans-serif;
+}
+
+div a {
+    font-size: 15px;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+footer {
+    width: calc(100% -10px);
+}
+
+@font-face {
+    font-family: "exo";
+    src: url("../fonts/exo.ttf");
+}
+
+@font-face {
+    font-family: "anam";
+    src: url("../fonts/anm.ttf");
+}
+
+@font-face {
+    font-family: "bangla-bold";
+    src: url("../fonts/AnekBold.ttf");
+}
+
+@font-face {
+    font-family: "bangla";
+    src: url("../fonts/AnekSemiBold.ttf");
+}
+
+@font-face {
+    font-family: "bangla-thin";
+    src: url("../fonts/AnekLight.ttf");
+}
+
+@font-face {
+    font-family: "bana";
+    src: url("../fonts/AnekA.ttf");
+}
+
+/* menu */
+ul.menu {
+    background-color: #333;
+    list-style: none;
+    margin: 0;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-around;
+    font-family: exo, 'Times New Roman', Times, serif;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+ul.menu li {
+    display: flex;
+    margin: 0 5px;
+}
+
+ul.menu a {
+    color: #fff;
+    text-decoration: none;
+}
+
+ul.menu a:hover {
+    color: #ccc;
+}
+
+/* ifrem */
+iframe {
+    position: fixed;
+    z-index: -1;
+    height: max(100vh, 100vw);
+    width: max(100vh, 100vw);
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    opacity: 40%;
+    background-position: center;
+}
+
+/* Pop-up container */
+.popupMessage {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 1000;
+}
+
+/* Overlay */
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Button */
+.popupMessage button {
+    background-color: var(--tilt);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    font-family: "bana", "exo", "Arial", sans-serif;
+}
+
+a:hover {
+    border-bottom: 1px solid #fff;
+}
+
+div.success {
+    border-color: #264741;
+    color: #00792e;
+    background-color: #78ffc7;
+}
+
+div.error {
+    border-color: #590000;
+    color: #880000;
+    background-color: #ffab73;
+}
+
+div.warn {
+    border-color: #504b23;
+    color: #b78600;
+    background-color: #ffe689;
+}
+
+div.info {
+    border-color: #2a2550;
+    color: #0047aa;
+    background-color: #7affff;
+}
+
+div.info::before {
+    content: "Info:";
+    width: 80px;
+    display: inline-block;
+}
+
+div.warn::before {
+    content: "Warning:";
+    width: 80px;
+    display: inline-block;
+}
+
+div.error::before {
+    content: "Error:";
+    width: 80px;
+    display: inline-block;
+}
+
+div.success::before {
+    content: "Success:";
+    width: 80px;
+    display: inline-block;
+}
+
+button.cancel,
+a.cancel {
+    background-color: #f53a3a;
+}
+
+button.cancel:hover,
+a.cancel:hover {
+    background-color: #ca3e21;
+}
+
+/* Prompt overlay styling */
+.custom-prompt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgb(255, 255, 255);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* Prompt box styling */
+.custom-prompt-box {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Prompt title */
+.custom-prompt-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Prompt message */
+.custom-prompt-message {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 20px;
+    line-height: 1.6;
+    text-align: left;
+}
+
+/* Textarea for user input */
+.custom-prompt-input {
+    width: calc(100% - 20px);
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    resize: none;
+    margin-bottom: 20px;
+}
+
+/* Prompt buttons container */
+.custom-prompt-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Button styling */
+.custom-prompt-button {
+    background-color: var(--tilt);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-prompt-button:hover {
+    background-color: #3e8c7d;
+}
+
+/* Cancel button */
+.custom-prompt-cancel {
+    background-color: #f44336;
+}
+
+.custom-prompt-cancel:hover {
+    background-color: #c0392b;
+}
+
+/* Show animation */
+.custom-prompt-overlay.show {
+    display: flex;
+}
+
+.custom-alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.custom-alert-box {
+    background-color: white;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.custom-alert-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.custom-alert-message {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.custom-alert-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.custom-alert-button:hover {
+    background-color: #0056b3;
+}
+
+#popup-container {
+    position: fixed;
+    width: 300px;
+    height: 100vh;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+div.popup {
+    position: relative;
+    padding: 20px;
+    margin: 10px 0;
+    background-color: white;
+    border: 2px solid;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    cursor: auto;
+    animation: entry ease-in-out 1s forwards;
+}
+
+.popup.hide {
+    animation: outro ease-in-out 1s forwards;
+}
+
+@keyframes entry {
+    0% {
+        transform: translateX(150%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes outro {
+    100% {
+        transform: translateX(150%);
+    }
+
+    0% {
+        transform: translateX(0);
+    }
+}
+
+/* Popup message */
+div.popup .popup-message {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* Button */
+div.popup button {
+    background-color: var(--tilt);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+div.popup button:hover {
+    background-color: #4ea18f;
+}
+
+/* Countdown timer */
+div.popup .popup-timer {
+    margin-top: 10px;
+    color: #333;
+}
+
+section.checking {
+    margin: 50px auto;
+    width: min(600px, calc(100% - 40px));
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+}
+
+section.checking h2 {
+    color: var(--tilt);
+    font-size: 1.5em;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+section.checking input[type="text"],
+section.checking input[type="password"] {
+    padding: 10px;
+    margin: 2.5% 0;
+    border: 2px solid var(--tilt);
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+section.checking button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--tilt);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.7);
+    transition: background-color 0.3s ease;
+}
+
+section.checking button:hover {
+    background-color: #4a9a88;
+}

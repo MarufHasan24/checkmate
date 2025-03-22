@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @font-face {
+            font-family: "bangla";
+            src: url("/assets/fonts/AnekLight.ttf");
+        }
+
+        @font-face {
+            font-family: "exo";
+            src: url("/assets/fonts/exo.ttf");
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            font-family: "bangla", "exo", "Arial", sans-serif;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+        }
+
+        .circle {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        svg {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            transform: rotate(-90deg);
+        }
+
+        circle {
+            fill: none;
+            stroke-width: 10;
+        }
+
+        circle:nth-child(1) {
+            stroke: #ffffff;
+        }
+
+        circle:nth-child(2) {
+            stroke: #61dafb;
+            stroke-dasharray: 282.74;
+            stroke-dashoffset: 282.74;
+            transition: stroke-dashoffset 1s linear;
+        }
+
+        .label {
+            font-size: 1em;
+        }
+
+        .number {
+            font-size: 1.5em;
+            font-weight: bold;
+            padding: 0%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="countdown">
+        <div class="circle" id="days-circle">
+            <svg>
+                <circle cx="50" cy="50" r="45"></circle>
+                <circle cx="50" cy="50" r="45" id="days-progress"></circle>
+            </svg>
+            <div class="label">Days</div>
+            <div class="number" id="days">00</div>
+        </div>
+        <div class="circle" id="hours-circle">
+            <svg>
+                <circle cx="50" cy="50" r="45"></circle>
+                <circle cx="50" cy="50" r="45" id="hours-progress"></circle>
+            </svg>
+            <div class="label">Hours</div>
+            <div class="number" id="hours">00</div>
+        </div>
+        <div class="circle" id="minutes-circle">
+            <svg>
+                <circle cx="50" cy="50" r="45"></circle>
+                <circle cx="50" cy="50" r="45" id="minutes-progress"></circle>
+            </svg>
+            <div class="label">Minutes</div>
+            <div class="number" id="minutes">00</div>
+        </div>
+        <video id="hcvedio" width="50px" height="50px" loop muted>
+            <source src="./assets/video/hourclock.webm" type="video/webm">
+        </video>
+    </div>
+
+    <script>
+        window.countdown = function () { };
+        document.addEventListener("DOMContentLoaded", function () {
+            const video = document.getElementById("hcvedio")
+            countdown = function (endDate, startDate, trns) {
+                document.querySelectorAll(".label").forEach((e) => {
+                    e.innerHTML = trns[e.textContent]
+                })
+                document.querySelectorAll(".number").forEach((e) => {
+                    e.innerHTML = transition(e.textContent, trns, "d")
+                })
+
+
+                if (isNaN(endDate)) {
+                    return;
+                } else if (isNaN(startDate)) {
+                    return;
+                }
+
+                function calculate(date = Date.now()) {
+                    let timeRemaining = parseInt((endDate - date) / 1000);
+
+                    if (timeRemaining >= 0) {
+                        let days = parseInt(timeRemaining / 86400);
+                        timeRemaining = (timeRemaining % 86400);
+                        let hours = parseInt(timeRemaining / 3600);
+                        timeRemaining = (timeRemaining % 3600);
+                        let minutes = parseInt(timeRemaining / 60);
+
+                        document.getElementById("days").innerText = transition(pad(days), trns, "d")
+                        document.getElementById("hours").innerText = transition(pad(hours), trns, "d");
+                        document.getElementById("minutes").innerText = transition(pad(minutes), trns, "d");
+                        updateProgress(days, hours, minutes);
+                    } else {
+                        return;
+                    }
+                }
+
+                function transition(string, trobj, type = "s") {
+                    if (type == "d") {
+                        return string.split("").map(element => {
+                            return trobj[element]
+                        }).join("");
+                    } else {
+                        return trobj[string]
+                    }
+                }
+
+                function pad(n) {
+                    return (n < 10 ? '0' : '') + n;
+                }
+
+                function updateProgress(days, hours, minutes) {
+                    const totalDays = (endDate - startDate) / (24 * 60 * 60 * 1000);
+                    const totalHours = 24;
+                    const totalMinutes = 60;
+
+                    const daysPercent = ((totalDays - days) / totalDays) * 282.74;
+                    const hoursPercent = ((totalHours - hours) / totalHours) * 282.74;
+                    const minutesPercent = ((totalMinutes - minutes) / totalMinutes) * 282.74;
+
+                    document.getElementById("days-progress").style.strokeDashoffset = daysPercent;
+                    document.getElementById("hours-progress").style.strokeDashoffset = hoursPercent;
+                    document.getElementById("minutes-progress").style.strokeDashoffset = minutesPercent;
+                }
+
+                // Initial calculation
+                if (startDate < Date.now() && endDate > Date.now()) {
+                    // Play the video if the start date has passed
+                    video.play();
+                    calculate();
+
+                    // Calculate the remaining seconds until the next minute
+                    let thissec = 60 - new Date().getSeconds();
+
+                    // Set interval to update every minute
+                    setTimeout(() => {
+                        setInterval(calculate, 60000);
+                    }, thissec * 1000);
+
+                } else {
+                    // Do not play the video, just show the first frame
+                    video.pause();
+                    video.currentTime = 0; // Rewind to the first frame
+                    if (startDate > Date.now() && endDate > Date.now()) {
+                        calculate(startDate);
+                    }
+                }
+            }
+        })
+        // Set after reciving time value from ifrem here
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,372 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+.container>section {
+    text-align: center;
+    width: min(100%, 600px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-direction: column;
+    backdrop-filter: blur(10px);
+    background-color: #ddd5;
+    padding: 10px;
+    border-radius: 0 0 10px 10px;
+}
+
+.container section form {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: max(15%, 10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: calc(70%);
+}
+
+.stats,
+.settings {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    padding: 25px;
+    margin: 2% 0;
+    padding: 3% 0;
+    background-color: #ffffffdd;
+}
+
+.settings .values {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 12px;
+}
+
+.settings input[type="text"],
+.settings input[type="password"],
+.settings input[type="number"],
+.settings input[type="date"],
+.settings input[type="time"],
+.settings input[type="datetime-local"],
+.settings select,
+.settings textarea {
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: white;
+    color: #333;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+    font-size: 1em;
+    resize: none;
+}
+
+.settings input[type="date"],
+.settings input[type="time"] {
+    width: calc(45% - 14px);
+}
+
+.settings div.datetime {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.settings input[type="text"]:focus,
+.settings input[type="number"]:focus,
+.settings input[type="password"]:focus,
+.settings input[type="date"]:focus,
+.settings input[type="time"]:focus,
+.settings textarea:focus {
+    outline: none;
+    background-color: #f0f0f0;
+    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.1), inset -4px -4px 8px rgba(255, 255, 255, 0.7);
+}
+
+.card {
+    background-color: var(--tilt);
+    border-radius: 12px;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.7);
+    padding: 20px;
+    color: white;
+    flex: 1 1 calc(33.333% - 50px);
+    /* Cards will take up a third of the row with spacing */
+    max-width: calc(33.333% - 50px);
+    box-sizing: border-box;
+    transition: box-shadow 0.3s ease;
+}
+
+.card.big {
+    flex: 1 1 calc(100% - 100px);
+    max-width: calc(100% - 100px)
+}
+
+.card.small {
+    flex: 1 1 calc(20% - 40px);
+    max-width: calc(20% - 40px);
+}
+
+.card.very-small {
+    flex: 1 1 calc(15% - 30px);
+    max-width: calc(15% - 30px);
+}
+
+.card.medium {
+    flex: 1 1 calc(25% - 45px);
+    max-width: calc(25% - 45px);
+}
+
+.card.double {
+    flex: 1 1 calc(66% - 65px);
+    max-width: calc(66% - 65px);
+}
+
+.judgement-option input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.judgement-option {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 10px;
+    grid-template-columns: 4fr 5fr 3fr;
+}
+
+.stats .card p {
+    text-align: center;
+    width: 100%;
+}
+
+.card:hover {
+    box-shadow: -8px 8px 20px rgba(0, 0, 0, 0.2), 8px 8px 20px rgba(255, 255, 255, 0.7);
+}
+
+.card h3 {
+    margin-top: 0;
+    color: white;
+    font-size: 1.25em;
+}
+
+.card h2 {
+    font-size: 2.25em;
+    color: white;
+}
+
+.settings .values {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 12px;
+}
+
+.savecancle {
+    display: none;
+    /* Hidden by default */
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-end;
+    background-color: var(--tilt);
+    padding: 10px;
+    /* Span across the full width of the grid */
+}
+
+.savecancle button,
+.settings .card.buttonCont button,
+input[type="submit"] {
+    background-color: white;
+    color: var(--tilt);
+    border: 0px;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin: 0 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.savecancle button:hover,
+.settings .card.buttonCont button:hover {
+    background-color: var(--tilt);
+    border: 2px groove white;
+    color: white;
+}
+
+.savecancle button.cancel:hover {
+    background-color: #b41919;
+}
+
+@media (max-width: 800px) {
+
+    .settings {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .card.big {
+        min-width: calc(100% - 100px);
+        grid-column: 1 / -1;
+    }
+
+    .card.medium {
+        min-width: calc(50% - 50px);
+        grid-column: 1 / -1;
+    }
+
+    .settings .card,
+    .stats .card {
+        flex: none;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-weight: 600;
+    text-align: center;
+}
+
+.checking input[type="text"],
+.checking input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: #f8f8f8;
+}
+
+.checking input[type="text"]:focus,
+.checking input[type="password"]:focus {
+    border-color: var(--tilt);
+    background-color: #fff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 255, 153, 0.5);
+}
+
+.checking button {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: var(--tilt);
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.checking button:hover {
+    background-color: #00b368;
+}
+
+iframe.countdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
+    width: 500px;
+    position: relative;
+    opacity: 1;
+    background-color: rgba(var(--tilt-rgb), 0.5);
+    transform: scale(1);
+    transition: 1s;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.nav {
+    background-color: #444;
+    overflow: hidden;
+}
+
+.nav a {
+    float: left;
+    display: block;
+    color: #fff;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.nav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+@media (max-width:720px) {
+    iframe.countdown {
+        transform: scale(0.65);
+    }
+}
+
+div.card ul {
+    list-style: none;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0;
+}
+
+div.card ul li {
+    min-width: 72px;
+    width: auto;
+    text-align: center;
+    background-color: var(--tilt);
+    color: white;
+    padding: 2px;
+}
+
+div.card ul li:hover {
+    color: var(--tilt);
+    background-color: white;
+}
+
+div.card ul li:hover a {
+    color: var(--tilt);
+}
+
+.card.confidential h3::after {
+    content: " (private)";
+    font-size: small;
+    font-weight: 400;
+}

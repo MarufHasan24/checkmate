@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 17 July, 2024-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <title>Template:<% data.title %>
+    </title>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/template.css">
+    <!--     <script src="/assets/scripts/jquery.min.js"></script> -->
+    <script src="/assets/scripts/tools.js"></script>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+    <main>
+        <div>
+            <h1>Template:<%= data.title %>
+            </h1>
+            <p>
+                <%= data.description %> <a href="https://meta.wikimedia.org/wiki/User:<%=data.username %>">
+                        <%= data.creator %>
+                    </a> You can create
+                    templates
+                    like this from <a href="./create.html">here</a>.
+            </p>
+        </div>
+        <ul class="menu" id="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+        </ul>
+        <% if(obj.key && obj.password) {%>
+            <div id="banner">
+                <span>
+                    <b>key: <%= obj.key %></b><br>
+                    <b>Password: <%= obj.password %></b>
+                </span>
+                <p>Copy Id and Password and save it somewhere for feuture referance <button id="copy"
+                        style="box-shadow: none;">Copy</button>
+                </p>
+            </div>
+            <% } %>
+    </main>
+    <nav>
+        <section id='window'>
+            <h2>Window</h2>
+            <ul>
+                <li>
+                    <input data-properties='Page name' type='checkbox' name='window' id='windowinp-input1' disabled
+                        checked>
+                    <label for='windowinp-input1'>Page name</label>
+                </li>
+                <li>
+                    <input data-properties='User names' type='checkbox' name='window' id='windowinp-input2' checked>
+                    <label for='windowinp-input2'>User names</label>
+                </li>
+                <li>
+                    <input data-properties='Reviewers name' type='checkbox' name='window' id='windowinp-input3' checked>
+                    <label for='windowinp-input3'>Reviewers name</label>
+                </li>
+                <li>
+                    <input data-properties='Upload date' type='checkbox' name='window' id='windowinp-input4' checked>
+                    <label for='windowinp-input4'>Upload date</label>
+                </li>
+                <li>
+                    <input data-properties='Creation Date' type='checkbox' name='window' id='windowinp-input5'>
+                    <label for='windowinp-input5'>Creation Date</label>
+                </li>
+                <li data-tool='ec'>
+                    <input data-properties='User edit Count' type='checkbox' name='window' id='windowinp-input6'>
+                    <label for='windowinp-input6'>User edit Count</label>
+                </li>
+                <li>
+                    <input data-properties='user last contribiution' type='checkbox' name='window'
+                        id='windowinp-input7'>
+                    <label for='windowinp-input7'>User's last contribiution</label>
+                </li>
+                <li data-tool='twc'>
+                    <input data-properties='Byte Count' type='checkbox' name='window' id='windowinp-input9'>
+                    <label for='windowinp-input9'>Byte Count</label>
+                </li>
+                <li data-tool='twc'>
+                    <input data-properties='Word Count' type='checkbox' name='window' id='windowinp-input9'>
+                    <label for='windowinp-input9'>Word Count</label>
+                </li>
+                <li>
+                    <input data-properties='Jurry name' type='checkbox' name='window' id='windowinp-input10'>
+                    <label for='windowinp-input10'>Make jurry name public</label>
+                </li>
+                <li>
+                    <label for='windowinp-input11-select'>Default Sort using: <span style='color:red;'>(check if that
+                            field is checked; Default: Page name)</span></label>
+                    <select data-properties="Default Sort" id='windowinp-input11-select' name='window-select'>
+                        <option value='Page Name' selected>Page Name</option>
+                        <option value='User names'>User names</option>
+                        <option value='Upload date'>Upload date</option>
+                        <option value='Creation Date'>Creation Date</option>
+                    </select>
+                </li>
+                <li data-tool='msn'>
+                    <input type='checkbox' name='window' id='windowinp-input12' data-properties='Send feedback' checked>
+                    <label for='windowinp-input12'>Send feedback to user page</label>
+                </li>
+                <li>
+                    <label for='windowinp-input13-radio1'>Feedback Template (if needed, not required)</label>
+                    <input type='text' name='window-text' data-properties='Feedback Template'
+                        id='windowinp-input13-radio1'>
+                </li>
+                <li>
+                    <label for='windowinp-input14-select'>Dashboard funtionality:</label>
+                    <select data-properties="Dashboard functionality" id='windowinp-input14-select'
+                        name='window-select'>
+                        <option value='unlisted' selected>Unlisted</option>
+                        <option value='anyone'>Logged in users can see</option>
+                        <option value='everyone'>Everyone can see</option>
+                        <option value='Jurries view'>Jurry members can see only</option>
+                        <option value='Jurries update'>Jurry members can update data</option>
+                    </select>
+                </li>
+                <li data-tool='cw'>
+                    <input data-properties='Countdown' type='checkbox' name='window' id='windowinp-input15' checked>
+                    <label for='windowinp-input15'>Countdown</label>
+                </li>
+                <li data-tool='msn'>
+                    <input data-properties='add text in talk page' type='checkbox' name='window' id='windowinp-input16'
+                        checked>
+                    <label for='windowinp-input16'>Text which will be added in talk page</label>
+                    <input style="min-height: 50px;" type="text" id='windowinp-input16-text1'>
+                </li>
+                <li data-tool='msn'>
+                    <input data-properties='add text in main pages' type='checkbox' name='window'
+                        id='windowinp-input17'>
+                    <label for='windowinp-input17'>Text which will be added in Article page</label>
+                    <input style="min-height: 50px;" type="text" id='windowinp-input17-text1'>
+                </li>
+                <li>
+                    <label for='windowinp-input18-select'>Make Result using:</label>
+                    <select data-properties="Make result" id='windowinp-input18-select' name='window-select'>
+                        <option value='Page Count' selected>Page Count</option>
+                        <option value='Word Count' data-tool='twc'>Word Count</option>
+                        <option value='Byte Count' data-tool='twc'>Byte Count</option>
+                    </select>
+                </li>
+                <li data-tool='bu'>
+                    <input data-properties='Batch Upload' type='checkbox' name='window' id='windowinp-input19' checked>
+                    <label for='windowinp-input19'>Batch Upload</label>
+                </li>
+                <li>
+                    <input data-properties='Statistic' type='checkbox' name='window' id='windowinp-input20' checked>
+                    <label for='windowinp-input20'>Statistic</label>
+                </li>
+                <li>
+                    <input data-properties='Allowed namespaces' type='text' name='window' id='windowinp-input21'
+                        value="0">
+                    <label for='windowinp-input21'>Allowed namespaces(code only or left blank for all)</label>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <form id="main"></form>
+            <div class="btncontainer">
+                <button type='submit' id='submit'>Submit</button>
+                <a class="cancel" onclick="deleteKey('<%=obj.key%>')" id='cancel'>Cancel</a>
+            </div>
+        </section>
+        <section id='tools'>
+            <h2>Tools</h2>
+            <ul>
+                <li class='item'><span class='color' style='background-color: #c800ff;'></span><span>word added
+                    </span> <!-- (code:wa) -->
+                </li>
+                <li class='item'><span class='color' style='background-color: #2e35ff;'></span><span>Total word
+                        Count </span> <!-- (code:twc) -->
+                </li>
+                <li class='item'><span class='color' style='background-color: #ffd92e;'></span><span>Table maker
+                    </span> <!-- (code:tm) -->
+                </li>
+                <li class='item'><span class='color' style='background-color: #0cb400;'></span><span>Messenger
+                    </span> <!-- (code:msn) -->
+                </li>
+                <li class='item'><span class='color' style='background-color: #ff2bb5;'></span><span>Edit counter
+                    </span> <!-- (code:cc) -->
+                </li>
+                <li class='item'><span class='color' style='background-color: #8521ff;'></span><span>Countdown
+                    </span> <!-- (code:cw) -->
+                </li>
+                <li class='item'><span class='color' style='background-color: #21f3ff;'></span><span>Batch Upload
+                    </span> <!-- (code:bu) -->
+                </li>
+            </ul>
+        </section>
+    </nav>
+</body>
+<script>
+    const deleteKey = async function (key) {
+        try {
+            const response = await fetch("/delete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: key,
+                    type: "key",
+                }),
+            });
+
+            const resdata = await response.json();
+
+            if (resdata.success) {
+                // Redirect to create new key page
+                window.location.href = "/";
+            } else {
+                console.error("Error deleting key file:", resdata.error);
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+        }
+    };
+    const jsonobj = JSON.parse(validateStr('<%= jsonobj %>'));
+    const main = document.getElementById("main");
+    main.innerHTML += validateStr('<%= data.html %>').replace(/\$\{name\}/, jsonobj.name).replace(/\$\{project\}/, jsonobj.project).replace(/\$\{langcode\}/, jsonobj.project.split(".")[0]);
+</script>
+<script src="/assets/scripts/template.js"></script>
+<script>
+    document.getElementById("copy").addEventListener("click", () => {
+        navigator.clipboard ? navigator.clipboard
+            .writeText("Key: <%= obj.key %>, Password: <%= obj.password %>").then(function () {
+                alert('Copied into clipboard successfully!');
+            }, function () {
+                alert('Unable to copy. Please copy it manually :-(');
+            }) : alert('Unable to copy. Please copy it manually :-(');
+    });
+</script>
+
+</html>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 31 July, 2024-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <title>Dashboard</title>
+    <header>
+        <h1>Welcome to Dashboard</h1>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/editathon?key=<%= key %>">Editathon</a></li>
+            <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+            <% if(key) {%>
+                <li><a href="javascript:void" onclick="deleteKey('<%=key%>')">Delete key</a></li>
+                <li><a href="/dashboard">Reset</a></li>
+                <% } %>
+        </ul>
+    </header>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/dashboard.css">
+    <script src="/assets/scripts/tools.js"></script>
+    <script src="/assets/scripts/dashboard.js"></script>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+    <div class="container">
+        <% if (!key && !pass) { %>
+            <!-- If retake is true, ask for both key and password -->
+            <section class="checking">
+                <h2>Enter Your key and Password</h2>
+                <form>
+                    <input type="text" name="key" placeholder="key">
+                    <input type="password" name="pass" placeholder="Password">
+                    <button onclick="submit()" type="submit">Submit</button>
+                </form>
+            </section>
+            <script>
+                function submit() {
+                    proxyFetch("dashboard",
+                        {
+                            key: document.querySelector("input[name='key']").value,
+                            password: document.querySelector("input[name='pass']").value,
+                            action: "login"
+                        },
+                        (data) => {
+                            if (data && data.key) {
+                                location.replace("/dashboard?key=" + data.key);
+                            } else {
+                                //console.log(data)
+                            }
+                        });
+                }
+            </script>
+            <% } else if(key){ %>
+                <script>
+                    const userdata = JSON.parse(validateStr('<%=jsondata%>'));
+                    const container = document.getElementsByClassName("container")[0];
+                    init(userdata.trns)
+                    let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+                    let logindata = JSON.parse(localStorage.getItem(key));
+                    let username = null;
+                    if (logindata) {
+                        username = logindata.username;
+                    }
+                </script>
+                <% if(!pass && data.dashboard_functionality=="unlisted" ){ %>
+                    <!-- If only the key is provided, ask for the password -->
+                    <section class="checking">
+                        <h2>Please Enter Your Password</h2>
+                        <form id="passwordForm">
+                            <input type="hidden" name="key" value="<%= key %>">
+                            <p>Key: <%= key %>
+                            </p>
+                            <input type="password" name="pass" placeholder="Password">
+                            <button type="submit">Submit</button>
+                            <p id="errorMessage" style="color: red; display: none;">Incorrect password. Please
+                                try
+                                again.</p>
+                        </form>
+                    </section>
+                    <script>
+                        document.getElementById('passwordForm').addEventListener('submit', function (event) {
+                            event.preventDefault(); // Prevent default form submission
+
+                            const enteredPassword = event.target.pass.value;
+                            const correctPassword = '<%= checkpass %>'; // Replace with actual logic to get the correct password
+                            const errorMessage = document.getElementById('errorMessage');
+
+                            if (enteredPassword === correctPassword) {
+                                const key = event.target.key.value;
+                                const queryString = `?key=${encodeURIComponent(key)}&pass=${encodeURIComponent(enteredPassword)}`;
+                                window.location.href = '/dashboard' + queryString;
+                            } else {
+                                errorMessage.style.display = 'block';
+                            }
+                        });
+                    </script>
+                    <% } else { %>
+                        <!-- normal -->
+                        <div id="overlay"></div>
+                        <div id="popupMessage" class="popupMessage">
+                            <p>Incorrect password. Please try again.</p>
+                            <button id="closePopup">OK</button>
+                        </div>
+                        <%if (data.dashboard_functionality=="unlisted" && pass !==checkpass ) {%>
+                            <script>
+                                // Show custom pop-up
+                                document.getElementById('overlay').style.display = 'block';
+                                document.getElementById('popupMessage').style.display = 'block';
+
+                                // Close pop-up and redirect when button is clicked
+                                document.getElementById('closePopup').addEventListener('click', function () {
+                                    document.getElementById('overlay').style.display = 'none';
+                                    document.getElementById('popupMessage').style.display = 'none';
+                                    window.location.href = "/dashboard?key=" + encodeURIComponent('<%= key %>');
+                                });
+                            </script>
+                            <% } else { %>
+                                <% if(data) { %>
+                                    <%if(data && Object.keys(data).length) { %>
+                                        <h1>
+                                            <%=data.title%>
+                                        </h1>
+                                        <!-- main works go here -->
+                                        <!-- Countdown section -->
+                                        <iframe class="countdown" src="./countdown.html" id="countdown"
+                                            frameborder="0"></iframe>
+                                        <script>
+                                            // Ensure the iframe is fully loaded before accessing its content
+                                            document.getElementById('countdown').onload = function () {
+                                                // Access the countdown function inside the iframe's content window
+                                                this.contentWindow.countdown(
+                                                    Date.parse('<%=data.end_date%>' + ' ' + '<%=data.end_time%>'), Date.parse('<%=data.start_date%>' + ' ' + '<%=data.start_time%>')
+                                                    , window.transObj.lebel.counts);
+                                            };
+                                        </script>
+                                        <!-- CountDown section end -->
+                                        <!-- Statistic section -->
+                                        <div class="stats">
+                                            <div class="card small">
+                                                <h2>
+                                                    <%=data.pagecount%>
+                                                </h2>
+                                                <p>Total submission</p>
+                                            </div>
+                                            <!-- <div class="card small">
+                                                <h2>
+                                                    <%=data.usercount.length%>
+                                                </h2>
+                                                <p>Total Submitor</p>
+                                            </div> -->
+                                            <div class="card small">
+                                                <h2>
+                                                    <%=Object.keys(data.jurries_list).length%>
+                                                </h2>
+                                                <p>Total Jurries. Page/Jurries have to review is about :
+                                                    <b>
+                                                        <%=Math.ceil((Number(data.pagecount) - Number(data.reviewed))
+                                                            /Object.keys(data.jurries_list).length)%>
+                                                    </b>
+                                                </p>
+                                            </div>
+                                            <div class="card small">
+                                                <h2 style="color: #0050ec;">
+                                                    <%=data.reviewed%>
+                                                </h2>
+                                                <p>Total Reviewed</p>
+                                            </div>
+                                            <div class="card small">
+                                                <h2 style="color: red;">
+                                                    <%=Number(data.pagecount) - Number(data.reviewed)%>
+                                                </h2>
+                                                <p>Remaining</p>
+                                            </div>
+                                            <div class="card big">
+                                                <h3>Jurries review count</h3>
+                                                <ul id="reviewCount"></ul>
+                                            </div>
+                                            <!-- Group 0: Basic -->
+                                            <div class="card medium">
+                                                <h3>Basic</h3>
+                                                <p><i>Project:</i>
+                                                    <a href="https://<%= data['base_component']%>.org/">
+                                                        <%= data["base_component"]%>
+                                                    </a>
+                                                </p>
+                                                <p><i>Title:</i>
+                                                    <%= data["title"]%>
+                                                </p>
+                                            </div>
+                                            <!-- Group 1: Page and User Info -->
+                                            <div class="card medium confidential">
+                                                <h3>Page and User Info</h3>
+                                                <p><i>Page Name:</i>
+                                                    <%= data.page_name ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>User Names:</i>
+                                                    <%= data.user_names ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Jurry Names:</i>
+                                                    <%= data.jurry_names ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Reviewers Name:</i>
+                                                    <%= data['reviewers_name'] ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                            </div>
+
+                                            <!-- Group 2: Dates -->
+                                            <div class="card medium confidential">
+                                                <h3>Dates</h3>
+                                                <p><i>Upload Date:</i>
+                                                    <%= data.upload_date ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Creation Date:</i>
+                                                    <%= data.creation_date ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>User Last Contribution Date:</i>
+                                                    <%= data.user_last_contribution_date ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                            </div>
+
+                                            <!-- Group 3: Checks and Reviews -->
+                                            <div class="card medium confidential">
+                                                <h3>Checks and Reviews</h3>
+                                                <p><i>User Edit Count:</i>
+                                                    <%= data.user_edit_count ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Single Checking:</i>
+                                                    <%= data.single_checking ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                            </div>
+
+                                            <!-- Group 4: Feedback and Templates -->
+                                            <div class="card medium confidential">
+                                                <h3>Feedback and Templates</h3>
+                                                <p><i>Send Feedback:</i>
+                                                    <%= data.send_feedback ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Feedback Template:</i>
+                                                    <%= data.feedback_template || 'N/A' %>
+                                                </p>
+                                            </div>
+
+                                            <!-- Group 5: Text Options -->
+                                            <div class="card medium confidential">
+                                                <h3>Text Options</h3>
+                                                <p><i>Add Text in Talk Page:</i>
+                                                    <%= data.add_text_in_talk_page ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Talk page textContent:</i>
+                                                    <%= data['windowinp-input16-text1'] || 'N/A' %>
+                                                </p>
+                                                <p><i>Add Text in Main Pages:</i>
+                                                    <%= data.add_text_in_main_pages ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Input Text 2:</i>
+                                                    <%= data['windowinp-input15-text1'] || 'N/A' %>
+                                                </p>
+                                            </div>
+
+                                            <!-- Group 6: Batch Operations and Statistics -->
+                                            <div class="card medium confidential">
+                                                <h3>Batch Operations and Statistics</h3>
+                                                <p><i>Batch Upload:</i>
+                                                    <%= data.batch_upload ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Statistic:</i>
+                                                    <%= data.statistic ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                            </div>
+
+                                            <!-- Group 7: Countdown and Select -->
+                                            <div class="card medium confidential">
+                                                <h3>Others</h3>
+                                                <p><i>Countdown:</i>
+                                                    <%= data.countdown ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Result on basis of:</i>
+                                                    <%= data['make_result'] %>
+                                                </p>
+                                                <p><i>Dashboard functionality:</i>
+                                                    <%= data['dashboard_functionality'] %>
+                                                </p>
+                                            </div>
+                                            <!-- Group 7: Countdown and Select -->
+                                            <div class="card medium confidential">
+                                                <h3>Others</h3>
+                                                <p><i>Countdown:</i>
+                                                    <%= data.countdown ? 'Enabled' : 'Disabled' %>
+                                                </p>
+                                                <p><i>Result on basis of:</i>
+                                                    <%= data['make_result'] %>
+                                                </p>
+                                                <p><i>Dashboard functionality:</i>
+                                                    <%= data['dashboard_functionality'] %>
+                                                </p>
+                                            </div>
+                                            <script>
+                                                document.getElementById("reviewCount").innerHTML = (Object.entries(userdata.jurries_list).map(e => {
+                                                    return `<li><a target='_blank' href='https://${userdata.base_component}.org/wiki/user:${e[0]}' title='User:${e[0]}'>${e[0]} : ${Object.keys(e[1]).length}</a></li>`
+                                                }).join(""));
+                                            </script>
+                                        </div>
+                                        <div class="savecancle">
+                                            <button class="save">Save</button>
+                                            <button class="cancel">Cancel</button>
+                                        </div>
+                                        <div class="settings">
+                                            <div class="card">
+                                                <h3>List Page</h3>
+                                                <p class="values">Current Value: <%=data.list_page || "not set" %>
+                                                </p>
+                                                <input data-properties='listed Page' type="text"
+                                                    value="<%=data.listed_page%>" placeholder="Edit List Page">
+                                                <h3>Result</h3>
+                                                <p class="values">Current Value: <%= data.result || "not set" %>
+                                                </p>
+                                                <input data-properties='Result' type="text" placeholder="Edit Result"
+                                                    value="<%= data.result %>">
+                                                <p class="values">Make Result using: <%= data.make_result %>
+                                                </p>
+
+                                                <select data-properties="Make result" id='windowinp-input18-select'
+                                                    name='window-select'>
+                                                    <option value='Page Count' <%=(data.make_result=='Page Count'
+                                                        ? 'selected' : null) %> >Page Count</option>
+                                                    <option value='Word Count' data-tool='twc'
+                                                        <%=(data.make_result=='Word Count' ? 'selected' : null) %>
+                                                        >Word Count</option>
+                                                    <option value='Byte Count' data-tool='twc'
+                                                        <%=(data.make_result=='Byte Count' ? 'selected' : null) %>
+                                                        >Byte Count</option>
+                                                </select>
+                                            </div>
+                                            <div class="card">
+                                                <h3>Pre conditions</h3>
+                                                <div
+                                                    style='display: flex; align-items: center; justify-content: space-evenly; flex-wrap: nowrap;     margin: 12px 0'>
+                                                    <div style="width: 45%;">
+                                                        <label class="values">Word limit: <%= data.word_limit
+                                                                || "not set" %></label>
+                                                        <input data-properties="word_limit" type="number"
+                                                            value="<%= data.word_limit %>" placeholder="word limit">
+
+                                                    </div>
+                                                    <div style="width: 45%;">
+                                                        <label class="values">Byte limit: <%= data.byte_limit
+                                                                || "not set" %>
+                                                        </label>
+                                                        <input data-properties="byte_limit" type="number"
+                                                            value="<%= data.byte_limit %>" placeholder="byte limit">
+                                                    </div>
+                                                </div>
+                                                <p class="values">Created Date Condition: <%= data.date_condition
+                                                        || "not set" %>
+                                                </p>
+                                                <select data-properties="date_condition" name="usrinp"
+                                                    id="item5-select1">
+                                                    <option value="before" <%=data.date_condition==="before"
+                                                        ? "selected" : "" %> >Before</option>
+                                                    <option value="after" <%=data.date_condition==="after" ? "selected"
+                                                        : "" %> >After</option>
+                                                </select>
+
+                                                <p class="values">Date limit: <%= data.date_limit || "not set" %>
+                                                </p>
+                                                <input data-properties="date_limit" type="datetime-local" name="usrinp"
+                                                    value="<%= data.date_limit %>" placeholder="date limit">
+                                            </div>
+                                            <div class="card">
+                                                <h3>Others</h3>
+                                                <p class="values"> Dashboard functionality :
+                                                    <%= data.dashboard_functionality || "N/A" %>
+                                                </p>
+                                                <select data-properties="Dashboard functionality"
+                                                    id='windowinp-input14-select' name='window-select'>
+                                                    <option value='unlisted'
+                                                        <%=data.dashboard_functionality==="unlisted" ? "selected" : ""
+                                                        %>>Unlisted</option>
+                                                    <option value='anyone' <%=data.dashboard_functionality==="anyone"
+                                                        ? "selected" : "" %>
+                                                        >Logged in users can see</option>
+                                                    <option value='everyone'
+                                                        <%=data.dashboard_functionality==="everyone" ? "selected" : ""
+                                                        %> >Everyone can see</option>
+                                                    <option value='Jurries view'
+                                                        <%=data.dashboard_functionality==="Jurries view" ? "selected"
+                                                        : "" %>
+                                                        >Jurry members can see only</option>
+                                                    <option value='Jurries update'
+                                                        <%=data.dashboard_functionality==="Jurries update" ? "selected"
+                                                        : "" %>
+                                                        >Jurry members can update data
+                                                    </option>
+                                                </select>
+                                                <p class="values">Who can upload articles: <%= data.upload_conditions
+                                                        || "not set" %>
+                                                </p>
+                                                <select data-properties="upload conditions" id="windowinp-input8-select"
+                                                    name="window-select">
+                                                    <option value="only creator"
+                                                        <%=data.upload_conditions==="only creator" ? "selected" : "" %>
+                                                        >only creator</option>
+                                                    <option value="anyone but creator"
+                                                        <%=data.upload_conditions==="anyone but creator" ? "selected"
+                                                        : "" %>>anyone but creator</option>
+                                                    <option value="anyone" <%=data.upload_conditions==="anyone"
+                                                        ? "selected" : "" %>>Anyone</option>
+                                                </select>
+                                            </div>
+                                            <div class="card">
+                                                <h3>Message Options</h3>
+                                                <% if(data.send_feedback) {%>
+                                                    <p><b>Feedback Template:</b>
+                                                        <%= data.feedback_template || 'N/A' %>
+                                                    </p>
+                                                    <input type="text" data-properties="feedback template"
+                                                        value="<%= data.feedback_template %>">
+                                                    <% } %>
+                                                        <% if (data.add_text_in_talk_page) { %>
+
+                                                            <p>
+                                                                <b>Message for Talk Page:</b>
+                                                                <%= data['windowinp-input16-text1'] || 'N/A' %>
+                                                            </p>
+                                                            <input type="text" data-properties="windowinp-input16-text1"
+                                                                value="<%= data['windowinp-input16-text1']%>">
+                                                            <% } %>
+                                                                <%if(data.add_text_in_main_pages) { %>
+
+                                                                    <p>
+                                                                        <b>Message for main page:</b>
+                                                                        <%= data['windowinp-input15-text1'] || 'N/A' %>
+                                                                    </p>
+                                                                    <input type="text"
+                                                                        data-properties="windowinp-input15-text1"
+                                                                        value="<%= data['windowinp-input15-text1']%>">
+
+                                                                    <% } %>
+
+                                            </div>
+                                            <div class="card">
+                                                <h3>Start and End Date and Time</h3>
+                                                <p class="values">Start Date Time : <%=(data.start_date || "not set" )
+                                                        + " | " + (data.start_time || "not set" ) %>
+                                                </p>
+                                                <div class="datetime"><input data-properties='Start date' type="date"
+                                                        value="<%=data.start_date%>">
+                                                    <input type="time" data-properties='Start time'
+                                                        value="<%=data.start_time%>">
+                                                </div>
+                                                <p class="values">End Date Time : <%=(data.end_date || "not set" )
+                                                        + " | " + (data.end_time || "not set" ) %>
+                                                </p>
+                                                <div class="datetime"><input data-properties='End Date' type="date"
+                                                        value="<%= data.end_date %>">
+                                                    <input data-properties='End time' type="time"
+                                                        value="<%= data.end_time %>">
+                                                </div>
+                                            </div>
+                                            <div class="card">
+                                                <h3>Jurries</h3>
+                                                <p class="values">Current Jurries:
+                                                <ul id="Jurries"></ul>
+                                                </p>
+                                                <textarea data-properties='Jurries' placeholder="Edit Jury Details"
+                                                    rows="3"><%=data.jurries%></textarea>
+                                            </div>
+                                            <div class="card double">
+                                                <h3>Judgement options</h3>
+                                                <div id="judgement-options"></div>
+                                            </div>
+                                            <script>
+                                                // Data coming from the server (replace this with actual data in your EJS)
+                                                const judgementData = userdata.dynamic; // EJS passes data here
+
+                                                // Get the container where we'll append the options
+                                                const judgementOptions = document.getElementById('judgement-options');
+
+                                                // Loop through the judgementData to create inputs dynamically
+                                                for (const [key, value] of Object.entries(judgementData)) {
+                                                    // Create a new div for each option
+                                                    const optionDiv = document.createElement('div');
+                                                    const valueDiv = document.createElement('p');
+                                                    optionDiv.classList.add('judgement-option');
+                                                    valueDiv.innerHTML = "Name : " + key + " | Mark : " + value.mark;
+                                                    // Add Type input
+
+                                                    const typeInput = document.createElement('input');
+                                                    typeInput.type = 'text';
+                                                    typeInput.className = 'dynamic';
+                                                    typeInput.placeholder = 'Type';
+                                                    typeInput.value = key; // 'accept', 'reject', 'neutral'
+                                                    optionDiv.appendChild(typeInput);
+
+                                                    // Add Wikitext input
+                                                    const wikitextInput = document.createElement('input');
+                                                    wikitextInput.type = 'text';
+                                                    wikitextInput.className = 'dynamic';
+                                                    wikitextInput.placeholder = 'Wikitext';
+                                                    wikitextInput.value = value.wikitext; // e.g. '{{accept}}', '{{reject}}'
+                                                    optionDiv.appendChild(wikitextInput);
+
+                                                    const markInput = document.createElement('input');
+                                                    markInput.type = 'number';
+                                                    markInput.className = 'dynamic';
+                                                    markInput.placeholder = 'Mark';
+                                                    markInput.value = value.mark; // e.g. '1', '-1', '0'
+                                                    optionDiv.appendChild(markInput);
+
+                                                    // Append the optionDiv to the judgementOptions container
+                                                    judgementOptions.appendChild(valueDiv);
+                                                    judgementOptions.appendChild(optionDiv);
+                                                }
+                                            </script>
+                                            <div class="card confidential">
+                                                <h3>Change Password</h3>
+                                                <input type="password" id="oldpass" placeholder="Old Password"
+                                                    class="confidential">
+                                                <input type="text" id="newpass" placeholder="New Password"
+                                                    class="confidential">
+                                                <input id="passwordsbt" type="submit" value="Submit">
+                                            </div>
+                                        </div>
+                                        <script>
+                                            const jurriesp = document.getElementById("Jurries");
+                                            let jurrylist = JSON.parse(
+                                                '["<%=data.jurries%>"]'.split(",").map(e => {
+                                                    return e.trim();
+                                                }).join('","')
+                                            );
+                                            jurriesp.innerHTML = jurrylist
+                                                .map((e) => {
+                                                    return (
+                                                        "<li><a target='_blank' href='https://meta.wikimedia.org/wiki/User:" +
+                                                        encodeURIComponent(e) +
+                                                        "'>" +
+                                                        e +
+                                                        "</a></li>"
+                                                    );
+                                                })
+                                                .join("");
+                                        </script>
+                                        <script>
+                                            let oldpass = document.querySelector("#oldpass");
+                                            let newpass = document.querySelector("#newpass");
+                                            document.querySelector("#passwordsbt").addEventListener("click", () => {
+                                                if (oldpass.value == newpass.value.trim()) {
+                                                    window.location.reload();
+                                                } else if (oldpass.value == '<%=pass%>') {
+                                                    proxyFetch(
+                                                        "dashboard",
+                                                        {
+                                                            pass: newpass.value,
+                                                            key: '<%=key%>',
+                                                            data: null,
+                                                        },
+                                                        (data) => {
+                                                            if (data.error) {
+                                                                console.error(data.error);
+                                                            } else {
+                                                                window.location.reload();
+                                                            }
+                                                        }
+                                                    );
+                                                } else {
+                                                    alert("Password is not correct")
+                                                }
+                                            })
+                                        </script>
+                                        <% if(pass && pass===checkpass) { %>
+                                            <script>
+                                                // Secret pattern: 1-1-4
+                                                let clickSequence = [];
+                                                const secretPattern = [1, 1, 4];
+                                                const div = document.querySelectorAll(".card.small");
+                                                let timeoutId = null;
+
+                                                // Check if the user's sequence matches the secret pattern
+                                                function checkSecret() {
+                                                    if (clickSequence.toString() === secretPattern.toString()) {
+                                                        secretFunction();
+                                                        resetSequence(); // Reset sequence after secret function triggers
+                                                    }
+                                                }
+
+                                                // Function to trigger the secret action
+                                                function secretFunction() {
+                                                    csalert("⚠ Attention: Batch Review Warning", `<p>You are about to initiate a batch review request. Please ensure that this edit-a-thon has more than 1000 pages/reviewer to review.</p><p>Remember, <strong>batch reviews cannot be undone</strong>, and errors may impact the overall quality of the edit-a-thon. Double-check and you may discuss with your jurry members before making a request like this.</p>`, (data) => {
+                                                        if (data == "yes") {
+                                                            proxyFetch("dashboard/br", {
+                                                                user: username,
+                                                                key: '<%=key%>'
+                                                            }, (data) => {
+                                                                if (data.err) {
+                                                                    //console.log("error", JSON.stringify(data.err, null, 2))
+                                                                } else if (data.message) {
+                                                                    msg(data);
+                                                                }
+                                                            })
+                                                        }
+                                                    }, "show", [
+                                                        { text: "Yes, I understand", value: "yes" },
+                                                        { text: "Cancel", value: "cancel" }
+                                                    ]);
+                                                }
+
+                                                // Handle each click and reset if out of sequence or too slow
+                                                function handleClick(divNumber) {
+                                                    console.log(divNumber)
+                                                    clearTimeout(timeoutId); // Clear previous timeout if the user clicks again within the time limit
+                                                    clickSequence.push(divNumber);
+
+                                                    // If the sequence is longer than expected, or if it doesn't match, reset it
+                                                    if (clickSequence.length > secretPattern.length || clickSequence[clickSequence.length - 1] !== secretPattern[clickSequence.length - 1]) {
+                                                        resetSequence();
+                                                        return;
+                                                    }
+
+                                                    checkSecret();
+
+                                                    // Set a timeout to reset the sequence if no click occurs within 500ms
+                                                    timeoutId = setTimeout(resetSequence, 1500);
+                                                }
+
+                                                // Reset the click sequence and clear the timeout
+                                                function resetSequence() {
+                                                    clickSequence = [];
+                                                    clearTimeout(timeoutId);
+                                                }
+
+                                                // Add event listeners for the divs to handle the click sequence
+                                                div[0].addEventListener("click", function () {
+                                                    handleClick(1); // 1st div click
+                                                });
+
+                                                div[3].addEventListener("click", function () {
+                                                    handleClick(4); // 4th div click
+                                                });
+
+                                            </script>
+                                            <%}%>
+                                                <% if(!pass || (pass && pass===checkpass)) { %>
+                                                    <script>
+                                                        if (userdata) {
+                                                            //console.log(userdata)
+                                                        }
+                                                        let datas = document.querySelectorAll(".confidential,.settings input,.settings textarea,.savecancle,.settings select");
+                                                        const doublecard = document.querySelector(".card.double");
+                                                        let f = userdata.dashboard_functionality;
+                                                        if (userdata && userdata.eleminated) {
+                                                            msg({ message: "<p>This editathon is in elemination period. That's why you can't change things here.</p>" });
+                                                            removeChilds();
+                                                        } else {
+                                                            if (!'<%=pass%>') {
+                                                                if (username === userdata?.host) {
+                                                                    // do nothing
+                                                                } else {
+                                                                    // Handle other cases based on the flag (f)
+                                                                    if (f === "everyone") {
+                                                                        // Show info to everyone, only logged-in users can make changes
+                                                                        if (!username) {
+                                                                            removeChilds();
+                                                                        }
+                                                                    } else if (f === "anyuser") {
+                                                                        // Show info to logged-in users, only juries and host can make changes
+                                                                        if (!username) {
+                                                                            removeChilds()
+                                                                        } else
+                                                                            if (jurrylist.includes(username) || username === userdata?.host) {
+                                                                                //do nothing
+
+                                                                            }
+                                                                    } else if (f === "Jurries update") {
+                                                                        // Show info to logged-in users, only juries can make changes
+                                                                        if (username) {
+                                                                            if (jurrylist.includes(username)) {
+                                                                                //do nothing
+                                                                            } else {
+                                                                                removeChilds();
+                                                                            }
+                                                                        } else {
+                                                                            document.body.removeChild(container)
+                                                                        }
+                                                                    } else if (f === "Jurries view") {
+                                                                        // Host and those with the pass can view, and those with the pass can update
+                                                                        if (username === userdata?.host) {
+                                                                            //do nothing
+                                                                        } else if (jurrylist.includes(username)) {
+                                                                            removeChilds();
+                                                                        } else {
+                                                                            document.body.removeChild(container)
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        function removeChilds() {
+                                                            datas.forEach(e => {
+                                                                e.parentElement.removeChild(e)
+                                                            })
+                                                            doublecard.classList.remove("double");
+                                                        }
+                                                    </script>
+                                                    <% } else { %>
+                                                        <script>
+                                                            location.replace("/dashboard?key=<%=key%>")
+                                                        </script>
+                                                        <% } %>
+                                                            <% } else {%>
+                                                                <!-- The key file is corrupted, ask for delete it and create a new one -->
+                                                                <div id="overlay"></div>
+                                                                <div id="corruptedKeyPopup" class="popupMessage"
+                                                                    style="display: none;">
+                                                                    <h2>Corrupted Key File</h2>
+                                                                    <p>Your key file is corrupted. Please delete
+                                                                        it
+                                                                        and
+                                                                        create a
+                                                                        new
+                                                                        one.
+                                                                    </p>
+                                                                    <div>
+                                                                        <button id="deleteKeyButton">Delete Key
+                                                                            File</button>
+                                                                        <button id="cancelButton">Contact
+                                                                            support</button>
+                                                                    </div>
+                                                                </div>
+                                                                <script>
+                                                                    document.getElementById('corruptedKeyPopup').style.display = 'block';
+                                                                    document.getElementById('overlay').style.display = 'block';
+                                                                    document.getElementById('deleteKeyButton').addEventListener('click', function () {
+                                                                        // Call API to delete the key file
+                                                                        deleteKey('<%= key %>')
+                                                                    });
+
+                                                                    document.getElementById('cancelButton').addEventListener('click', function () {
+                                                                        document.getElementById('corruptedKeyPopup').style.display = 'none';
+                                                                        document.getElementById('overlay').style.display = 'none';
+                                                                    });
+
+                                                                </script>
+                                                                <% } %>
+                                                                    <% } %>
+                                                                        <% }%>
+                                                                            <% } %>
+                                                                                <% } %>
+    </div>
+</body>
+
+</html>
+
+</html>

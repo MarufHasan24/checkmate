@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 23 September, 2024-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="/assets/styles/common.css" />
+    <script src="/assets/scripts/tools.js"></script>
+    <header>
+        <h1>Admin Panel</h1>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/admin">admin panel</a></li>
+            <li><a href="/admin/log">Log</a></li>
+            <li><a href="/admin/permit">Permitions</a></li>
+        </ul>
+    </header>
+    <style>
+        /* Container for the table divs */
+        #log-cont {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        }
+
+        /* Style for each table container */
+        .table-container {
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            padding: 16px;
+            border-radius: 8px;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <%if(html){%>
+        <div id="log-cont"></div>
+        <script>
+            setTimeout(() => {
+                document.getElementById("log-cont").innerHTML = validateStr('<%= html %>');
+            }, 300)
+        </script>
+        <%}%>
+</body>
+
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Results</title>
+
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/table.css">
+    <link rel="stylesheet" href="/assets/styles/list.css">
+    <script src="/assets/scripts/tools.js"></script>
+    <header>
+        <h1>Query Results</h1>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="javasctipt:void" id="editSearchBtn">Edit Search</a></li>
+            <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+        </ul>
+    </header>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+    <!-- Popup Modal -->
+    <div id="searchPopup">
+        <div class="popup-content">
+            <span class="close">&times;</span>
+            <h2>Edit Search Query</h2>
+            <form id="editSearchForm">
+                <label for="host">Host:</label>
+                <input type="text" id="host" name="host" value="<%= data.host %>">
+
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" value="<%= data.name %>">
+
+                <label for="project">Project:</label>
+                <input type="text" id="project" name="project" value="<%= data.project %>">
+
+                <label for="key">Key:</label>
+                <input type="text" id="key" name="key" value="<%= data.key %>">
+
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <!-- Trigger button for the popup -->
+    <table>
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">
+                    <div class="sort-icon"><span>Name</span><img src="/assets/imgs/sort down.svg" alt=""></div>
+                </th>
+                <th onclick="sortTable(1)">
+                    <div class="sort-icon"><span>Key</span><img src="/assets/imgs/sort down.svg" alt=""></div>
+                </th>
+                <th onclick="sortTable(2)">
+                    <div class="sort-icon"><span>Creation Date</span><img src="/assets/imgs/sort down.svg" alt="">
+                    </div>
+                </th>
+                <th onclick="sortTable(3)">
+                    <div class="sort-icon"><span>Project</span><img src="/assets/imgs/sort down.svg" alt=""></div>
+                </th>
+                <th onclick="sortTable(4)">
+                    <div class="sort-icon"><span>Host</span><img src="/assets/imgs/sort down.svg" alt=""></div>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="table">
+            <!-- Dynamic content will be inserted here -->
+        </tbody>
+    </table>
+    <% if(data?.send) { %>
+        <script>
+            msg(JSON.parse(validateStr("<%= data.send %>")))
+        </script>
+        <% } %>
+            <script>
+                document.getElementById("table").innerHTML = validateStr(`<%= html %>`);
+                document.addEventListener("DOMContentLoaded", function () {
+                    // Get the modal
+                    const popup = document.getElementById("searchPopup");
+
+                    // Get the button that opens the modal
+                    const btn = document.getElementById("editSearchBtn");
+
+                    // Get the <span> element that closes the modal
+                    const span = document.getElementsByClassName("close")[0];
+
+                    // When the user clicks the button, open the modal
+                    btn.onclick = function () {
+                        popup.style.display = "block";
+                    }
+
+                    // When the user clicks on <span> (x), close the modal
+                    span.onclick = function () {
+                        popup.style.display = "none";
+                    }
+
+                    // When the user clicks anywhere outside of the modal, close it
+                    window.onclick = function (event) {
+                        if (event.target == popup) {
+                            popup.style.display = "none";
+                        }
+                    }
+
+                    // Handle the form submission
+                    document.getElementById("editSearchForm").onsubmit = function (e) {
+                        e.preventDefault(); // Prevent the default form submission
+
+                        const host = document.getElementById("host").value;
+                        const name = document.getElementById("name").value;
+                        const project = document.getElementById("project").value;
+                        const key = document.getElementById("key").value;
+
+                        // Redirect with the new query parameters
+                        const queryParams = new URLSearchParams({ host, name, project, key });
+                        window.location.href = `/query?${queryParams.toString()}`;
+                    }
+                });
+            </script>
+</body>
+
+</html>

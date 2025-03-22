@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 25 September, 2024-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <title>Permitions</title>
+    <link rel="stylesheet" href="/assets/styles/common.css" />
+    <link rel="stylesheet" href="/assets/styles/admin.css" />
+    <script src="/assets/scripts/tools.js"></script>
+    <header>
+        <h1>Admin Panel</h1>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/admin">admin panel</a></li>
+            <li><a href="/admin/log">Log</a></li>
+            <li><a href="/admin/permit">Permitions</a></li>
+        </ul>
+    </header>
+    <style>
+        .log-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+            max-width: 800px;
+            width: 100%;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .log-item:hover {
+            filter: none;
+            transform: none;
+            background-color: #ddd;
+
+        }
+    </style>
+</head>
+<script src="/assets/scripts/extraTools.js"></script>
+
+<body>
+    <div class="container">
+        <div class="log-container">
+            <% data.forEach(function(entry, index) { %>
+                <div class="log-item">
+                    <p class="log-date"><b>
+                            <%= new Date(entry.date).toLocaleString() %>
+                        </b><i class="timediff"></i></p>
+                    <script>
+                        document.querySelectorAll(".timediff")['<%-index%>'].innerHTML = timeDifference(new Date("<%=entry.date%>")) + " ago"
+                    </script>
+                    <p class="log-action"><strong>
+                            <%= entry.requester %>
+                        </strong> requested for <strong>
+                            <a href="/editathon?key=<%=entry.key%>">
+                                <%=entry.key%>
+                            </a>
+                        </strong></p>
+                    <div class="toggle-button"><span onclick="toggleMetadata(parseInt('<%= index %>'))">Toggle
+                            Details</span>
+                        <span onclick="reviewAll(JSON.parse(validateStr('<%=JSON.stringify(entry)%>')))">Aprove and
+                            review remaining
+                            pages</span>
+                    </div>
+                    <div id="metadata-<%= index %>" class="metadata">
+                        <strong>Details:</strong>
+                        <ul>
+                            <li><strong>Host:</strong>
+                                <%= entry.host %>
+                            </li>
+                            <li><strong>Hosting Date:</strong>
+                                <%= new Date(entry.hostingDate).toLocaleString() %>
+                            </li>
+                            <li><strong>Starting:</strong>
+                                <%= new Date(entry.starting).toLocaleString() %>
+                            </li>
+                            <li><strong>Ending:</strong>
+                                <%= new Date(entry.ending).toLocaleString() %>
+                            </li>
+                            <li><strong>Reamining Time:</strong>
+                                <span class="timediffEnding"></span>
+                            </li>
+                            <script>
+                                document.querySelectorAll(".timediffEnding")['<%-index%>'].innerHTML = timeDifference(new Date(parseInt("<%=entry.ending%>")))
+                            </script>
+                            <li><strong>Jurries:</strong>
+                                <ul>
+                                    <% entry.jurries.forEach((e)=>{ %>
+                                        <%let href=encodeURIComponent(e)%>
+                                            <li>
+                                                <a href="/user?user=<%=href%>">
+                                                    <%=e%>
+                                                </a>
+                                            </li>
+                                            <%})%>
+                                </ul>
+                            </li>
+                            <li><strong>State:</strong>
+                                <%= entry.state ? 'Approved' : 'Not Approved' %>
+                            </li>
+                            <li><strong>Aprover:</strong>
+                                <%= entry.aprover ? entry.aprover : 'N/A' %>
+                            </li>
+                            <li><strong>Total Submission:</strong>
+                                <%= entry["total submission"] %>
+                            </li>
+                            <li><strong>Reamining:</strong>
+                                <%= entry.reamining %>
+                            </li>
+                            <li><strong>Pages per reviewer:</strong>
+                                <%= Math.ceil(entry.reamining / entry.jurries.length) %>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <% }); %>
+        </div>
+    </div>
+</body>
+<script>
+    // Function to toggle the visibility of the metadata
+    function toggleMetadata(index) {
+        const metadata = document.getElementById('metadata-' + index);
+        if (metadata.style.display === 'none' || metadata.style.display === '') {
+            metadata.style.display = 'block';  // Show the metadata
+        } else {
+            metadata.style.display = 'none';  // Hide the metadata
+        }
+    }
+    function reviewAll(data) {
+        csalert("Choose your decission!", "You want to placce a batch review. what state should you take for the remainings.", (cdata) => {
+            msg({ message: "Aproving request in " + cdata + " state.", type: "info" })
+            proxyFetch("permit", { ...data, dis: cdata }, (data) => {
+                msg(data);
+            })
+        }, "show", Object.keys(data.dynamic).map((e) => {
+            return e + " : " + data.dynamic[e].mark;
+        })
+        )
+
+    }
+</script>
+
+</html>

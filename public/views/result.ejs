@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results Page</title>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/dashboard.css">
+    <link rel="stylesheet" href="/assets/styles/table.css">
+    <script src="/assets/scripts/tools.js"></script>
+    <script src="/assets/scripts/extraTools.js"></script>
+    <header>
+        <% if(data) { %>
+            <ul class="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
+                <li><a href="/editathon?key=<%= key %>">Editathon</a></li>
+                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+            </ul>
+            <% } else { %>
+                <p>Enter Pages's key first</p>
+                <ul class="menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                </ul>
+                <% } %>
+    </header>
+    <style>
+        .card {
+            background-color: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .container h1 {
+            margin-bottom: 15px;
+            color: #5fb6a4;
+        }
+
+        .card strong {
+            color: #333;
+        }
+
+        .card h2 {
+            color: #666;
+        }
+
+        .card ul.juries-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .card ul.juries-list li {
+            background-color: #f5f5f5;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            color: #333;
+        }
+
+        fieldset {
+            display: flex;
+            flex-direction: column;
+            border: #f5f5f5 groove 2px;
+        }
+
+        .settings fieldset div input[type="text"] {
+            width: max(50%, 275px);
+        }
+
+        .settings fieldset div {
+            display: grid;
+            grid-template-columns: 1fr 6fr;
+        }
+
+        .settings .card {
+            background-color: var(--tilt);
+            color: #f5f5f5;
+        }
+
+        .settings fieldset div label {
+            margin-right: 20px;
+        }
+
+        .settings fieldset div span {
+            align-items: center;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .cancel#cancel {
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin: 0 10px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: rgb(255, 57, 60);
+
+        }
+
+        .cancel#cancel:hover {
+            background-color: rgb(255, 178, 179);
+            color: rgb(135, 0, 0);
+        }
+
+        .letter td {
+            border: none;
+            background-color: #35ffd7b6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Summary of Results</h1>
+        <div class="stats">
+            <div class="card small">
+                <strong>Page Count:</strong>
+                <h2>
+                    <%= data.pagecount %>
+                </h2>
+            </div>
+            <div class="card small">
+                <strong>Reviewed:</strong>
+                <h2>
+                    <%= data.reviewed %>
+                </h2>
+            </div>
+            <% if((data.pagecount - data.reviewed)> 0) {%>
+                <div class="card small" style="background-color: rgb(255, 134, 134);">
+                    <%} else {%>
+                        <div class="card small" style="background-color: rgb(144, 255, 141);">
+                            <%}%>
+
+                                <strong>Remaining:</strong>
+                                <h2>
+                                    <%= data.pagecount - data.reviewed %>
+                                </h2>
+                        </div>
+                        <% if(data.reaminingTime> 0) {%>
+                            <div class="card small" style="background-color: rgb(255, 134, 134);">
+                                <%} else {%>
+                                    <div class="card small" style="background-color: rgb(144, 255, 141);">
+                                        <%}%>
+                                            <strong>Remaining Time:</strong>
+                                            <h2 id="remainingTime"></h2>
+                                    </div>
+                                    <div class="card small">
+                                        <strong>Host:</strong>
+                                        <h2>
+                                            <%= data.host %>
+                                        </h2>
+                                    </div>
+                                    <div class="card">
+                                        <strong>Particepents:</strong>
+                                        <ul class="juries-list">
+                                            <% data.usercount.forEach(function(juror) { %>
+                                                <li>
+                                                    <%= juror %>
+                                                </li>
+                                                <% }); %>
+                                        </ul>
+                                    </div>
+                            </div>
+                </div>
+                <div class="settings">
+                    <h4>Result page:</h4>
+                    <div class="card big">
+                        <p style="color: #f5f5f5;">
+                            <% if(data.result){ %>
+                                <a target="_blank"
+                                    href="https://<%=data.project%>.org/wiki/<%=encodeURIComponent(data.result)%>">
+                                    <%=data.result%>
+                                </a>
+                                <%} else {%>
+                                    N/A
+                                    <%}%>
+                        </p>
+                        <input type="text" id="resultPage" value="<%=data.result%>">
+                    </div>
+                    <div class="card big">
+                        <fieldset>
+                            <legend>Choose fields and their wiki translation</legend>
+                            <div>
+                                <span>
+                                    <input type="checkbox" name="" id="serial" checked disabled>
+                                    <label for="serial">Serial</label>
+                                </span>
+                                <span>
+                                    <label for="serialt">Serial : </label>
+                                    <input type="text" value="Serial" name="" id="serialt">
+                                </span>
+                            </div>
+
+                            <div>
+                                <span>
+                                    <input type="checkbox" name="" id="name" checked disabled>
+                                    <label for="name">Name</label>
+                                </span>
+                                <span>
+                                    <label for="namet">Name : </label>
+                                    <input type="text" value="name" name="" id="namet">
+                                </span>
+                            </div>
+
+                            <div>
+                                <span>
+                                    <input type="checkbox" name="" id="Page_name">
+                                    <label for="Page_name">Pagename</label>
+                                </span>
+                                <span>
+                                    <label for="Page_namet">Page name : </label>
+                                    <input type="text" value="Page name" id="Page_namet">
+                                </span>
+                            </div>
+                            <div><span>
+                                    <input type="checkbox" name="" id="Page_count">
+                                    <label for="Page_count">pagecount</label>
+                                </span>
+                                <span>
+                                    <label for="Page_countt">Page Count : </label>
+                                    <input type="text" value="Page Count" id="Page_countt">
+                                </span>
+                            </div>
+
+                            <div>
+                                <span>
+                                    <input type="checkbox" name="" id="Reviewer">
+                                    <label for="Reviewer">Reviewer</label>
+                                </span>
+                                <span>
+                                    <label for="Reviewert">Reviewer : </label>
+                                    <input type="text" value="Reviewer" id="Reviewert">
+                                </span>
+                            </div>
+                            <div>
+                                <span>
+                                    <input type="checkbox" name="" id="result">
+                                    <label for="result">Result</label>
+                                </span>
+                                <span>
+                                    <label for="resultt">Result : </label>
+                                    <input type="text" value="Result" name="" id="resultt">
+                                </span>
+                            </div>
+                            <div>
+                                <span>
+                                    <input type="checkbox" name="" id="Submission_Date">
+                                    <label for="Submission_Date">Submission Date</label>
+                                </span>
+                                <span>
+                                    <label for="Submission_Datet">Submission Date : </label>
+                                    <input type="text" value="Submission Date" id="Submission_Datet">
+                                </span>
+                            </div>
+
+                            <div>
+                                <span>
+                                    <input type="checkbox" name="" id="Word_Count">
+                                    <label for="Word_Count">Word Count</label>
+                                </span>
+                                <span>
+                                    <label for="Word_Countt">Word Count : </label>
+                                    <input type="text" value="Word Count" id="Word_Countt">
+                                </span>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="card buttonCont" style="display: flex; justify-content: space-between;"><button
+                            id="submit">Submit</button><a class="cancel" id="cancel"
+                            href="/editathon?key=<%=key%>">Cancel</a>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="card big">
+                        <strong style="display: flex; justify-content: space-between;"><span>Jurries
+                                Performance:</span><span><input id="publishJuries" class="publishJuries"
+                                    type="checkbox"><label for="publishJuries">Publish Jurries Performance
+                                    with result</label>
+                            </span></strong>
+                        <table class="jurries">
+                            <thead>
+                                <tr class="thead">
+                                    <!-- Dynamic Head will be inserted here -->
+                                </tr>
+                            </thead>
+                            <tbody class="table">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                        <strong style="display: flex; justify-content: space-between;"><span>Particepents
+                                Performance:</span><span><input id="publishPerticipents" class="publishJuries"
+                                    type="checkbox" checked><label for="publishPerticipents">Publish Particepents
+                                    Performance
+                                    with result</label>
+                            </span></strong>
+                        <table class="particepents">
+                            <thead>
+                                <tr class="thead">
+                                    <!-- Dynamic Head will be inserted here -->
+                                </tr>
+                            </thead>
+                            <tbody class="table">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="card big">
+                        <strong style="display: flex; justify-content: space-between;"><span>Particepents Detiled
+                                Performance:</span><span><input id="publishJuriesD" class="publishJuries"
+                                    type="checkbox"><label for="publishJuriesD">Publish Particepents Detiled Performance
+                                    with result</label>
+                            </span></strong>
+                        <div class="particepents full" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+</body>
+<script>
+    const userdata = JSON.parse(validateStr("<%=jsondata%>"));
+    let jurriesList = userdata.jlist;
+    document.getElementById("remainingTime").innerHTML = timeDifference(Number("<%=data.reaminingTime%>"), "diff");
+    let project = "<%=data.project%>";
+    let key = "<%=key%>";
+</script>
+<script src="/assets/scripts/result.js"></script>
+
+</html>

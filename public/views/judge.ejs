@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 13 September, 2024-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <title>Judgement</title>
+    <script src="/assets/scripts/tools.js"></script>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/judge.css">
+    <link rel="stylesheet" href="/assets/styles/wikiskin.css">
+    <link rel="stylesheet" href="/assets/styles/mobileWikiSkin.css">
+    <header>
+        <% if(key) { %>
+            <ul class="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
+                <li><a href="/editathon?key=<%= key %>">Editathon</a></li>
+                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+            </ul>
+            <% } else { %>
+                <p>Enter Editathon's key first</p>
+                <ul class="menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                </ul>
+                <% } %>
+    </header>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+    <% if(pagelist) { %>
+        <script>
+            const userdata = JSON.parse(validateStr('<%= jsondata %>'));
+            //console.log(userdata);
+            let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+            let data = JSON.parse(localStorage.getItem(key));
+            if (userdata) {
+                if (!(data && data.username)) {
+                    csalert("Login Required!", "Please login first to judge pages", function () {
+                        document.getElementsByClassName("container")[0].remove();
+                        window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
+                    });
+                }
+                if (!userdata.jurries.includes(data.username)) {
+                    // redirect to  that wiki page
+                    window.location.replace("https://" + userdata.project + ".org/wiki/" + userdata.page);
+
+                }
+            } else {
+                if (data && data.username) {
+                    window.location.href += "&judge=" + data.username;
+                }
+            }
+        </script>
+        <button class="collups">Show</button>
+        <% if(page) { %>
+            <ul class="flex">
+                <li class="this"><a href="/judge?key=<%=key%>&page=<%=encodeURIComponent(page)%>">
+                        <%=page%>
+                    </a></li>
+                <% for(i in pagelist) {%>
+                    <% if(page!==pagelist[i]) { %>
+                        <li><a href="/judge?key=<%=key%>&page=<%=encodeURIComponent(pagelist[i])%>">
+                                <%=pagelist[i]%>
+                            </a></li>
+                        <% } %>
+                            <%}%>
+            </ul>
+            <div class="header">
+                <h3>
+                    <a target="_blank" href="https://<%=data.project%>.org/wiki/<%=page%>">
+                        <%=page%>
+                    </a>
+                </h3>
+                <div>
+                    <p>Creator: <a target="_blank"
+                            href="https://<%=data.project%>.org/wiki/user:<%= pagedata.creator %>">
+                            <%= pagedata.creator %>
+                        </a>
+                    </p>
+                    <p>Creation Date: <%= new Date(pagedata.creation).toLocaleString() %>
+                    </p>
+                    <p>Submission Date: <%= new Date(pagedata.sd).toLocaleString() %>
+                    </p>
+                    <p>Submitter:<a target="_blank" href="https://<%=data.project%>.org/wiki/user:<%= pagedata.sub %>">
+                            <%= pagedata.sub %>
+                        </a>
+                    </p>
+                    <% if(pagedata.wc) { %>
+                        <p>Word Count: <%=pagedata.wc%>
+                        </p>
+                        <% } %>
+                            <% if(pagedata.length) { %>
+                                <p>Size: <%=pagedata.length%> bytes
+                                </p>
+                                <% } %>
+                </div>
+            </div>
+            <script>
+                let btn = document.querySelector(".collups");
+                let ul = document.querySelector("ul.flex");
+                btn.addEventListener("click", (e) => {
+                    if (ul.classList.contains("show")) {
+                        ul.classList.remove("show");
+                        btn.innerHTML = "Show";
+                    } else {
+                        ul.classList.add("show");
+                        btn.innerHTML = "Hide"
+                    }
+                })
+            </script>
+            <% } else { %>
+                <% } %>
+                    <% if(html) { %>
+                        <div class="container">
+                            <%-html%>
+                        </div>
+                        <div class="sticky">
+                            <ul class="options">
+                            </ul>
+                            <button id="comment-button">comment</button>
+                            <div class="controls">
+                                <span>Marks:<span id="marks">0</span></span>
+                                <button type="button" disabled="" class="buttons" id="Save">Save</button><button
+                                    type="button" class="buttons" id="Skip">Skip</button>
+                            </div>
+                        </div>
+                        <script src="/assets/scripts/judge.js"></script>
+                        <% } %>
+                            <% } %>
+</body>
+
+</html>

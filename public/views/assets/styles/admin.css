@@ -1,0 +1,192 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f0f4f8;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.chart-container {
+    margin-top: 50px;
+    width: 80%;
+}
+
+#userPiChart {
+    width: 100%;
+    /* Adjust to container */
+    height: auto;
+    /* Adjust to container */
+}
+
+.chart-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+#mainC {
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.log-container {
+    max-width: 800px;
+    width: 100%;
+    margin: auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    height: 50vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.log-container a {
+    cursor: pointer;
+    color: var(--tilt);
+    text-decoration: underline;
+}
+
+.toggle-button {
+    color: #fff;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.toggle-button span,
+.btn,
+input[type="button"] {
+    padding: 5px;
+    border-radius: 5px;
+    border: 2px solid var(--tilt);
+    background-color: var(--tilt);
+    color: #fff;
+    cursor: pointer;
+
+}
+
+.toggle-button span:hover,
+.btn:hover,
+input[type="button"]:hover {
+    color: var(--tilt);
+    background-color: #fff;
+}
+
+.log-item {
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.log-item.hosting {
+    background-color: #87cefa99;
+    border: 2px solid #87cefa;
+}
+
+.log-item.login {
+    background-color: #5fb6a499;
+    border: 2px solid var(--tilt);
+}
+
+.log-item.logout {
+    background-color: #ffa07a99;
+    border: 2px solid #ffa07a;
+
+}
+
+.log-item.delete {
+    background-color: #f0808099;
+    border: 2px solid #f08080;
+}
+
+.log-item.create {
+    background-color: #dda0dd99;
+    border: 2px solid #dda0dd;
+}
+
+.log-item.discard {
+    background-color: #98fb9899;
+    border: 2px solid #98fb98;
+}
+
+.log-item.remove {
+    background-color: #ffdab999;
+    border: 2px solid #ffdab9;
+}
+
+.log-item.elemination {
+    border: 2px solid #410016;
+    background-color: #ff4e8999;
+}
+
+.log-item.br-request {
+    background-color: #ffd70099;
+    border: 2px solid #ffd700;
+}
+
+.log-item.batch-review {
+    background-color: #4682b499;
+    border: 2px solid #4682b4;
+}
+
+.log-item:hover {
+    filter: contrast(1.5);
+    transform: scale(101%);
+}
+
+.log-date {
+    font-size: 0.9em;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.log-action {
+    font-size: 1em;
+    color: #333;
+}
+
+.log-action strong {
+    color: #000;
+}
+
+.metadata {
+    display: none;
+    margin-top: 10px;
+    padding-left: 15px;
+    font-size: 0.9em;
+    color: #555;
+    border-left: 3px solid var(--tilt);
+    transition: max-height 0.3s ease;
+}
+
+.log-item.active .metadata {
+    display: block;
+}
+
+.filter-sort {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.filter-sort select,
+.filter-sort input {
+    padding: 5px;
+    font-size: 1em;
+}

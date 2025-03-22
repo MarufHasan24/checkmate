@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 01 September, 2024-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <title>Submition</title>
+    <script src="/assets/scripts/tools.js"></script>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/submit.css">
+    <header>
+        <% if(key) { %>
+            <h1>
+                Submition Form for: <%=data.title%>
+            </h1>
+            <ul class="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
+                <li><a href="/editathon?key=<%= key %>">Editathon</a></li>
+                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+            </ul>
+            <% } else { %>
+                <p>Enter key first</p>
+                <ul class="menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                </ul>
+                <% } %>
+    </header>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+    <% if(data) { %>
+        <script>
+            const userdata = JSON.parse(validateStr('<%=jsondata%>'));
+        </script>
+        <% } %>
+            <% if(key) { %>
+                <div class="container">
+                    <div class="lebel">
+                        <div>
+                            <label for="devider">Devider</label>
+                            <input type="text" id="devider" value=";">
+                        </div>
+                        <div>
+                            <label for="Submitter">Submitter</label>
+                            <input type="text" id="Submitter" value="">
+                        </div>
+                        <div>
+                            <label for="limit">Limit</label>
+                            <input type="number" id="limit" value="10" min="5" max="100">
+                        </div>
+                    </div>
+                    <label for="value">Your Page list</label>
+                    <textarea id="value" rows="2" placeholder="Enter your page list..."></textarea>
+                    <input type="submit" value="Submit">
+                    <div id="suggestion-box" class="suggestion-box">
+                        <ul id="suggestion-list"></ul>
+                    </div>
+                </div>
+                <div id="loader-container">
+                    <p id="estime"> Reamining time : 0s</p>
+                    <div id="loader"></div>
+                </div>
+                <div class="rcont" style="display: none;"></div>
+                <% } else { %>
+                    <!-- If retake is true, ask for both key and password -->
+                    <section class="checking">
+                        <h2>Enter Your key here.</h2>
+                        <form>
+                            <input type="text" name="key" placeholder="key">
+                            <button onclick="submit()" type="submit">Submit</button>
+                        </form>
+                    </section>
+                    <script>
+                        function submit() {
+                            let key = document.querySelector("input[name='key']").value;
+                            location.href = "/submit?key=" + encodeURIComponent(key)
+                        }
+                    </script>
+                    <% } %>
+</body>
+
+<script>
+    let user = '<%=user%>';
+    window.addEventListener("DOMContentLoaded", () => {
+        const submitbtn = document.querySelector("input[type='submit']");
+        const acontainer = document.querySelector(".container");
+        const container = document.querySelector(".rcont");
+        const value = document.querySelector("#value");
+        const limit = document.querySelector("#limit")
+        const devider = document.querySelector("#devider");
+        const Submitter = document.querySelector("#Submitter");
+        const suggestionBox = document.getElementById('suggestion-box');
+        const suggestionList = document.getElementById('suggestion-list');
+        const estimatedTimePerItem = 1200; // Estimated 1200ms per item
+        const loader = document.getElementById("loader");
+        const loadCont = document.getElementById("loader-container");
+        const estime = document.getElementById("estime");
+        loader.style.width = "0%";
+
+        let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+        let data = JSON.parse(localStorage.getItem(key));
+        let namespaces = userdata?.allowed_namespaces?.split(",").join("|") || "*";
+        if ((data && data.username) || user) {
+            Submitter.value = (data?.username) || user;
+            submitbtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                //console.log(JSON.stringify({ body: value.value, key: '<%=key%>' }));
+                document.body.removeChild(acontainer);
+                container.style.display = "flex"
+                container.innerHTML = `<span style="font-size: 20px;">Please wait for a while<span
+                            class="dotdotanimation">...</span></span>`
+                let fetchData = {
+                    body: value.value,
+                    devider: devider.value, key: '<%=key%>',
+                    username: Submitter.value,
+                    wordcount: userdata.make_result !== "Page Count",
+                    editcount: userdata.user_edit_count,
+                    performer: (data?.username) || user,
+                    creator: undefined
+                }
+                let length = value.value.split(devider.value).length;
+                console.log(length);
+                const estimatedTime = length * estimatedTimePerItem;
+                let fakeProgress = 0;
+                let delay = estimatedTimePerItem * (1.5 * Math.random() + 0.5);
+                progress = (Math.random() * 15) + 82;
+                loadCont.style.display = "block";
+                proxyFetch(
+                    "submit",
+                    fetchData,
+                    (data) => {
+                        if (data) {
+                            if (data.message) {
+                                msg(data);
+                            } else {
+                                loader.style.width = "100%";
+                                estime.innerHTML = "reamining time : 0s";
+                                setTimeout(() => {
+                                    loadCont.style.display = "none"
+                                    container.innerHTML = "<button><a href='/editathon?key=<%=key%>'>Editathon</a></button><div class='rcontainer'>";
+                                    if (data.state) {
+                                        for (i in data.state) {
+                                            let obj = data.state[i];
+                                            //console.log(obj);
+                                            if (obj?.result) {
+                                                container.innerHTML += `<div class='result ${obj.result}'><span>${obj.cause}</span>`
+                                            }
+                                        }
+                                    }
+                                    container.innerHTML += "</div>"
+                                }, 500)
+                            }
+                        } else {
+                            console.log("Fail Data", data);
+                        }
+                    }
+                );
+                const interval = setInterval(() => {
+                    fakeProgress += (100 / length) * 2 * Math.random();
+                    delay = estimatedTimePerItem * (1.5 * Math.random() + 0.5);
+                    if (fakeProgress > progress) {
+                        clearInterval(interval);
+                    }
+                    loader.style.width = Math.min(fakeProgress, progress) + "%";
+                    estime.innerHTML = "reamining time : " + Math.floor(((100 - fakeProgress) * estimatedTime) / 60000) + "s"
+                }, delay);
+
+            });
+            value.addEventListener("input", function (e) {
+                let lastword = value.value.split(devider.value).pop().trim();
+                let limitnum = Number(limit.value);
+                if (limitnum < 5 || limitnum > 100 || !Number.isInteger(limitnum)) {
+                    limit.value = limitnum = 10;
+                }
+                if (lastword) {
+                    fetch(
+                        "https://" +
+                        userdata.base_component +
+                        ".org/w/api.php?action=query&format=json&list=prefixsearch&formatversion=2&psnamespace=" + namespaces + "&pssearch=" +
+                        encodeURIComponent(lastword) +
+                        "&pslimit=" + limitnum + "&origin=*",
+                        {
+                            method: "GET",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    )
+                        .then((res) => res.json())
+                        .then((data) => {
+                            let suggestions = data.query.prefixsearch.map((e) => {
+                                return e.title
+                            });
+                            let list = suggestions.filter((e) => {
+                                return e.toLowerCase().includes(lastword.toLowerCase());
+                            });
+                            if (list.length) {
+                                suggestionList.innerHTML = "";
+                                makeHtml(list);
+                            } else {
+                                suggestionBox.style.display = "none";
+                                suggestionList.innerHTML = "";
+                            }
+                        });
+                } else {
+                    suggestionBox.style.display = "none";
+                    suggestionList.innerHTML = "";
+                }
+            });
+        } else {
+            alert("Please login first to submit your pages");
+            window.location.href = "/login?callback=" + encodeURIComponent("submit?key=<%=key%>")
+        }
+        function makeHtml(array) {
+            array.forEach(item => {
+                const listItem = document.createElement('li'); // Create a list item
+                listItem.textContent = item; // Set the list item text
+                listItem.addEventListener('click', () => {
+                    let array = value.value.split(devider.value);
+                    array.pop();
+                    array.push(item);
+                    value.value = array.join(devider.value);
+                    value.focus();
+                    suggestionBox.style.display = "none";
+                    suggestionList.innerHTML = '';
+                });
+                suggestionList.appendChild(listItem)
+            });
+            suggestionBox.appendChild(suggestionList)
+            suggestionBox.style.display = "block";
+        }
+
+    });
+</script>
+
+</html>

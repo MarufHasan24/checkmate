@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= status %> Error
+    </title>
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> -->
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            height: 100%;
+            width: 100%;
+            font-family: 'Roboto', sans-serif;
+            background: url("./assets/imgs/background.jpg");
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 20% center;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .container {
+            width: min(720px, 100%);
+            padding: 20px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            align-items: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .container h1 {
+            font-size: 5rem;
+            color: #f57c00;
+            margin-bottom: 20px;
+            width: 70%;
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+        }
+
+        .container div:last-child {
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .container p {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        .chess-image {
+            width: 150px;
+            margin-bottom: 30px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #3498db;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 0.25rem;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #e65100;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 720px) {
+            body {
+                background: url("./assets/imgs/backgroundMobile.jpg");
+                background-attachment: fixed;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
+
+            .container h1 {
+                font-size: 3.5rem;
+            }
+
+            .container p {
+                font-size: 1.2rem;
+            }
+
+            .chess-image {
+                width: 100px;
+            }
+
+            a {
+                padding: 8px 20px;
+            }
+        }
+
+        /* ifrem */
+        iframe {
+            position: fixed;
+            z-index: -1;
+            height: max(100vh, 100vw);
+            width: max(100vh, 100vw);
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            opacity: 10%;
+        }
+    </style>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+
+    <div class="container">
+        <h1><span style="border-right: 5px solid #ff8809;">&#x2658;</span><span>
+                <%- status %>
+            </span></h1>
+        <p>
+            <%- error %>
+        </p>
+        <div>
+            <% if (redirect) { %>
+                <a href="<%=redirect.url%>">
+                    <%= redirect.name %>
+                </a>
+                <% } else { %>
+                    <a href="/">Go to Homepage</a>
+                    <% } %>
+                        <a href="javascript:void" onclick="history.back()">Go back</a>
+                        <a href=" https://meta.wikimedia.org/wiki/User_talk:Maruf">Contact Support</a>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 08 August, 2024-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <meta name="description"
+        content="Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!">
+</head>
+
+<head>
+    <title>
+        <% if(data) { %>
+            <%=data.title%>
+                <% } %>
+    </title>
+    <script src="/assets/scripts/tools.js"></script>
+    <script src="/assets/scripts/extraTools.js"></script>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/dashboard.css">
+    <link rel="stylesheet" href="/assets/styles/table.css">
+    <link rel="stylesheet" href="/assets/styles/editathon.css">
+    <header>
+        <% if(data) { %>
+            <h1>
+                <%=data.title%>
+            </h1>
+            <ul class="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
+                <li><a href="/editathon">Reset</a></li>
+                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+            </ul>
+            <% } else { %>
+                <p>Enter Editathon's key first</p>
+                <ul class="menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                </ul>
+                <% } %>
+    </header>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+    <% if(data) {%>
+        <script>
+            const key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+            let storedData = JSON.parse(localStorage.getItem(key));
+            const userdata = JSON.parse(validateStr('<%= jsondata %>'));
+            init(userdata.trns);
+        </script>
+        <%if(data?.eleminated){%>
+            <div class="container warning">
+                <div class="warning-icon">⚠️</div>
+                <h1>
+                    <%=trns.message.elemination.alert.h1%>
+                </h1>
+                <div class="alert-message">
+                    <%- trns.message.elemination.alert.p.replace(/(\$eleminator)/gi,data.eleminated.eleminator) %>
+                </div>
+                <div class="card">
+                    <div class="field">
+                        <strong>
+                            <%=trns.message.elemination.alert.p2%>
+                        </strong>
+                        <%= new Date(data.eleminated.date) %>
+                    </div>
+                    <div class="field">
+                        <%-trns.message.elemination.alert.p3.replace( /(\$reason)/gi,data.eleminated.reason)%>
+                    </div>
+                    <div class="field">
+                        <p>
+                            <%-trns.message.elemination.alert.p4.replace( /(\$date)/gi ,new Date(data.eleminated.date +
+                                259200000)) %>
+                        </p>
+                    </div>
+                    <div class="field" style="display: none;">
+                        <button id="reqbtn">
+                            <%=trns.lebel["Request For review"]%>
+                        </button>
+                        <button id="deEleimenate">
+                            <%=trns.lebel["Cancel Elemination"]%>
+                        </button>
+                        <script>
+                            const reqbtn = document.querySelector("#reqbtn");
+                            const cncelbtn = document.querySelector("#deEleimenate");
+                            if (userdata.adminList.includes(storedData.username)) {
+                                cncelbtn.addEventListener("click", () => {
+                                    csalert("<%=trns.message.csalert1.title%>", "<%-trns.message.csalert1.text.replace(/(\$eleminator)/gi,data.eleminated.eleminator)%>", (data) => {
+                                        if (data !== "Discard") {
+                                            proxyFetch("elemination", {
+                                                user: storedData.username,
+                                                key: "<%= key %>",
+                                                type: data,
+                                            }, (data) => {
+                                                if (data.message) {
+                                                    msg(data)
+                                                }
+                                            });
+                                        }
+                                    },
+                                        "show", [{
+                                            text: "<%=trns.message.csalert1.values[0]%>",
+                                            value: "Cancel",
+                                        }, {
+                                            text: "<%=trns.message.csalert1.values[1]%>",
+                                            value: "Discard",
+                                        }]
+                                    )
+                                })
+                            }
+                            else {
+                                cncelbtn.remove();
+                            }
+                            reqbtn.addEventListener("click", () => {
+                                if (storedData) {
+                                    csprompt("Describe Your Reason Here", "Why you wants to review agaings this elemination describe correctly and widely here.", (data) => {
+                                        proxyFetch("elemination", {
+                                            user: storedData.username,
+                                            reason: data,
+                                            key: "<%= key %>",
+                                            type: "request"
+                                        }, (data) => {
+                                            if (data.message) {
+                                                msg(data)
+                                            }
+                                        });
+                                    }, {
+                                        buttonTexts: ["Send request"]
+                                    })
+                                } else {
+                                    msg({ message: "Login first to request a review!", redirect: null, type: "warn" })
+                                }
+                            })
+                        </script>
+                    </div>
+                    <script>
+                        if (storedData) {
+                            document.getElementsByClassName("field")[3].style.display = "block";
+                        } else {
+                            document.getElementsByClassName("field")[3].remove()
+                        }
+                    </script>
+                </div>
+            </div>
+            <%}else{%>
+                <div class="container">
+                    <div class="settings">
+                        <% if(data.countdown) {%>
+                            <div class="card countdown"><iframe class="countdown" src="./countdown.html" id="countdown"
+                                    frameborder="0"></iframe></div>
+                            <script>
+                                // Ensure the iframe is fully loaded before accessing its content
+                                document.getElementById('countdown').onload = function () {
+                                    // Access the countdown function inside the iframe's content window
+                                    this.contentWindow.countdown(
+                                        Date.parse('<%=data.end_date%>' + ' ' + '<%=data.end_time%>'), Date.parse('<%=data.start_date%>' + ' ' + '<%=data.start_time%>')
+                                        , window.transObj.lebel.counts);
+                                };
+                            </script>
+                            <% } %>
+                                <div class="psudo-card">
+                                    <div class="card medium">
+                                        <h2 class="value">
+                                            <%= data.pagecount %>
+                                        </h2>
+                                        <p class="label">Total Submission</p>
+                                    </div>
+                                    <div id="psudo" class="psudo-card" style="flex-direction: column;">
+                                        <% if(Date.now() < Date.parse(data.end_date + " " + data.end_time) &&
+                                            Date.now()>
+                                            Date.parse(data.start_date
+                                            + " " + data.start_time)) { %>
+                                            <a style="background-color: rgb(24, 119, 235); color: white;"
+                                                href="/submit?key=<%=data.key%>">
+                                                <%=trns.lebel.submit%>
+                                            </a>
+                                            <% } %>
+                                    </div>
+                                </div>
+                    </div>
+                    <script>
+                        const psudo = document.getElementById("psudo");
+                        if (storedData) {
+                            let username = storedData.username;
+                            // Check if the username is in the jurries_list and append a judge link if true
+
+                            if ((userdata.jurries).split(",").includes(username)) {
+                                let judgeLink = document.createElement('a');
+                                judgeLink.href = `/judge?key=${userdata.key}`;
+                                judgeLink.textContent = translate('Judge');
+                                psudo.appendChild(judgeLink);  // Append link to the body or a specific container
+                                let removeLink = document.createElement('a');
+                                removeLink.href = `/remove?key=${userdata.key}`;
+                                removeLink.textContent = translate('Remove');
+                                psudo.appendChild(removeLink);  // Append link to the body or a specific container
+                            }
+
+                            // Check if the username is the host and append a result link if true
+                            if (username === userdata.host || userdata.adminList.includes(username)) {
+                                let resultLink = document.createElement('a');
+                                resultLink.href = `/result?key=${userdata.key}`;
+                                resultLink.textContent = translate('Make result');
+                                psudo.appendChild(resultLink);  // Append link to the body or a specific container
+                            }
+                            if (userdata.adminList.includes(username)) {
+                                let eliminate = document.createElement('a');
+                                eliminate.href = `#`;
+                                eliminate.textContent = translate('Eleminate');
+                                eliminate.style.backgroundColor = "rgb(255,178,179)";
+                                eliminate.style.color = "rgb(135,0,0)";
+                                psudo.appendChild(eliminate);  // Append link to the body or a specific container
+                                eliminate.addEventListener("click", () => {
+                                    csprompt("Why?", "why you want to eleminate this editathon. This editathon was hosted by <strong><%=data.host%></strong>. There is/are <%=data.jurries.split(`,`).length%> jurries and <%=data.usercount.length%> perticipents in this editathon. This will end in <i>" + timeDifference(Date.parse("<%=data.end_date%> <%=data.end_time%>")) + "</i>.", (data) => {
+                                        if (typeof data == "string") {
+                                            if (data.length > 10) {
+                                                proxyFetch("elemination", {
+                                                    user: storedData.username,
+                                                    reason: data,
+                                                    key: "<%=key%>",
+                                                    type: "eleminate"
+                                                }, (data) => {
+                                                    if (data.message) {
+                                                        msg(data)
+                                                    }
+                                                });
+                                            } else {
+                                                msg({ message: "Mr." + storedData.username + "! Write a proper reason to eleminate the editathon! Elemination process is canceled for now.", redirect: null, type: "warn" })
+                                            }
+                                        }
+                                    }, {
+                                        buttonTexts: ["Eleminate"]
+                                    });
+                                })
+                            }
+                        }
+                    </script>
+                    <% if(data.statistic) { %>
+                        <div class="stats">
+                            <div class="card medium">
+                                <h2 class="value" id="tsum">
+                                    <%= data.usercount.length %>
+                                </h2>
+                                <p class="label">Total Submitor</p>
+                            </div>
+
+                            <div class="card medium">
+                                <h2 class="value">
+                                    <%= Object.keys(data.jurries_list).length %>
+                                </h2>
+                                <p class="label">
+                                    Total Jurries
+                                    <span class="detail">Pages per Jurry:
+                                        <strong>
+                                            <%= Math.ceil((Number(data.pagecount) - Number(data.reviewed)) /
+                                                Object.keys(data.jurries_list).length) %>
+                                        </strong>
+                                    </span>
+                                </p>
+                            </div>
+
+                            <div class="card medium">
+                                <h2 class="value reviewed">
+                                    <%= data.reviewed %>
+                                </h2>
+                                <p class="label">Total Reviewed</p>
+                            </div>
+
+                            <div class="card medium">
+                                <h2 class="value remaining">
+                                    <%= Number(data.pagecount) - Number(data.reviewed) %>
+                                </h2>
+                                <p class="label">Remaining</p>
+                            </div>
+                            <% if(data.jurry_name){ %>
+                                <div class="card big">
+                                    <h3>Current Jurries:</h3>
+                                    <p class="values">
+                                    <ul id="Jurries"></ul>
+                                    </p>
+                                </div>
+                                <script>
+                                    document.getElementById("Jurries").innerHTML = (Object.entries(userdata.jurries_list).map(e => {
+                                        return `<li><a target='_blank' href='https://${userdata.base_component}.org/wiki/user:${e[0]}' title='User:${e[0]}'>${e[0]} : ${Object.keys(e[1]).length}</a></li>`
+                                    }).join(""));
+                                </script>
+                                <%}%>
+                        </div>
+                        <% } %>
+                            <div class="stats" style="padding: 0px 5px;">
+                                <h2 id="Toggle"
+                                    style='color: #fff; width: 100%;text-align:center; cursor: pointer;margin: 0;padding: 20px;'>
+                                    Participents</h2>
+                                <div id="partipent-cont" style="display: none; width: 96%;">
+                                </div>
+                            </div>
+
+                            <script>
+                                let tsum = document.getElementById("tsum");
+                                document.querySelector("#Toggle").addEventListener("click", function () {
+                                    let participantDiv = document.getElementById("partipent-cont");
+                                    participantDiv.style.display = (participantDiv.style.display === "none" || participantDiv.style.display === "") ? "block" : "none";
+                                });
+                            </script>
+                </div>
+                <table>
+                    <thead>
+                        <tr id="headerRow">
+                            <!-- Dynamic headers will be appended here -->
+                        </tr>
+                    </thead>
+                    <tbody id="table">
+                        <!-- Table body rows -->
+                    </tbody>
+                </table>
+                <div id="pagination">
+                    <button id="prevPageBtn" disabled>Prev</button>
+                    <span id="pageNumbers"><span>1</span><span>2</span><span>3</span></span>
+                    <button id="nextPageBtn" disabled>Next</button>
+                </div>
+                <script>
+                    const mkey = "<%=key%>";
+                    function loadTable(currentPage, startindex, callback) {
+                        proxyFetch(
+                            "get-rows",
+                            { key: mkey, startindex: startindex, currentPage },
+                            (data) => {
+                                callback(data);
+                                renderTable(data.participent);
+                            }
+                        );
+                    }
+                    function renderTable(participent) {
+                        const container = document.getElementById("partipent-cont");
+                        container.innerHTML = "";
+
+                        let table = document.createElement("div");
+                        table.style.display = "flex";
+                        table.style.flexWrap = "wrap";
+                        table.style.gap = "10px";
+                        let entries = Object.entries(participent);
+                        tsum.innerHTML = entries.length;
+                        entries.forEach(([name, data]) => {
+                            let card = document.createElement("div");
+                            card.style.flex = "1 1 300px";
+                            card.style.border = "1px solid #ccc";
+                            card.style.padding = "10px";
+                            card.style.borderRadius = "8px";
+                            card.style.background = "#f9f9f9";
+
+                            card.innerHTML = `
+          <h4>${name}</h4>
+          <p><span><i style="opacity: 0.5;">Total Submissions:</i> <b>${data.total}</b></span>
+          <span><i style="opacity: 0.5;">Reviewed:</i> <b>${data.reviewed}</b></span>
+          <span><i style="opacity: 0.5;">Marks:</i> <b>${data.marks}</b></span></p>
+      `;
+                            table.appendChild(card);
+                        });
+
+                        container.appendChild(table);
+                    }
+                    document.querySelectorAll(".value").forEach(e => {
+                        e.innerHTML = translate(e.textContent, "d")
+                    })
+                </script>
+                <script src="/assets/scripts/editathon.js"></script>
+                <%}%>
+                    <% } else { %>
+                        <!-- If retake is true, ask for both key and password -->
+                        <div class="container">
+                            <section class="checking">
+                                <h2>Enter Your key here.</h2>
+                                <form>
+                                    <input type="text" name="key" placeholder="key">
+                                    <button onclick="submit()" type="submit">Submit</button>
+                                </form>
+                            </section>
+                        </div>
+                        <script>
+                            function submit() {
+                                let key = document.querySelector("input[name='key']").value;
+                                location.href = "/editathon?key=" + encodeURIComponent(key)
+                            }
+                        </script>
+                        <% } %>
+</body>
+
+</html>

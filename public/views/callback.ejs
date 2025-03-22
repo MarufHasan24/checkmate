@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Callback</title>
+    <script src="/assets/scripts/tools.js"></script>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <meta http-equiv="refresh" content="3;url=/<%=(url ? decodeURIComponent(url) : '')%>">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dashboard {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: var(--tilt);
+            padding: 20px;
+            color: white;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: var(--tilt);
+            font-size: 1.5rem;
+        }
+
+        .section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .section ul li {
+            background-color: #f5f5f5;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .key {
+            font-weight: bold;
+        }
+
+        ul.flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        ul.flex li {
+            width: 250px;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+    <div class="dashboard">
+        <div class="header">
+            <h1>Welcome, <%= user.displayName %>!</h1>
+            <p>Account ID: <%= user.id %>
+            </p>
+        </div>
+        <div style="
+    justify-content: flex-end;
+    display: flex;
+    align-items: center;
+"><a style="padding: 10px; margin: 5px; text-decoration: none; background-color: var(--tilt); color: #fff; border-radius: 10px;"
+                href="/<%=(url ? decodeURIComponent(url) : '')%>">Let's
+                Proseed Where You left...</a></div>
+        <div class="section">
+            <h2>Account Information</h2>
+            <p>According to <a style="color: var(--tilt);" href="<%=user.iss%>">
+                    <%=user.iss%>
+                </a></p>
+            <ul>
+                <li><span class="key">Username:</span>
+                    <%= user.displayName %>
+                </li>
+                <li><span class="key">Display Name:</span>
+                    <%= user.displayName %>
+                </li>
+                <li><span class="key">Edit Count:</span>
+                    <%= user.editcount %>
+                </li>
+                <li><span class="key">Registered ID:</span>
+                    <%=user.registered %>
+                </li>
+                <li><span class="key">Email Verified:</span>
+                    <%= user.email_verified ? 'Yes' : 'No' %>
+                </li>
+                <li><span class="key">Blocked:</span>
+                    <%= user.blocked ? 'Yes' : 'No' %>
+                </li>
+            </ul>
+        </div>
+        <%if(user?.groups){ %>
+            <div class="section">
+                <h2>Groups</h2>
+                <p>Count: <%=user.groups?.length%>
+                        <ul class="flex">
+                            <% user.groups.forEach(function(group) { %>
+                                <li>
+                                    <%= group %>
+                                </li>
+                                <% }); %>
+                        </ul>
+            </div>
+            <% } %>
+                <% if(user?.rights) {%>
+                    <div class="section">
+                        <h2>Rights</h2>
+                        <p>Count: <%=user.rights.length%>
+                        </p>
+                        <ul class="flex">
+                            <% user.rights.forEach(function(right) { %>
+                                <li>
+                                    <%= right %>
+                                </li>
+                                <% }); %>
+                        </ul>
+                    </div>
+                    <% } %>
+    </div>
+    <script type="module">
+        if (!'<%=user%>') {
+            location.replace("/login")
+        } else {
+            let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+            const user = JSON.parse(validateStr("<%= jsonuser %>"));
+            //console.log(user);
+            const data = JSON.parse(localStorage.getItem(key) || null);
+            localStorage.setItem(
+                key,
+                JSON.stringify({
+                    user: (JSON.stringify(user), encodeURIComponent(user.displayName)),
+                    username: user.displayName,
+                    expire: Date.now() + 30 * 24 * 60 * 60 * 1000,
+                    admin: data?.admin || [],
+                })
+            );
+        }
+    </script>
+</body>
+
+</html>

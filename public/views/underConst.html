@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Under Construction</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    /* Basic reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body,
+    html {
+        height: 100%;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Fullscreen video */
+    #bgVideo {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+    }
+
+    /* Overlay for semi-transparent effect */
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        padding-bottom: 30vh;
+        background: linear-gradient(#0005, #000);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        text-align: center;
+        color: orange;
+        z-index: 1;
+    }
+
+    /* Text Styling */
+    .overlay h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+
+    .overlay p {
+        font-size: 1.5rem;
+    }
+</style>
+
+<body>
+    <div class="overlay">
+        <h1>Page Under Construction</h1>
+        <p>We're working hard to get things ready. Stay tuned!</p>
+    </div>
+
+    <!-- Fullscreen Video Background -->
+    <video autoplay muted loop id="bgVideo">
+        <source src="./assets/video/construction.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</body>
+
+</html>

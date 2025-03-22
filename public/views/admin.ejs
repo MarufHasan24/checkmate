@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 29 August, 2024-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="/assets/styles/common.css" />
+    <link rel="stylesheet" href="/assets/styles/admin.css" />
+    <script src="/assets/scripts/tools.js"></script>
+    <script src="/assets/scripts/extraTools.js"></script>
+    <script src="/assets/scripts/chart.js"></script>
+    <script src="/assets/scripts/chartjs.zoom.js"></script>
+    <header>
+        <h1>Admin Panel</h1>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/admin">admin panel</a></li>
+            <li><a href="/admin/log">Log</a></li>
+            <li><a href="/admin/permit">Permitions</a></li>
+        </ul>
+    </header>
+</head>
+</head>
+
+<body>
+    <div class="container">
+        <% if(isAdmin) { %>
+            <div class="log-container">
+                <h3 class="mb-4" style="display: flex; justify-content: space-evenly;"><strong>Interactive User Activity
+                        Logs</strong></h3>
+
+                <div class="filter-sort">
+                    <!-- Filter by user or action -->
+                    <input type="text" id="filterInput" placeholder="Filter by user or action" onkeyup="filterLogs()">
+
+                    <!-- Time limit filter -->
+                    <select id="timeLimitSelect" onchange="filterLogs()">
+                        <option value="all">All Time</option>
+                        <option value="5minutes">Last 5 minutes</option>
+                        <option value="30minutes">Last 30 minutes</option>
+                        <option value="1hour">Last 1 Hour</option>
+                        <option value="1day">Last 1 Day</option>
+                        <option value="7days">Last 7 Days</option>
+                        <option value="30days">Last 30 Days</option>
+                        <option value="3months">Last 3 months</option>
+                        <option value="6months">Last 6 months</option>
+                        <option value="1year">Last 1 year</option>
+                    </select>
+                    <!-- Sort options -->
+                    <select id="sortSelect" onchange="sortLogs()">
+                        <option value="recent">Most Recent</option>
+                        <option value="oldest">Oldest</option>
+                    </select>
+                </div>
+
+                <div id="logList"></div>
+            </div>
+            <h1>Admin Panel Statistics</h1>
+            <div class="chart-container">
+                <h2 class="chart-title">User Actions Over Time</h2>
+                <canvas id="actionChart"></canvas>
+            </div>
+            <!-- Pie chart canvas -->
+            <div class="chart-container" style="max-width: 750px ;">
+                <h3 class="chart-title">User Activity Pie Chart (Action Counts)</h3>
+                <canvas id="userPiChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2 class="chart-title">Actions Per User</h2>
+                <canvas id="userActionChart"></canvas>
+            </div>
+            <%}%>
+    </div>
+    <% if(data) { %>
+        <script>
+            let data = JSON.parse(validateStr('<%= data %>'));
+            const main = document.getElementsByClassName("mb-4")[0];
+            if (data.message) {
+                msg(data);
+            } else {
+                function countActions(data) {
+                    const actionCounts = {};
+                    data.forEach(item => {
+                        const action = item.action.split("?")[0];
+                        if (actionCounts[action]) {
+                            actionCounts[action]++;
+                        } else {
+                            actionCounts[action] = 1;
+                        }
+                    });
+                    return actionCounts;
+                }
+                // Function to count actions per user
+                function countUserActions(data) {
+                    const userActionCounts = {};
+
+                    data.forEach(item => {
+                        const user = item.user;
+                        if (!userActionCounts[user]) {
+                            userActionCounts[user] = {
+                                "create user": 0, "remove pages": 0, "discard removal": 0, logout: 0, "br-request": 0,
+                                login: 0, hosting: 0, "elemination": 0, delete: 0,
+                                "batch-review": 0
+                            };
+                        }
+                        let p = item.action.split("?")[0].split("/")
+                        userActionCounts[user][p[0]]++
+                    });
+                    return userActionCounts;
+                }
+                function countUserPiActions(data) {
+                    const userActionCounts = {};
+                    data.forEach(log => {
+                        const user = log.user;
+                        if (userActionCounts[user]) {
+                            userActionCounts[user]++;
+                        } else {
+                            userActionCounts[user] = 1;
+                        }
+                    });
+                    return userActionCounts;
+                }
+                // Function to prepare data for user action chart
+                function getUserActionData(userActionCounts) {
+                    const labels = Object.keys(userActionCounts);
+                    const datasets = Object.keys(userActionCounts[labels[0]]).map((actionType, index) => {
+                        return {
+                            label: actionType.charAt(0).toUpperCase() + actionType.slice(1),
+                            data: labels.map(user => userActionCounts[user][actionType]),
+                            backgroundColor: [
+                                '#5fb6a4', '#87cefa', '#f08080', '#ffa07a', '#dda0dd',
+                                '#98fb98', '#ffdab9', '#ff4e89', '#4682b4', '#ffd700'
+                            ][index],
+                            borderWidth: 1
+                        };
+                    });
+
+                    return { labels, datasets };
+                }
+                // Function to generate logs dynamically
+                function generateLogs(logs) {
+                    const logList = document.getElementById('logList');
+                    logList.innerHTML = ''; // Clear any existing content
+                    main.innerHTML += `<strong>Total performed Action: ${logs.length}</strong>`
+                    for (let i = logs.length - 1; i >= 0; i--) {
+                        const log = logs[i];
+                        const logItem = document.createElement('div');
+                        let action = log.action.split("/")[0];
+                        logItem.className = 'log-item ' + action;
+                        logItem.innerHTML = `
+            <p class="log-date"><b>${new Date(log.date).toLocaleString()}</b><i>${timeDifference(log.date)}</i></p>
+            <p class="log-action"><strong>${log.user}</strong> performed <strong>${action}</strong></p>
+            <div class="metadata">
+                <%if(isCreator){%>
+                <strong>Action Details:</strong>
+                ${log.action ? generateMetadata((log.action)) : ''}
+                <%}%>
+                <strong>Details:</strong>
+                ${log.data ? generateMetadata(log.data) : ''}
+            </div>
+        `;
+                        logItem.addEventListener('click', () => {
+                            logItem.classList.toggle('active');
+                        });
+
+                        logList.appendChild(logItem);
+                    }
+                }
+                // Function to format metadata details
+                function generateMetadata(data) {
+                    let metaContent = '<ul>';
+                    for (let key in data) {
+                        metaContent += `<li><strong>${key}:</strong> ${data[key]}</li>`;
+                    }
+                    metaContent += '</ul>';
+                    return metaContent;
+                }
+                let filteredLogs = [...data];
+                function filterLogs() {
+                    const filterValue = document.getElementById('filterInput').value.toLowerCase();
+                    const timeLimit = document.getElementById('timeLimitSelect').value;
+
+                    const now = new Date();
+                    filteredLogs = data.filter(log => {
+                        const logDate = new Date(log.date);
+                        let isWithinTimeLimit = true;
+                        if (timeLimit === '5minutes') {
+                            isWithinTimeLimit = (now - logDate) <= 300000;
+                        }
+                        else if (timeLimit === '30minutes') {
+                            isWithinTimeLimit = (now - logDate) <= 1800000;
+                        }
+                        else if (timeLimit === '1hour') {
+                            isWithinTimeLimit = (now - logDate) <= 3600000; // 1 hour in ms
+                        } else if (timeLimit === '1day') {
+                            isWithinTimeLimit = (now - logDate) <= 86400000; // 1 day in ms
+                        } else if (timeLimit === '7days') {
+                            isWithinTimeLimit = (now - logDate) <= 604800000; // 7 days in ms
+                        } else if (timeLimit === '30days') {
+                            isWithinTimeLimit = (now - logDate) <= 86400000 * 30;
+                        }
+                        else if (timeLimit === '3months') {
+                            isWithinTimeLimit = (now - logDate) <= 86400000 * 90;
+                        }
+                        else if (timeLimit === '6months') {
+                            isWithinTimeLimit = (now - logDate) <= 86400000 * 180;
+                        }
+                        else if (timeLimit === '1year') {
+                            isWithinTimeLimit = (now - logDate) <= 86400000 * 366;
+                        }
+
+                        return (log.user.toLowerCase().includes(filterValue) || log.action.toLowerCase().includes(filterValue)) && isWithinTimeLimit;
+                    });
+
+                    generateLogs(filteredLogs);
+                    sortLogs();
+                }
+                function sortLogs() {
+                    const sortValue = document.getElementById('sortSelect').value;
+
+                    if (sortValue !== "recent") {
+                        filteredLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    } else {
+                        filteredLogs.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    }
+
+                    generateLogs(filteredLogs);
+                }
+                // Process data for action counts
+                const actionCounts = countActions(data);
+                // Create first chart for action counts
+                const ctxAction = document.getElementById('actionChart').getContext('2d');
+                // Create second chart for actions per user
+                const ctxUserAction = document.getElementById('userActionChart').getContext('2d');
+                const ctxUserPiAction = document.getElementById('userPiChart').getContext('2d');
+                // Process data for user actions
+                const userActionCounts = countUserActions(data);
+                const userActionPiCounts = countUserPiActions(data);
+                const userActionData = getUserActionData(userActionCounts);
+                setTimeout(() => {
+                    generateLogs(data);
+                    const actionChart = new Chart(ctxAction, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(actionCounts), // Action names (e.g., ['Login', 'Logout', 'Upload', 'Download'])
+                            datasets: [{
+                                label: 'Number of Actions', // General label for the dataset
+                                data: Object.values(actionCounts), // Action counts (e.g., [12, 8, 5, 7])
+                                backgroundColor: [
+                                    '#5fb6a4', '#87cefa', '#f08080', '#ffa07a', '#dda0dd',
+                                    '#98fb98', '#ffdab9', '#ff4e89', '#4682b4', '#ffd700'
+                                ],
+                                borderColor: [
+                                    '#5fb6a4', '#87cefa', '#f08080', '#ffa07a', '#dda0dd',
+                                    '#98fb98', '#ffdab9', '#ff4e89', '#4682b4', '#ffd700'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true, // Show the legend for the dataset
+                                    labels: {
+                                        color: '#000', // Optional: customize legend text color
+                                        font: {
+                                            weight: 'bold',
+                                            family: 'anam, Arial, Helvetica, sans-serif'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    const userActionChart = new Chart(ctxUserAction, {
+                        type: 'bar',
+                        data: {
+                            labels: userActionData.labels, // User names
+                            datasets: userActionData.datasets // Actions per user
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        // This more specific font property overrides the global property
+                                        font: {
+                                            weight: 'bold',
+                                            family: 'anam, Arial, Helvetica, sans-serif'
+                                        }
+                                    }
+                                },
+                                zoom: {
+                                    zoom: {
+                                        wheel: {
+                                            enabled: true,
+                                        },
+                                        pinch: {
+                                            enabled: true
+                                        },
+                                        mode: 'x',
+                                    }
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'x', // Allows panning along the x-axis
+                                }
+                            }
+                        }
+                    }
+                    );
+                    const userPiChart = new Chart(ctxUserPiAction, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(userActionPiCounts), // User names
+                            datasets: [{
+                                label: 'Actions per User',
+                                data: Object.values(userActionPiCounts), // Total action counts per user
+                                backgroundColor: [
+                                    '#5fb6a4', '#87cefa', '#f08080', '#ffa07a', '#dda0dd',
+                                    '#98fb98', '#ffdab9', '#ff4e89', '#4682b4', '#ffd700'
+                                ],
+                                borderColor: '#ffffff',
+                                borderWidth: 2,
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            maintainAspectRatio: true, // Disable maintaining aspect ratio
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        // This more specific font property overrides the global property
+                                        font: {
+                                            weight: 'bold',
+                                            family: 'anam, Arial, Helvetica, sans-serif'
+                                        }
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (tooltipItem) {
+                                            const total = tooltipItem.dataset.data.reduce((acc, value) => acc + value, 0);
+                                            const value = tooltipItem.raw;
+                                            const percentage = ((value / total) * 100).toFixed(2);
+                                            return `${tooltipItem.label}: ${value} actions (${percentage}%)`;
+                                        }
+                                    }
+                                },
+                            }
+                        }
+                    });
+                }, 200)
+            }
+            function getUrlVars(url) {
+                var hash;
+                var myJson = {};
+                var hashes = url.slice(url.indexOf('?') + 1).split('&');
+                for (var i = 0; i < hashes.length; i++) {
+                    hash = hashes[i].split('=');
+                    myJson[hash[0]] = hash[1];
+                    // If you want to get in native datatypes
+                    // myJson[hash[0]] = JSON.parse(hash[1]); 
+                }
+                return myJson;
+            }
+        </script>
+        <% } else { %>
+            <%=html%>
+                <% } %>
+</body>
+
+</html>

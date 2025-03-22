@@ -1,0 +1,232 @@
+ul.flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    background-color: #fff;
+    padding: 10px;
+    margin-top: 0;
+    height: 0;
+    width: 100%;
+    padding: 0;
+    position: fixed;
+    z-index: 10;
+    margin: 0;
+}
+
+ul.flex.show {
+    height: auto;
+    padding: 5px;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+ul.flex li {
+    width: 250px;
+    margin: 5px;
+    height: auto;
+    inline-size: 240px;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+    border: var(--tilt) solid 2px;
+}
+
+ul.flex a {
+    display: block;
+    color: var(--tilt);
+    font-size: medium;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+}
+
+ul.flex li.this {
+    background-color: var(--tilt);
+}
+
+ul.flex li.this a {
+    color: #fff;
+}
+
+.collups {
+    width: 100%;
+    color: #fff;
+    background-color: var(--tilt);
+    padding: 10px;
+    text-align: left;
+    cursor: pointer;
+}
+
+div.container {
+    padding: 10px;
+    background-color: #fffe;
+    padding-bottom: 20%;
+}
+
+/* Container styles for sticky div positioned at the bottom with 100% width */
+div.sticky {
+    position: fixed;
+    bottom: 0;
+    width: calc(100% - 30px);
+    background-color: #ffffff;
+    padding: 15px 30px;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+    border-radius: 20px 20px 0 0;
+    display: grid;
+    grid-template-columns: 8fr 2fr 4fr;
+    z-index: 10;
+}
+
+/* Link Styling */
+.sticky a {
+    color: var(--tilt);
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
+}
+
+.sticky a:hover {
+    color: #3e8c7d;
+}
+
+/* Options buttons */
+.options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.options button {
+    display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    border: none;
+    color: var(--tilt);
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.7);
+    transition: 0.2s ease;
+}
+
+.options button:hover {
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15), -3px -3px 6px rgba(255, 255, 255, 0.8);
+    color: #ffffff;
+    background-color: var(--tilt);
+}
+
+/* Comment Button */
+#comment-button {
+    background-color: var(--tilt);
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.1), -8px -8px 16px rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+}
+
+#comment-button:hover {
+    background-color: #3e8c7d;
+    transform: translateY(-3px);
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.8);
+}
+
+/* Controls (Buttons) */
+.controls {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.buttons {
+    background-color: var(--tilt);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1), -6px -6px 12px rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+}
+
+.buttons:hover {
+    background-color: #3e8c7d;
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.2), -4px -4px 8px rgba(255, 255, 255, 0.8);
+}
+
+/* Disabled button */
+.buttons[disabled] {
+    background-color: #d3d3d3;
+    cursor: not-allowed;
+}
+
+@media (max-width: 680px) {
+    div.sticky {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sticky a {
+        font-size: 13px;
+    }
+
+    .options {
+        width: 80%;
+    }
+
+    #comment-button,
+    .buttons,
+    .options button {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+.header {
+    color: var(--tilt);
+    background-color: white;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    width: 100%;
+    position: sticky;
+    border: #3e8c7d solid;
+    border-width: 0 0 2px 0;
+}
+
+.header div {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 60%;
+    margin-right: 10%;
+}
+
+.header div p {
+    margin: 6px;
+}

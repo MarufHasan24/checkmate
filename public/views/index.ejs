@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+    <meta name="description"
+        content="Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!">
+</head>
+
+<head>
+    <title>Checkmate</title>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/index.css">
+    <script src="/assets/scripts/tools.js"></script>
+</head>
+
+<body>
+    <iframe src="/background.html" frameborder="0"></iframe>
+    <header>
+        <ul class="menu">
+            <li><a href="/dashboard">Dashboard</a></li>
+            <li><a href="/editathon">Editathon</a></li>
+        </ul>
+    </header>
+    <main>
+        <nav id="app">
+            <!-- Content will be inserted here based on user status -->
+            <div class="container" id="container">
+                <!-- Sign Up Form -->
+                <div class="form-container sign-up-container">
+                    <form action="#">
+                        <h1>Find Competition</h1>
+                        <input id="searchkey" type="email" placeholder="key" />
+                        <input id="searchname" type="text" placeholder="name" />
+                        <input id="searchproject" type="text" placeholder="project" />
+                        <input id="searchhost" type="text" placeholder="host name" />
+                        <button id="search">Search</button>
+                    </form>
+                </div>
+                <!-- Overlay -->
+                <div class="overlay-container">
+                    <div class="overlay">
+                        <div class="overlay-panel overlay-right">
+                            <h1>Welcome Back!</h1>
+                            <p>Provide key, name, or host name to find your competition, which should already be hosted.
+                            </p>
+                            <button class="ghost" id="signIn">Host New Competition</button>
+                        </div>
+                        <div class="overlay-panel overlay-left">
+                            <h1>Hello!</h1>
+                            <p>Provide the required information and host a competition using the listed templates.</p>
+                            <button class="ghost" id="signUp">Search Your Competition</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Sign In Form -->
+                <div class="form-container sign-in-container" id="signincontainer">
+                    <form action="#">
+                        <h1>New Competition</h1>
+                        <input type="text" id="customLangcode" placeholder="Type or select a language code">
+                        <div class="project">
+                            <select id="langcode" name="langcode" onchange="updateInput(this.value)">
+                                <option value="">-- Select a language code --</option>
+                                <option value="species">species</option>
+                                <option value="www">www</option>
+                                <option value="commons">commons</option>
+                                <option value="meta">meta</option>
+                            </select>
+                            <select name="project" id="project">
+                                <option value="wikipedia">wikipedia</option>
+                                <option value="wikiquote">wikiquote</option>
+                                <option value="wiktionary">wiktionary</option>
+                                <option value="wikivoyage">wikivoyage</option>
+                                <option value="wikibooks">wikibooks</option>
+                                <option value="mediawiki">mediawiki</option>
+                                <option value="wikidata">wikidata</option>
+                                <option value="wikinews">wikinews</option>
+                                <option value="wikisource">wikisource</option>
+                                <option value="wikimedia">wikimedia</option>
+                                <option value="wikiversity">wikiversity</option>
+                            </select>
+                        </div>
+                        <input type="text" id="hostname" placeholder="Name" />
+                        <button id="host">Host</button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+        <nav id="queryies">
+            <div class="langCont"> <label for="search-box">Choose a language:</label>
+                <input type="text" id="search-box" autocomplete="off" placeholder="Search languages...">
+                <div id="language-select"></div>
+            </div>
+            <div class="patrol-container">
+                <table class="patrol-house">
+                    <tbody></tbody>
+                </table>
+            </div>
+        </nav>
+    </main>
+    <footer>
+        <p><b>&copy;2024</b> For any needs, you can contact me on my <a
+                href=" https://meta.wikimedia.org/wiki/User_talk:Maruf">Talk page</a></p>
+    </footer>
+</body>
+<script>
+    function updateInput(value) {
+        document.getElementById('customLangcode').value = value;
+    }
+    let apiuser = JSON.parse(validateStr("<%= user %>") || null);
+    document.querySelector("#queryies tbody").innerHTML =
+        validateStr(`<%=html%>`);
+</script>
+<script src="/assets/scripts/index.js"></script>
+
+</html>

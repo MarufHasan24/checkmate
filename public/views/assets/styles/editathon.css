@@ -1,0 +1,330 @@
+/* Overall container for stats */
+.stats,
+.settings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-around;
+    padding: 20px;
+    background-color: rgba(var(--tilt-rgb), 0.5);
+
+}
+
+/* Individual stat card */
+.card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 220px;
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card.big {
+    width: calc(100% - 40px);
+}
+
+.card.medium {
+    max-width: 200px;
+}
+
+.card.small {
+    width: calc(20% - 8px);
+}
+
+.card.very-small {
+    width: calc(10% - 4px);
+    height: auto;
+}
+
+.card.countdown {
+    min-width: 550px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+/* Stat header containing the value and label */
+.stats .header {
+    text-align: center;
+}
+
+/* Stat value styling */
+.stats .value {
+    color: var(--tilt);
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Stat label styling */
+.label {
+    color: #666;
+    font-size: 1em;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* Stat detail (additional info) styling */
+.stats .detail {
+    color: #999;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+/* Special color for reviewed stats */
+.stats .value.reviewed {
+    color: #0050ec;
+}
+
+/* Special color for remaining stats */
+.stats .value.remaining {
+    color: red;
+}
+
+.card h3 {
+    margin-top: 0;
+    color: var(--tilt);
+    font-size: 1.25em;
+}
+
+.card h2 {
+    font-size: 2.25em;
+    color: var(--tilt);
+}
+
+.psudo-card {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.psudo-card a {
+    color: var(--tilt);
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 100px;
+    text-align: center;
+    border-radius: 6px;
+    height: fit-content;
+    margin: 5px;
+    transition: 0.3s;
+}
+
+.psudo-card a:hover {
+    background-color: var(--tilt);
+    color: #fff;
+    box-shadow: 0 0px 8px rgba(255, 255, 255, 0.9);
+}
+
+.card .values {
+    font-size: 0.9em;
+    color: var(--tilt);
+    margin-bottom: 12px;
+}
+
+iframe.countdown {
+    opacity: 1;
+    background-color: #ffffff;
+}
+
+@media (max-width:600px) {
+
+    tr:not(.collapsed) td:not(:nth-child(2), :nth-child(1)) {
+        display: none;
+    }
+
+    tr.collapsed td:nth-child(3),
+    tr.collapsed td:nth-child(4),
+    tr.collapsed td:nth-child(5),
+    tr.collapsed td:nth-child(6),
+    tr.collapsed td:nth-child(7),
+    tr.collapsed td:nth-child(8),
+    tr.collapsed td:nth-child(9),
+    tr.collapsed td:nth-child(10) {
+        display: grid;
+    }
+}
+
+@media (max-width:400px) {
+    div.card.countdown {
+        width: 100%;
+    }
+
+    iframe.countdown {
+        transform: translateX(-22.5%) scale(0.6);
+    }
+
+    .psudo-card {
+        flex-direction: row-reverse;
+    }
+}
+
+#loadMoreBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: var(--tilt);
+    /* teal color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#loadMoreBtn:hover {
+    background-color: #4ca591;
+    /* Slightly darker teal on hover */
+}
+
+.container.warning {
+    font-family: Arial, sans-serif;
+    background-color: #f8d7da;
+    /* light red for warning */
+    color: #721c24;
+    /* dark red for text */
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.warning .card {
+    background-color: #5f2828;
+    border-radius: 10px;
+    border: 1px solid #f5c6cb;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    width: auto;
+    flex: 1 1 calc(100% - 100px);
+    max-width: calc(100% - 100px)
+}
+
+.warning h1 {
+    color: #721c24;
+    /* dark red */
+    text-align: center;
+}
+
+.warning .warning-icon {
+    text-align: center;
+    font-size: 50px;
+    color: #dc3545;
+    /* red color for the icon */
+}
+
+.warning .field {
+    margin: 10px 0;
+}
+
+.warning .field strong {
+    color: #ff8793;
+    /* red for the field label */
+}
+
+.warning .alert-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.warning a {
+    color: #dc3545;
+}
+
+.warning button {
+
+    background-color: var(--tilt);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin: 0 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.warning button:hover {
+    background-color: white;
+    color: var(--tilt);
+}
+
+/* Pagination Container */
+#pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+    margin-bottom: 10px;
+}
+
+/* Pagination Buttons */
+#pagination button {
+    background-color: #fff;
+    border: 1px solid #d1d1d1;
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+#pagination button:hover:not(:disabled) {
+    background-color: #f1f1f1;
+}
+
+#pagination button:disabled {
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+/* Page Numbers */
+#pageNumbers {
+    display: flex;
+    gap: 4px;
+    cursor: pointer;
+}
+
+#pageNumbers span {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-weight: bold;
+    color: #555;
+    transition: all 0.2s ease-in-out;
+}
+
+#pageNumbers span:hover {
+    background-color: #f1f1f1;
+    border: 1px solid #d1d1d1;
+}
+
+#pageNumbers .active {
+    color: #1a73e8;
+    border: 1px solid #1a73e8;
+    background-color: #e8f0fe;
+}
+
+/* Hide all td except the second one when collapsed */
+.collapsed td:not(:nth-child(2), :nth-child(1)) {
+    display: none;
+}
