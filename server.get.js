@@ -432,16 +432,18 @@ module.exports = {
               redirect: null,
             });
           } else {
-            if (!rdata?.post) {
-              if (rdata.result) {
-                res.redirect("/result?key=" + key + "&type=view");
-              } else {
-                res.render("error.ejs", {
-                  status: 400,
-                  error: JSON.stringify(rdata, null, 2),
-                  redirect: null,
-                });
-              }
+            if (rdata.result) {
+              res.redirect("/result?key=" + key + "&type=view");
+            } else if (
+              Object.keys(rdata?.post).length == 0 ||
+              Object.keys(rdata?.data).length == 0
+            ) {
+              res.render("error.ejs", {
+                status: 400,
+                error: "Invalid File.",
+                redirect: null,
+                deletable: key,
+              });
             } else {
               let sdata = {
                 ...rdata.data,
