@@ -9,7 +9,7 @@ tr:nth-child(even) a {
 
 @font-face {
     font-family: "banTable";
-    src: url("../fonts/AnekTable2.ttf");
+    src: url("../fonts/AnekLight.ttf");
 }
 
 table {
