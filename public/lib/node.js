@@ -225,7 +225,7 @@ function deleteFile(path, callback, key, username) {
             // move the file in to .bin
             fs.rename(
               path,
-              `${__dirname}/../../private/.bin/files/file-${key}.json`,
+              `${__dirname}/../../private/.bin/files/${key}.json`,
               (err) => {
                 if (err) {
                   callback(err);
