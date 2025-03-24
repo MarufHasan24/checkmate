@@ -212,75 +212,75 @@ module.exports = {
   },
   delete: function (req, res) {
     if (req.body) {
-      if (req.body.type == "key") {
-        let key = req.body.name;
-        let userdata = {};
-        updateFile(
-          join(__dirname, "private", "querylist.json"),
-          (err, olddata, callback) => {
-            if (err) {
-              //console.error(err);
-            } else {
-              userdata = olddata.key[key];
-              delete olddata.key[key];
-              callback(olddata, (err) => {
-                if (err) {
-                  //console.error(err);
-                } else {
-                  updateFile(
-                    join(
-                      __dirname,
-                      "private",
-                      "user",
-                      `usr-${encodeURIComponent(userdata.host)}.json`
-                    ),
-                    (err, uolddata, callback) => {
-                      if (err) {
-                        //console.error(err);
-                      } else {
-                        uolddata.data = uolddata.data.filter(
-                          (e) => e.key !== key
-                        );
-                        callback(uolddata, (err) => {
-                          if (err) {
-                            //console.error(err);
-                          } else {
-                            deleteFile(
-                              join(
-                                __dirname,
-                                "private",
-                                "db",
-                                "files",
-                                key + ".json"
-                              ),
-                              (err) => {
-                                if (err) {
-                                  res.render("error.ejs", {
-                                    status: 500,
-                                    error:
-                                      "Something went error. File not deleted",
-                                    redirect: null,
-                                  });
-                                } else {
-                                  return res.status(200).send({
-                                    success: true,
-                                  });
-                                }
-                              },
-                              key,
-                              userdata.host
-                            );
-                          }
-                        });
-                      }
+      let key = req.body.key;
+      let user = req.body.user;
+      let host = req.body.host;
+      let userdata = {};
+      updateFile(
+        join(__dirname, "private", "querylist.json"),
+        (err, olddata, callback) => {
+          if (err) {
+            //console.error(err);
+          } else {
+            userdata = olddata.key[key];
+            delete olddata.key[key];
+            callback(olddata, (err) => {
+              if (err) {
+                //console.error(err);
+              } else {
+                updateFile(
+                  join(
+                    __dirname,
+                    "private",
+                    "user",
+                    `usr-${encodeURIComponent(host)}.json`
+                  ),
+                  (err, uolddata, callback) => {
+                    if (err) {
+                      //console.error(err);
+                    } else {
+                      uolddata.data = uolddata.data.filter(
+                        (e) => e.key !== key
+                      );
+                      callback(uolddata, (err) => {
+                        if (err) {
+                          //console.error(err);
+                        } else {
+                          deleteFile(
+                            join(
+                              __dirname,
+                              "private",
+                              "db",
+                              "files",
+                              key + ".json"
+                            ),
+                            (err) => {
+                              if (err) {
+                                res.render("error.ejs", {
+                                  status: 500,
+                                  error:
+                                    "Something went error. File not deleted",
+                                  redirect: null,
+                                });
+                              } else {
+                                return res.status(200).send({
+                                  success: true,
+                                });
+                              }
+                            },
+                            key,
+                            user
+                          );
+                        }
+                      });
                     }
-                  );
-                }
-              });
-            }
+                  }
+                );
+              }
+            });
           }
-        );
-      }
+        }
+      );
     } else {
       res.render("error.ejs", {
         status: 500,
@@ -707,62 +707,61 @@ module.exports = {
         "remove pages",
         (lerr) => {
           if (lerr) {
-            console.error(lerr);
-          } else {
-            updateFile(
-              join(__dirname, "private", "db", "files", mainkey + ".json"),
-              (err, data, callback) => {
-                if (err) {
-                  return res.status(200).send({
-                    message: JSON.stringify(err, null, 2),
-                    type: "error",
-                  });
-                } else {
-                  let page_List = data.post.page_list;
-                  let jurriesList = data.post.jurries_list;
-                  let pagecount = data.post.pagecount;
-                  let reviewed = data.post.reviewed;
+            // console.error(lerr);
+          }
+          updateFile(
+            join(__dirname, "private", "db", "files", mainkey + ".json"),
+            (err, data, callback) => {
+              if (err) {
+                return res.status(200).send({
+                  message: JSON.stringify(err, null, 2),
+                  type: "error",
+                });
+              } else {
+                let page_List = data.post.page_list;
+                let jurriesList = data.post.jurries_list;
+                let pagecount = data.post.pagecount;
+                let reviewed = data.post.reviewed;
+                pagelist = pagelist.filter((e) => {
+                  if (page_List[e]) {
+                    delete page_List[e];
+                    pagecount--;
+                    console.log(e);
+                  } else {
+                    return e;
+                  }
+                });
+                Object.entries(jurriesList).forEach(([key, value]) => {
                   pagelist = pagelist.filter((e) => {
-                    if (page_List[e]) {
-                      delete page_List[e];
+                    if (value[e]) {
+                      delete value[e];
                       pagecount--;
+                      reviewed--;
                       console.log(e);
                     } else {
                       return e;
                     }
                   });
-                  Object.entries(jurriesList).forEach(([key, value]) => {
-                    pagelist = pagelist.filter((e) => {
-                      if (value[e]) {
-                        delete value[e];
-                        pagecount--;
-                        reviewed--;
-                        console.log(e);
-                      } else {
-                        return e;
-                      }
-                    });
-                  });
+                });
 
-                  data.post.pagecount = pagecount;
-                  data.post.reviewed = reviewed;
-                  callback(data, (err) => {
-                    if (err) {
-                      return res.status(200).send({
-                        message: JSON.stringify(err, null, 2),
-                        type: "error",
-                      });
-                    } else {
-                      return res.status(200).send({
-                        message: "Pages removed successfully!",
-                        type: "success",
-                      });
-                    }
-                  });
-                }
+                data.post.pagecount = pagecount;
+                data.post.reviewed = reviewed;
+                callback(data, (err) => {
+                  if (err) {
+                    return res.status(200).send({
+                      message: JSON.stringify(err, null, 2),
+                      type: "error",
+                    });
+                  } else {
+                    return res.status(200).send({
+                      message: "Pages removed successfully!",
+                      type: "success",
+                    });
+                  }
+                });
               }
-            );
-          }
+            }
+          );
         },
         {
           ip:

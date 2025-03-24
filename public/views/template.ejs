@@ -197,30 +197,29 @@
     </nav>
 </body>
 <script>
-    const deleteKey = async function (key) {
-        try {
-            const response = await fetch("/delete", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    name: key,
-                    type: "key",
-                }),
-            });
-
-            const resdata = await response.json();
-
-            if (resdata.success) {
-                // Redirect to create new key page
-                window.location.href = "/";
-            } else {
-                console.error("Error deleting key file:", resdata.error);
+    const deleteKey = function (key) {
+        proxyFetch(
+            "delete",
+            {
+                key: key,
+                user: username,
+            },
+            (data) => {
+                if (data.error) {
+                    console.error(data.error);
+                } else {
+                    msg({
+                        message: "Edithathon is canceled from hosting",
+                        type: "warn",
+                        duration: 3,
+                        redirect: {
+                            url: "/",
+                            timer: 4,
+                        },
+                    });
+                }
             }
-        } catch (error) {
-            console.error("Fetch error:", error);
-        }
+        );
     };
     const jsonobj = JSON.parse(validateStr('<%= jsonobj %>'));
     const main = document.getElementById("main");
