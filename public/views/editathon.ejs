@@ -2,14 +2,14 @@
 <!--Code created by Maruf hasan-->
 <!--Date: 08 August, 2024-->
 <html>
-<meta name="author" content="Maruf hasan" />
-<meta name="description"
-    content="Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!">
-<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-<meta content="width=device-width, initial-scale=1" name="viewport" />
-<html>
 
 <head>
+    <meta name="author" content="Maruf hasan" />
+    <meta name="description"
+        content="Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!">
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -32,54 +32,45 @@
       }
     }
     </script>
-</head>
 
-<body>
-</body>
 
-</html>
-
-<head>
-    <meta name="description"
-        content="Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!">
-</head>
-
-<head>
-    <title>
-        <% if(data) { %>
+    <% if(data) { %>
+        <title>
             <%=data.title%>
-                <% } %>
-    </title>
-    <script src="/assets/scripts/tools.js"></script>
-    <script src="/assets/scripts/extraTools.js"></script>
-    <link rel="stylesheet" href="/assets/styles/common.css">
-    <link rel="stylesheet" href="/assets/styles/dashboard.css">
-    <link rel="stylesheet" href="/assets/styles/table.css">
-    <link rel="stylesheet" href="/assets/styles/editathon.css">
-    <header>
-        <% if(data) { %>
-            <h1>
-                <%=data.title%>
-            </h1>
-            <ul class="menu">
-                <li><a href="/">Home</a></li>
-                <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
-                <li><a href="/editathon">Reset</a></li>
-                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
-            </ul>
-            <% } else { %>
-                <p>Enter Editathon's key first</p>
-                <ul class="menu">
-                    <li><a href="/">Home</a></li>
-                    <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
-                </ul>
-                <% } %>
-    </header>
+        </title>
+        <meta name="keywords"
+            content="Checkmate, <%= data.title.split(' ').join(', ') %>, Wikimedia, Toolforge, edit-a-thon, management, dashboard, contributions" />
+        <% } %>
+            <script src="/assets/scripts/tools.js"></script>
+            <script src="/assets/scripts/extraTools.js"></script>
+            <link rel="stylesheet" href="/assets/styles/common.css">
+            <link rel="stylesheet" href="/assets/styles/dashboard.css">
+            <link rel="stylesheet" href="/assets/styles/table.css">
+            <link rel="stylesheet" href="/assets/styles/editathon.css">
+            <header>
+                <% if(data) { %>
+                    <h1>
+                        <%=data.title%>
+                    </h1>
+                    <ul class="menu">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
+                        <li><a href="/editathon">Reset</a></li>
+                        <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                    </ul>
+                    <% } else { %>
+                        <p>Enter Editathon's key first</p>
+                        <ul class="menu">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                        </ul>
+                        <% } %>
+            </header>
 </head>
 
 <body>
     <iframe src="/background.html" frameborder="0"></iframe>
-    <% if(Object.keys(data).length> 0 ) {%>
+    <% if(data && Object.keys(data).length> 0 ) {%>
         <script>
             const key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
             let storedData = JSON.parse(localStorage.getItem(key));
@@ -402,23 +393,29 @@
                 <script src="/assets/scripts/editathon.js"></script>
                 <%}%>
                     <% } else { %>
-                        <!-- If retake is true, ask for both key and password -->
-                        <div class="container">
-                            <section class="checking">
-                                <h2>Enter Your key here.</h2>
-                                <form>
-                                    <input type="text" name="key" placeholder="key">
-                                    <button onclick="submit()" type="submit">Submit</button>
-                                </form>
-                            </section>
-                        </div>
-                        <script>
-                            function submit() {
-                                let key = document.querySelector("input[name='key']").value;
-                                location.href = "/editathon?key=" + encodeURIComponent(key)
-                            }
-                        </script>
-                        <% } %>
+                        <%if(data){%>
+                            /* redirect it to error page*/
+                            <script>
+                                location.href = "/error?error='Invalid key'";
+                            </script>
+                            <%}else{%>
+                                <div class="container">
+                                    <section class="checking">
+                                        <h2>Enter Your key here.</h2>
+                                        <form>
+                                            <input type="text" name="key" placeholder="key">
+                                            <button onclick="submit()" type="submit">Submit</button>
+                                        </form>
+                                    </section>
+                                </div>
+                                <script>
+                                    function submit() {
+                                        let key = document.querySelector("input[name='key']").value;
+                                        location.href = "/editathon?key=" + encodeURIComponent(key)
+                                    }
+                                </script>
+                                <% } %>
+                                    <% } %>
 </body>
 
 </html>

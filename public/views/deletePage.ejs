@@ -50,11 +50,6 @@
             <!-- Table body rows -->
         </tbody>
     </table>
-    <div id="pagination">
-        <button id="prevPageBtn" disabled>Prev</button>
-        <span id="pageNumbers"><span>1</span><span>2</span><span>3</span></span>
-        <button id="nextPageBtn" disabled>Next</button>
-    </div>
 </body>
 <script>
     const key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
@@ -65,36 +60,72 @@
     function loadTable(currentPage, startindex, callback) {
         proxyFetch(
             "get-rows",
-            { key: mkey, startindex: startindex, currentPage },
+            { key: mkey, startindex: startindex, currentPage, count: "All" },
             (data) => {
                 callback(data);
             }
         );
     }
+    let currentPage = 1;
+    let totalPages = 1;
+    let startindex = 0;
+
+    loadTable(currentPage, startindex, (data) => {
+        table.innerHTML = data.html;
+        table.querySelectorAll("tr").forEach((row) => {
+            row.addEventListener("click", () => {
+                deleteRow(row);
+            });
+        });
+    });
     function deleteSelected() {
-        const rows = document.querySelectorAll("tr");
+        const rows = document.querySelectorAll("tr.deleted");
         const deletedRows = [];
         rows.forEach((row) => {
-            if (row.classList.contains("deleted")) {
-                deletedRows.push(row.id);
-            }
+            deletedRows.push(row.querySelectorAll("td")[1].innerText);
         });
         if (deletedRows.length > 0) {
             proxyFetch(
-                "delete",
-                { key: mkey, rows: deletedRows },
+                "remove",
+                { key: mkey, list: deletedRows, user: storedData.user },
                 (data) => {
-                    if (data.status === "success") {
-                        location.reload();
+                    if (data.message) {
+                        msg(data);
+                    } else {
+                        msg({
+                            message: "Error deleting rows",
+                            redirect: null,
+                            type: "error",
+                            autoHide: 2,
+                        });
                     }
                 }
             );
+        } else {
+            msg({
+                message: "No rows selected for deletion",
+                redirect: null,
+                type: "info",
+                autoHide: 2,
+            });
         }
     }
+    function cancelDelete() {
+        const rows = document.querySelectorAll("tr.deleted");
+        rows.forEach((row) => {
+            row.classList.remove("deleted");
+        });
+        msg({
+            message: "Deletion cancelled",
+            redirect: null,
+            type: "info",
+            autoHide: 2,
+        });
+    }
 </script>
-<script src="/assets/scripts/editathon.js"></script>
+<!-- <script src="/assets/scripts/editathon.js"></script> -->
 <script>
-    function makeRowCollapsible() { return 0; }//Empty function to prevent error
+    function makeRowCollapsible(row) { return 0; }
     let list = {}
     function deleteRow(row) {
         console.log(row);

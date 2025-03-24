@@ -698,17 +698,16 @@ module.exports = {
     }
   },
   remove: function (req, res) {
-    // explain remove function to me
     let mainkey = req.body?.key;
     let user = req.body?.username;
     let pagelist = req.body?.list; // list of pages to remove
-    if (!mainkey) {
+    if (mainkey) {
       keepLog(
         user,
         "remove pages",
         (lerr) => {
           if (lerr) {
-            //console.error(lerr);
+            console.error(lerr);
           } else {
             updateFile(
               join(__dirname, "private", "db", "files", mainkey + ".json"),
@@ -719,25 +718,34 @@ module.exports = {
                     type: "error",
                   });
                 } else {
-                  let jurries_list = data.post.jurries_list;
-                  let page_list = data.post.page_list;
-                  Object.keys(jurries_list).forEach((e) => {
-                    pagelist.forEach((page) => {
-                      if (jurries_list[e][page]) {
-                        data.post.reviewed--;
-                        data.post.pagecount--;
-                        delete jurries_list[e][page];
+                  let page_List = data.post.page_list;
+                  let jurriesList = data.post.jurries_list;
+                  let pagecount = data.post.pagecount;
+                  let reviewed = data.post.reviewed;
+                  pagelist = pagelist.filter((e) => {
+                    if (page_List[e]) {
+                      delete page_List[e];
+                      pagecount--;
+                      console.log(e);
+                    } else {
+                      return e;
+                    }
+                  });
+                  Object.entries(jurriesList).forEach(([key, value]) => {
+                    pagelist = pagelist.filter((e) => {
+                      if (value[e]) {
+                        delete value[e];
+                        pagecount--;
+                        reviewed--;
+                        console.log(e);
+                      } else {
+                        return e;
                       }
                     });
                   });
-                  Object.keys(page_list).forEach((e) => {
-                    if (pagelist.includes(e)) {
-                      data.post.pagecount--;
-                      delete page_list[e];
-                    }
-                  });
-                  data.post.jurries_list = jurries_list;
-                  data.post.page_list = page_list;
+
+                  data.post.pagecount = pagecount;
+                  data.post.reviewed = reviewed;
                   callback(data, (err) => {
                     if (err) {
                       return res.status(200).send({
@@ -746,12 +754,8 @@ module.exports = {
                       });
                     } else {
                       return res.status(200).send({
-                        message: "Pages removed successfully",
+                        message: "Pages removed successfully!",
                         type: "success",
-                        redirect: {
-                          url: "/editathon?key=" + mainkey,
-                          timer: 3,
-                        },
                       });
                     }
                   });
@@ -900,6 +904,7 @@ module.exports = {
               let keys = Object.keys(page_list);
               let tempagelist = {};
               let table = {};
+              count == "All" ? (count = keys.length) : null;
               let startindex = count * (currentPage - 1);
               let endindex = count * currentPage;
               for (let i = startindex; i < endindex; i++) {
