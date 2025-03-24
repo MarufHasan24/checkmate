@@ -1,0 +1,18 @@
+# .github/labeler.yml
+# Add labels to your pull requests based on files modified
+
+# Example:
+# "label-to-add":
+#   - "file/path/*"
+#   - "another/file/path/*"
+
+"documentation":
+  - "**/*.md"
+  - "**/*.rst"
+
+"frontend":
+  - "src/frontend/**"
+
+"backend":
+  - "src/backend/**"
+  - "src/api/**"
