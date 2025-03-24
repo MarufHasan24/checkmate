@@ -122,7 +122,7 @@ const deleteKey = function (key) {
               msg({
                 message: "Key deleted successfully",
                 type: "error",
-                duration: 3,
+                duration: 2,
                 redirect: {
                   url: "/",
                   timer: 4,
