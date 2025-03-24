@@ -1,3 +1,13 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+p,
+div {
+    font-size: 1rem;
+    font-family: "exo", "Arial", sans-serif;
+}
+
 .cdx-icon {
     color: var(--color-base, #202122);
     display: inline-flex;
@@ -2726,7 +2736,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
     }
 
     a:visited {
-        color: #0a9d8e;
+        color: var(--tilt);
     }
 
     a:active {

@@ -222,13 +222,18 @@ function deleteFile(path, callback, key, username) {
           if (err) {
             console.error(err);
           } else {
-            fs.unlink(path, function (err) {
-              if (err) {
-                callback(err);
-              } else {
-                callback(null, { result: "Success" });
+            // move the file in to .bin
+            fs.rename(
+              path,
+              `${__dirname}/../../private/.bin/files/file-${key}.json`,
+              (err) => {
+                if (err) {
+                  callback(err);
+                } else {
+                  callback(null, "File moved to .bin");
+                }
               }
-            });
+            );
           }
         },
         { ...stats, key: key || null }

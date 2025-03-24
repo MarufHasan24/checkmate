@@ -15,7 +15,6 @@
             <li><a href="/editathon?key=<%= key %>">Editathon</a></li>
             <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
             <% if(key) {%>
-                <li><a href="javascript:void" onclick="deleteKey('<%=key%>')">Delete key</a></li>
                 <li><a href="/dashboard">Reset</a></li>
                 <% } %>
         </ul>
@@ -60,10 +59,16 @@
                 <script>
                     const userdata = JSON.parse(validateStr('<%=jsondata%>'));
                     const container = document.getElementsByClassName("container")[0];
-                    init(userdata.trns)
                     let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
                     let logindata = JSON.parse(localStorage.getItem(key));
                     let username = null;
+
+                    if (logindata && userdata.adminList.includes(logindata.username)) {
+                        //console.log("Admin")
+                        console.log(logindata && userdata.adminList)
+                        document.querySelector("ul.menu").innerHTML += `<li><a href="javascript:void" onclick="deleteKey('<%=key%>')">Delete key</a></li>`;
+                    }
+                    init(userdata.trns)
                     if (logindata) {
                         username = logindata.username;
                     }
@@ -735,11 +740,6 @@
                                                                 <script>
                                                                     document.getElementById('corruptedKeyPopup').style.display = 'block';
                                                                     document.getElementById('overlay').style.display = 'block';
-                                                                    document.getElementById('deleteKeyButton').addEventListener('click', function () {
-                                                                        // Call API to delete the key file
-                                                                        deleteKey('<%= key %>')
-                                                                    });
-
                                                                     document.getElementById('cancelButton').addEventListener('click', function () {
                                                                         document.getElementById('corruptedKeyPopup').style.display = 'none';
                                                                         document.getElementById('overlay').style.display = 'none';

@@ -103,28 +103,42 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initially hide buttons
   hideButtons();
 });
-const deleteKey = async function (key) {
-  try {
-    const response = await fetch("/delete", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: key,
-        type: "key",
-      }),
-    });
-
-    const resdata = await response.json();
-
-    if (resdata.success) {
-      // Redirect to create new key page
-      window.location.href = "/";
-    } else {
-      console.error("Error deleting key file:", resdata.error);
+const deleteKey = function (key) {
+  csprompt(
+    "Delete Key",
+    "Are you sure you want to delete this key? This action cannot be undone. If you are sure you want to delete this key, please type the editathon name.",
+    function (response) {
+      if (response == userdata.title) {
+        proxyFetch(
+          "delete",
+          {
+            key: key,
+            user: logindata.username,
+          },
+          (data) => {
+            if (data.error) {
+              console.error(data.error);
+            } else {
+              msg({
+                message: "Key deleted successfully",
+                type: "error",
+                duration: 3,
+                redirect: {
+                  url: "/",
+                  timer: 4,
+                },
+              });
+            }
+          }
+        );
+      } else {
+        // User cancelled the prompt
+        msg({
+          message: "Key not deleted",
+          type: "success",
+          duration: 3,
+        });
+      }
     }
-  } catch (error) {
-    console.error("Fetch error:", error);
-  }
+  );
 };

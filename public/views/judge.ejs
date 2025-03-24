@@ -117,17 +117,19 @@
             <% } else { %>
                 <% } %>
                     <% if(html) { %>
-                        <div class="container">
-                            <%-html%>
-                        </div>
-                        <div class="sticky">
-                            <ul class="options">
-                            </ul>
-                            <button id="comment-button">comment</button>
-                            <div class="controls">
-                                <span>Marks:<span id="marks">0</span></span>
-                                <button type="button" disabled="" class="buttons" id="Save">Save</button><button
-                                    type="button" class="buttons" id="Skip">Skip</button>
+                        <div>
+                            <div class="container">
+                                <%-html%>
+                            </div>
+                            <div class="sticky">
+                                <ul class="options">
+                                </ul>
+                                <button id="comment-button">comment</button>
+                                <div class="controls">
+                                    <span>Marks:<span id="marks">0</span></span>
+                                    <button type="button" disabled="" class="buttons" id="Save">Save</button><button
+                                        type="button" class="buttons" id="Skip">Skip</button>
+                                </div>
                             </div>
                         </div>
                         <script src="/assets/scripts/judge.js"></script>

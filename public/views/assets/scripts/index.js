@@ -249,7 +249,7 @@ window.onload = () => {
               {
                 key: generateRandomKey(30),
                 password: generateRandomKey(15),
-                template: listparent.value,
+                template: "common",
                 userdata: user,
                 compname: hostname.value,
                 project: projecturl,
@@ -368,6 +368,7 @@ function generateRandomKey(len) {
 //check api validity
 function checkWikimediaAPI(projecturl, callback) {
   const url = `https://${projecturl}.org/w/api.php?action=query&meta=siteinfo&format=json&origin=*`;
+  console.log(url);
   fetch(url)
     .then((response) => {
       if (!response.ok) {
@@ -376,6 +377,7 @@ function checkWikimediaAPI(projecturl, callback) {
       return response.json();
     })
     .then((data) => {
+      console.log(data);
       if (data && data.query && data.query.general) {
         // Valid API
         callback(true);
