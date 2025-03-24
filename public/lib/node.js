@@ -433,7 +433,6 @@ function editathonTable(page_list, mkey, startindex = 0, translation = null) {
   return table;
 }
 function keepLog(username, action, callback, rdata) {
-  console.log(action, rdata);
   let sdata = {};
   if (rdata) {
     rdata.atime ? (sdata["last access"] = rdata.atime) : null;
