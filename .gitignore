@@ -2,3 +2,5 @@ config.json
 node_modules/
 private/
 **/test*
+**.sh
+data.txt
