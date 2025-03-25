@@ -1,3 +1,7 @@
+* {
+    overflow-x: hidden;
+}
+
 body {
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -64,6 +68,10 @@ div {
     height: 2.5rem;
     border: 1px solid var(--border-color-subtle, #c8ccd1);
     border-radius: 2px
+}
+
+div.mw-content-ltr {
+    overflow-x: scroll;
 }
 
 .cdx-thumbnail__image {
@@ -1418,7 +1426,7 @@ sup.reference:target {
 }
 
 #p-lang .uls-settings-trigger {
-    background: transparent url(/w/extensions/UniversalLanguageSelector/resources/images/cog-sprite.svg?39d1e) no-repeat center top;
+    background: transparent url(https://en.wikipedia.org/w/extensions/UniversalLanguageSelector/resources/images/cog-sprite.svg?39d1e) no-repeat center top;
     border: 0;
     min-height: 16px;
     min-width: 16px;
@@ -1464,29 +1472,29 @@ sup.reference:target {
 .badge-goodarticle,
 .badge-goodlist,
 .badge-recommendedarticle {
-    list-style-image: url(/w/extensions/WikimediaBadges/resources/images/badge-silver-star.png?70a8c)
+    list-style-image: url(https://en.wikipedia.org/w/extensions/WikimediaBadges/resources/images/badge-silver-star.png?70a8c)
 }
 
 .badge-featuredarticle,
 .badge-featuredportal,
 .badge-featuredlist {
-    list-style-image: url(/w/extensions/WikimediaBadges/resources/images/badge-golden-star.png?ed948)
+    list-style-image: url(https://en.wikipedia.org/w/extensions/WikimediaBadges/resources/images/badge-golden-star.png?ed948)
 }
 
 .badge-problematic {
-    list-style-image: url(/w/extensions/WikimediaBadges/resources/images/badge-problematic.png?f3177)
+    list-style-image: url(https://en.wikipedia.org/w/extensions/WikimediaBadges/resources/images/badge-problematic.png?f3177)
 }
 
 .badge-proofread {
-    list-style-image: url(/w/extensions/WikimediaBadges/resources/images/badge-proofread.png?e81f9)
+    list-style-image: url(https://en.wikipedia.org/w/extensions/WikimediaBadges/resources/images/badge-proofread.png?e81f9)
 }
 
 .badge-validated {
-    list-style-image: url(/w/extensions/WikimediaBadges/resources/images/badge-validated.png?6232c)
+    list-style-image: url(https://en.wikipedia.org/w/extensions/WikimediaBadges/resources/images/badge-validated.png?6232c)
 }
 
 .badge-digitaldocument {
-    list-style-image: url(/w/extensions/WikimediaBadges/resources/images/badge-digitaldocument.png?d1c50)
+    list-style-image: url(https://en.wikipedia.org/w/extensions/WikimediaBadges/resources/images/badge-digitaldocument.png?d1c50)
 }
 
 .oo-ui-icon-alert,
@@ -2348,7 +2356,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
         overflow: hidden;
         width: 15px;
         height: 11px;
-        background-image: url(/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e);
+        background-image: url(https://en.wikipedia.org/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e);
         -webkit-user-select: none;
         -moz-user-select: none;
         user-select: none
@@ -2359,7 +2367,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
     }
 
     .mw-content-ltr .magnify a {
-        background-image: url(/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e)
+        background-image: url(https://en.wikipedia.org/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e)
     }
 
     .mw-content-rtl .magnify {
@@ -2367,7 +2375,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
     }
 
     .mw-content-rtl .magnify a {
-        background-image: url(/w/resources/src/mediawiki.skinning/images/magnify-clip-rtl.svg?38fd5)
+        background-image: url(https://en.wikipedia.org/w/resources/src/mediawiki.skinning/images/magnify-clip-rtl.svg?38fd5)
     }
 
     figure[typeof~='mw:File/Thumb'],
@@ -2436,21 +2444,21 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
         position: absolute;
         bottom: -11px;
         right: 6px;
-        background-image: url(/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e)
+        background-image: url(https://en.wikipedia.org/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e)
     }
 
     .mw-content-ltr figure[typeof~='mw:File/Thumb']>.mw-file-description::after,
     .mw-content-ltr figure[typeof~='mw:File/Thumb']>.mw-file-magnify::after {
         right: 6px;
         left: auto;
-        background-image: url(/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e)
+        background-image: url(https://en.wikipedia.org/w/resources/src/mediawiki.skinning/images/magnify-clip-ltr.svg?8330e)
     }
 
     .mw-content-rtl figure[typeof~='mw:File/Thumb']>.mw-file-description::after,
     .mw-content-rtl figure[typeof~='mw:File/Thumb']>.mw-file-magnify::after {
         right: auto;
         left: 6px;
-        background-image: url(/w/resources/src/mediawiki.skinning/images/magnify-clip-rtl.svg?38fd5)
+        background-image: url(https://en.wikipedia.org/w/resources/src/mediawiki.skinning/images/magnify-clip-rtl.svg?38fd5)
     }
 
     @media all and (max-width:calc(640px - 1px)) {
@@ -3507,7 +3515,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
 
 .mixin-vector-legacy-menu-heading-arrow {
     content: '';
-    background: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/arrow-down.svg?f88ee) 100% 50% no-repeat;
+    background: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/arrow-down.svg?f88ee) 100% 50% no-repeat;
     width: 1.23076923em;
     height: 1.23076923em
 }
@@ -3534,7 +3542,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
     }
 
     ul {
-        list-style-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/bullet-icon.svg?d4515)
+        list-style-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/bullet-icon.svg?d4515)
     }
 
     pre,
@@ -3717,7 +3725,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
     }
 
     .mw-parser-output a.external {
-        background-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/link-external-small-ltr-progressive.svg?fb64d);
+        background-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/link-external-small-ltr-progressive.svg?fb64d);
         background-position: center right;
         background-repeat: no-repeat;
         background-size: 0.857em;
@@ -3940,7 +3948,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
 
     .vector-menu-dropdown .vector-menu-heading::after {
         content: '';
-        background: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/arrow-down.svg?f88ee) 100% 50% no-repeat;
+        background: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/arrow-down.svg?f88ee) 100% 50% no-repeat;
         width: 1.23076923em;
         height: 1.23076923em;
         opacity: 1
@@ -4257,7 +4265,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
     }
 
     .searchButton[name='go'] {
-        background: no-repeat center / 1.23076923em url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/search.svg?a45d6);
+        background: no-repeat center / 1.23076923em url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/search.svg?a45d6);
         opacity: 0.67
     }
 
@@ -4327,30 +4335,30 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
     }
 
     .vector-menu-tabs #ca-unwatch.icon a::before {
-        background-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/unwatch-icon.svg?75797)
+        background-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/unwatch-icon.svg?75797)
     }
 
     .vector-menu-tabs #ca-unwatch.mw-watchlink-temp.icon a::before {
-        background-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/unwatch-temp-icon.svg?6e0c5)
+        background-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/unwatch-temp-icon.svg?6e0c5)
     }
 
     .vector-menu-tabs #ca-watch.icon a::before {
-        background-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/watch-icon.svg?6ab6f)
+        background-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/watch-icon.svg?6ab6f)
     }
 
     .vector-menu-tabs #ca-unwatch.icon a:hover::before,
     .vector-menu-tabs #ca-unwatch.icon a:focus::before {
-        background-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/unwatch-icon-hl.svg?72bac)
+        background-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/unwatch-icon-hl.svg?72bac)
     }
 
     .vector-menu-tabs #ca-unwatch.mw-watchlink-temp.icon a:hover::before,
     .vector-menu-tabs #ca-unwatch.mw-watchlink-temp.icon a:focus::before {
-        background-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/unwatch-temp-icon-hl.svg?9a8e5)
+        background-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/unwatch-temp-icon-hl.svg?9a8e5)
     }
 
     .vector-menu-tabs #ca-watch.icon a:hover::before,
     .vector-menu-tabs #ca-watch.icon a:focus::before {
-        background-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/watch-icon-hl.svg?9bf90)
+        background-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/watch-icon-hl.svg?9bf90)
     }
 
     .vector-menu-tabs #ca-unwatch.icon .loading::before,
@@ -4373,7 +4381,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
     .vector-user-menu-legacy #pt-anonuserpage,
     .vector-user-menu-legacy #pt-userpage a {
         background-position: left 0.33333333em;
-        background-image: url(/w/skins/Vector/resources/skins.vector.styles.legacy/images/user-avatar.svg?943a0);
+        background-image: url(https://en.wikipedia.org/w/skins/Vector/resources/skins.vector.styles.legacy/images/user-avatar.svg?943a0);
         background-repeat: no-repeat;
         background-size: 1.16666667em 1.16666667em;
         padding-top: 0.5em;
@@ -4682,7 +4690,7 @@ figure[typeof~='mw:File/Thumb']>figcaption:empty {
 
 .wb-langlinks-link>a::before {
     content: '';
-    background-image: url(/w/extensions/Wikibase/client/resources/images/edit.svg?34bc5);
+    background-image: url(https://en.wikipedia.org/w/extensions/Wikibase/client/resources/images/edit.svg?34bc5);
     background-position: left top;
     background-repeat: no-repeat;
     background-size: 0.625rem 0.625rem;
@@ -5192,4 +5200,17 @@ body.skin-vector-legacy .mw-indicators {
 .navbar.plainlinks.hlist.navbar-mini ul li {
     padding: 2px;
     margin: 2px;
+}
+
+.mw-heading {
+    font-weight: bold;
+    background-color: rgba(var(--tilt-dark), 0.2);
+    margin: 0.5em 0 0.5em 0;
+    padding: 0.5em 0.3em;
+    border-bottom: 1px solid #ccc;
+    font-family: 'bangla-bold', 'exo', 'Noto Sans', sans-serif;
+}
+
+span.mw-editsection {
+    display: none;
 }

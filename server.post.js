@@ -214,68 +214,80 @@ module.exports = {
     if (req.body) {
       let key = req.body.key;
       let user = req.body.user;
-      let host = req.body.host;
-      let userdata = {};
+      let host = "";
+      let type = req.body.type;
+      let bin = req.body.bin || false;
       updateFile(
         join(__dirname, "private", "querylist.json"),
         (err, olddata, callback) => {
           if (err) {
-            //console.error(err);
+            console.error("Err 1:", err);
           } else {
-            userdata = olddata.key[key];
+            if (olddata.key[key]) {
+              host = olddata.key[key].host;
+            }
             delete olddata.key[key];
             callback(olddata, (err) => {
               if (err) {
-                //console.error(err);
+                console.error(err);
               } else {
-                updateFile(
-                  join(
-                    __dirname,
-                    "private",
-                    "user",
-                    `usr-${encodeURIComponent(host)}.json`
-                  ),
-                  (err, uolddata, callback) => {
-                    if (err) {
-                      //console.error(err);
-                    } else {
-                      uolddata.data = uolddata.data.filter(
-                        (e) => e.key !== key
-                      );
-                      callback(uolddata, (err) => {
-                        if (err) {
-                          //console.error(err);
-                        } else {
-                          deleteFile(
-                            join(
-                              __dirname,
-                              "private",
-                              "db",
-                              "files",
-                              key + ".json"
-                            ),
-                            (err) => {
-                              if (err) {
-                                res.render("error.ejs", {
-                                  status: 500,
-                                  error:
-                                    "Something went error. File not deleted",
-                                  redirect: null,
-                                });
-                              } else {
-                                return res.status(200).send({
-                                  success: true,
-                                });
-                              }
-                            },
-                            key,
-                            user
-                          );
-                        }
+                if (type === "missing") {
+                  keepLog(
+                    user,
+                    "delete/permanent",
+                    (err) => {
+                      return res.status(200).send({
+                        success: true,
                       });
+                    },
+                    { key: key || null }
+                  );
+                } else {
+                  updateFile(
+                    join(
+                      __dirname,
+                      "private",
+                      "user",
+                      `usr-${encodeURIComponent(host)}.json`
+                    ),
+                    (err, uolddata, callback) => {
+                      if (err) {
+                        //console.error(err);
+                      } else {
+                        uolddata.data = uolddata.data.filter(
+                          (e) => e.key !== key
+                        );
+                        callback(uolddata, (err) => {
+                          if (err) {
+                            //console.error(err);
+                          } else {
+                            deleteFile(
+                              join(
+                                __dirname,
+                                "private",
+                                "db",
+                                "files",
+                                key + ".json"
+                              ),
+                              (err) => {
+                                if (err) {
+                                  console.error(err);
+                                } else {
+                                  return res.status(200).send({
+                                    success: true,
+                                  });
+                                }
+                              },
+                              key,
+                              user,
+                              bin
+                            );
+                          }
+                        });
+                      }
                     }
-                  }
-                );
+                  );
+                }
               }
             });
           }
@@ -1368,6 +1380,8 @@ module.exports = {
           })
           .filter((e) => {
             // filter out keys that are not in the specified language
+            if (!rawData[e]?.project) return false;
+            if (langcode == "*") return true;
             let lang = rawData[e]?.project
               ? rawData[e].project.split(".")[0]
               : null;
@@ -1392,14 +1406,18 @@ module.exports = {
           )
           .join("");
         //return res.status(200).send({ asAdmin: false, html: html });
-        isAdmin(user, langcode, (err, asAdmin) => {
-          if (err) {
-            console.error(err);
-            return res.status(200).send({ asAdmin: false, html: html });
-          } else {
-            return res.status(200).send({ asAdmin, html: html });
-          }
-        });
+        if (langcode == "*") {
+          return res.status(200).send({ asAdmin: false, html: html });
+        } else {
+          isAdmin(user, langcode, (err, asAdmin) => {
+            if (err) {
+              console.error(err);
+              return res.status(200).send({ asAdmin: false, html: html });
+            } else {
+              return res.status(200).send({ asAdmin, html: html });
+            }
+          });
+        }
       }
     });
   },

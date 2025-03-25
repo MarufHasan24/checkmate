@@ -1,72 +1,85 @@
 <!DOCTYPE html>
-<!--Code created by Maruf hasan-->
-<!--Date: 08 August, 2024-->
-<html>
+<!-- Editathon Page | Created by Maruf Hasan -->
+<!-- Date: 08 August, 2024 -->
+<html lang="en">
 
 <head>
-    <meta name="author" content="Maruf hasan" />
+    <meta charset="UTF-8">
+    <meta name="author" content="Maruf Hasan">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description"
-        content="Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!">
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
+        content="Organize and manage Wikimedia edit-a-thons with Checkmate. Track contributions, set templates, and monitor progress in an intuitive dashboard.">
+    <meta name="keywords"
+        content="Checkmate, Wikimedia, Toolforge, edit-a-thon, event management, Wikipedia, contribution tracking">
+    <meta name="robots" content="index, follow">
 
+    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "Checkmate",
-        "description": "Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!",
-        "applicationCategory": "Web Application",
-        "operatingSystem": "Web",
-        "url": "https://checkmate.toolforge.org/",
-        "image": "https://checkmate.toolforge.org/assets/images/logo.png",
-        "author": {
-          "@type": "Person",
-          "name": "Maruf Hasan",
-            "url": "https://bn.wikipedia.org/wiki/User:Maruf_Hasan",
-            "sameAs": "https://bn.wikipedia.org/wiki/User:Maruf_Hasan"
-        },
+      "name": "Checkmate - Editathon",
+      "description": "Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions and monitor progress.",
+      "applicationCategory": "WebApplication",
+      "operatingSystem": "Web",
+      "url": "https://checkmate.toolforge.org/editathon",
+      "image": "https://checkmate.toolforge.org/assets/images/logo.png",
+      "author": {
+        "@type": "Person",
+        "name": "Maruf Hasan",
+        "url": "https://bn.wikipedia.org/wiki/User:Maruf_Hasan",
+        "sameAs": ["https://bn.wikipedia.org/wiki/User:Maruf_Hasan"]
+      },
       "offers": {
         "@type": "Offer",
-        "price": 0,
+        "price": "0"
       }
     }
     </script>
 
-
     <% if(data) { %>
         <title>
-            <%=data.title%>
+            <%=data.title%> - Editathon | Checkmate
         </title>
         <meta name="keywords"
-            content="Checkmate, <%= data.title.split(' ').join(', ') %>, Wikimedia, Toolforge, edit-a-thon, management, dashboard, contributions" />
-        <% } %>
-            <script src="/assets/scripts/tools.js"></script>
-            <script src="/assets/scripts/extraTools.js"></script>
-            <link rel="stylesheet" href="/assets/styles/common.css">
-            <link rel="stylesheet" href="/assets/styles/dashboard.css">
-            <link rel="stylesheet" href="/assets/styles/table.css">
-            <link rel="stylesheet" href="/assets/styles/editathon.css">
-            <header>
-                <% if(data) { %>
-                    <h1>
-                        <%=data.title%>
-                    </h1>
-                    <ul class="menu">
-                        <li><a href="/">Home</a></li>
-                        <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
-                        <li><a href="/editathon">Reset</a></li>
-                        <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
-                    </ul>
-                    <% } else { %>
-                        <p>Enter Editathon's key first</p>
-                        <ul class="menu">
-                            <li><a href="/">Home</a></li>
-                            <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
-                        </ul>
-                        <% } %>
-            </header>
+            content="Checkmate, Editathon, <%= data.title.split(' ').join(', ') %>, Wikimedia, Toolforge, Wikipedia event, dashboard">
+        <% } else { %>
+            <title>Editathon | Checkmate</title>
+            <% } %>
+
+                <!-- Preload Important Assets -->
+                <link rel="preload" href="/assets/styles/common.css" as="style">
+                <link rel="preload" href="/assets/styles/editathon.css" as="style">
+                <link rel="preload" href="/assets/scripts/tools.js" as="script">
+
+                <link rel="stylesheet" href="/assets/styles/common.css">
+                <link rel="stylesheet" href="/assets/styles/dashboard.css">
+                <link rel="stylesheet" href="/assets/styles/table.css">
+                <link rel="stylesheet" href="/assets/styles/editathon.css">
+
+                <!-- Load Scripts Efficiently -->
+                <script src="/assets/scripts/tools.js"></script>
+                <script src="/assets/scripts/extraTools.js"></script>
 </head>
+<header>
+    <% if(data) { %>
+        <h1>
+            <%=data.title%>
+        </h1>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
+            <li><a href="/editathon">Reset</a></li>
+            <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+        </ul>
+        <% } else { %>
+            <p>Enter Editathon's key first</p>
+            <ul class="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+            </ul>
+            <% } %>
+</header>
 
 <body>
     <iframe src="/background.html" frameborder="0"></iframe>

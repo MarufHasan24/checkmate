@@ -3,18 +3,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <head>
+    <meta charset="UTF-8">
     <meta name="description"
-        content="Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!">
-    <title>Checkmate</title>
+        content="Checkmate is a powerful Wikimedia Toolforge tool for organizing and managing edit-a-thons. Track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management today!">
     <meta name="keywords"
-        content="Checkmate, Wikimedia, Toolforge, edit-a-thon, management, dashboard, contributions" />
+        content="Checkmate, Wikimedia, Toolforge, edit-a-thon, event management, contribution tracking, Wikipedia tools, dashboard">
+    <meta name="author" content="Maruf Hasan">
+    <meta name="robots" content="index, follow">
+    <title>Checkmate - Edit-a-thon Management Tool | Wikimedia Toolforge |</title>
+
+    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "WebApplication",
             "name": "Checkmate",
             "url": "https://checkmate.toolforge.org/",
-            "description": "Checkmate is a powerful Wikimedia Toolforge tool designed for organizing and managing edit-a-thons. It helps organizers, participants, and judges track contributions, set templates, and monitor progress with an intuitive dashboard. Simplify edit-a-thon management with Checkmate. Learn more!",
+            "description": "Checkmate is a powerful Wikimedia Toolforge tool for organizing and managing edit-a-thons. Track contributions, set templates, and monitor progress with an intuitive dashboard.",
             "applicationCategory": "ProductivityApplication",
             "operatingSystem": "All",
             "browserRequirements": "Requires JavaScript enabled browser",
@@ -27,21 +32,32 @@
                 "@type": "Person",
                 "name": "Maruf Hasan",
                 "url": "https://meta.wikimedia.org/wiki/User:Maruf"
-            },
+            }
         }
     </script>
+
+    <!-- Preload Critical Assets for Performance -->
+    <link rel="preload" href="/assets/styles/common.css" as="style">
+    <link rel="preload" href="/assets/styles/index.css" as="style">
     <link rel="stylesheet" href="/assets/styles/common.css">
     <link rel="stylesheet" href="/assets/styles/index.css">
+
+    <!-- Preload and Defer JavaScript -->
+    <link rel="preload" href="/assets/scripts/tools.js" as="script">
     <script src="/assets/scripts/tools.js"></script>
 </head>
+
 
 <body>
     <iframe src="/background.html" frameborder="0"></iframe>
     <header>
-        <ul class="menu">
-            <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/editathon">Editathon</a></li>
-        </ul>
+        <h1>Welcome to Checkmate</h1>
+        <nav aria-label="Main Navigation">
+            <ul class="menu">
+                <li><a href="/dashboard" title="View your edit-a-thon dashboard">Dashboard</a></li>
+                <li><a href="/editathon" title="Manage and participate in edit-a-thons">Editathon</a></li>
+            </ul>
+        </nav>
     </header>
     <main>
         <nav id="app">
@@ -119,9 +135,12 @@
             </div>
         </nav>
     </main>
-    <footer>
-        <p><b>&copy;2024</b> For any needs, you can contact me on my <a
-                href=" https://meta.wikimedia.org/wiki/User_talk:Maruf">Talk page</a></p>
+    <footer aria-label="Page Footer">
+        <p>Checkmate is a Wikimedia Toolforge tool designed to simplify edit-a-thon management, offering features to
+            track contributions, set templates, and monitor progress through an intuitive dashboard.</p>
+        <p><b>&copy; <%= new Date().getFullYear(); %></b> For any needs, you can contact me on my
+            <a href="https://meta.wikimedia.org/wiki/User_talk:Maruf">Talk page</a>.
+        </p>
     </footer>
 </body>
 <script>
