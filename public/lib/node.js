@@ -210,30 +210,40 @@ function writeFile(path, data, callback) {
  * @param {string} path - The path to the file.
  * @param {function} callback - The callback function to be called after the operation is complete.
  */
-function deleteFile(path, callback, key, username) {
+function deleteFile(path, callback, key, username, willBin = false) {
   fs.stat(path, (err, stats) => {
     if (err) {
       console.error(err);
     } else {
       keepLog(
         username,
-        "delete",
+        "delete" + (willBin ? "" : "/permanent"),
         (err) => {
           if (err) {
             console.error(err);
           } else {
             // move the file in to .bin
-            fs.rename(
-              path,
-              `${__dirname}/../../private/.bin/files/${key}.json`,
-              (err) => {
+            if (willBin) {
+              fs.rename(
+                path,
+                `${__dirname}/../../private/.bin/files/${key}.json`,
+                (err) => {
+                  if (err) {
+                    callback(err);
+                  } else {
+                    callback(null, "File moved to .bin");
+                  }
+                }
+              );
+            } else {
+              fs.unlink(path, (err) => {
                 if (err) {
                   callback(err);
                 } else {
-                  callback(null, "File moved to .bin");
+                  callback(null, "File deleted");
                 }
-              }
-            );
+              });
+            }
           }
         },
         { ...stats, key: key || null }

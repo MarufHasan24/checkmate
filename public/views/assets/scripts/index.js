@@ -7,6 +7,7 @@ const languageSelect = document.getElementById("language-select");
 const hostname = document.getElementById("hostname");
 const navContainer = document.getElementById("nav-container");
 const languages = {
+  "*": "All Languages",
   en: "English - English",
   es: "Español - Spanish",
   fr: "Français - French",
@@ -377,7 +378,7 @@ function checkWikimediaAPI(projecturl, callback) {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
+      console.log(data.query.general);
       if (data && data.query && data.query.general) {
         // Valid API
         callback(true);

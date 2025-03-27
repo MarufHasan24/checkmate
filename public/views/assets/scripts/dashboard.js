@@ -114,6 +114,7 @@ const deleteKey = function (key) {
           {
             key: key,
             user: logindata.username,
+            bin: true,
           },
           (data) => {
             if (data.error) {

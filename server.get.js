@@ -427,6 +427,7 @@ module.exports = {
               status: 400,
               error: "File not found!",
               redirect: null,
+              adminList: CONFIG.admin.join(","),
             });
           } else {
             if (rdata.result) {

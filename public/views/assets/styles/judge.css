@@ -205,6 +205,12 @@ div.sticky {
     }
 }
 
+.header h3 a {
+    color: var(--tilt);
+    font-size: 1.5em;
+    text-decoration: none;
+}
+
 .header p {
     overflow: hidden;
 }
