@@ -1421,6 +1421,64 @@ module.exports = {
       }
     });
   },
+  pagelock: function (req, res) {
+    let key = req.body.key;
+    let user = req.body.user;
+    let page = req.body.page;
+    let type = req.body.type || "lock";
+    if (key && user && page) {
+      updateFile(
+        join(__dirname, "private", "db", "files", key + ".json"),
+        (err, rdata, callback) => {
+          if (err) {
+            return res.status(200).send({
+              message: JSON.stringify(err, null, 2),
+              type: "error",
+            });
+          } else {
+            if (rdata.post.page_list[page]) {
+              if (type == "unlock") {
+                rdata.post.page_list[page].lock = false;
+              } else {
+                rdata.post.page_list[page].lock = user;
+              }
+              callback(rdata, (err) => {
+                if (err) {
+                  return res.status(200).send({
+                    message: JSON.stringify(err, null, 2),
+                    type: "error",
+                  });
+                } else {
+                  return res.status(200).send({
+                    message:
+                      type == "lock"
+                        ? `<b>${page}</b> is locked to you. Only you can judge it now.`
+                        : `<b>${page}</b> is unlocked. Anyone can judge it now.`,
+                    type: "success",
+                    redirect: {
+                      url:
+                        "/judge?key=" +
+                        key +
+                        "&page=" +
+                        page +
+                        "&judge=" +
+                        encodeURIComponent(user),
+                      timer: 3,
+                    },
+                  });
+                }
+              });
+            }
+          }
+        }
+      );
+    } else {
+      return res.status(200).send({
+        message: "Missing key, user or page",
+        type: "error",
+      });
+    }
+  },
 };
 function removeCircularReferences(obj) {
   const seen = new WeakSet();

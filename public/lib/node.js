@@ -436,7 +436,7 @@ function editathonTable(page_list, mkey, startindex = 0, translation = null) {
                 : pageData[field]
             }</td>`;
           } else {
-            td = `<td data-label=''>${pageData[field]}</td>`;
+            /* td = `<td data-label=''>${pageData[field]}</td>`; */
           }
           table += td;
         });
