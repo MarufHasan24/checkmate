@@ -54,7 +54,3 @@ If you encounter any issues or have feedback, please open an issue on the [GitHu
 ## Author
 
 Checkmate was created by [[Md. Maruf Hasan](https://bn.wikipedia.org/wiki/ব্যবহারকারী:Maruf)]. You can contact me on my [Talk page](https://meta.wikimedia.org/wiki/User_talk:Maruf) for any questions or feedback.
-
-## Acknowledgments
-
-Checkmate was inspired by [list any inspirations or dependencies]. Thank you to the open-source community for making this project possible!
