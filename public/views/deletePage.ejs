@@ -32,13 +32,35 @@
         tr:nth-child(odd).deleted {
             background-color: rgb(191, 37, 3);
         }
+
+        .settings {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .settings button {
+            margin: 0 1rem;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+            background-color: rgb(var(--tilt-dark));
+        }
+
+        .discard:hover {
+            background-color: #ceffd1;
+            color: rgb(var(--tilt-rgb));
+        }
     </style>
 </head>
 
 <body>
     <div class="settings">
-        <button id="deleteBtn" onclick="deleteSelected()">Delete Selected</button>
-        <button id="cancelBtn" onclick="cancelDelete()">Cancel</button>
+        <button id="deleteBtn" class="cancel" onclick="deleteSelected()">Delete Selected</button>
+        <button id="cancelBtn" class="discard" onclick="cancelDelete()">Cancel</button>
     </div>
     <table>
         <thead>
@@ -120,6 +142,10 @@
             redirect: null,
             type: "info",
             autoHide: 2,
+            redirect: {
+                url: "/editathon?key=<%=key%>",
+                timer: 2,
+            }
         });
     }
 </script>

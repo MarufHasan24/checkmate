@@ -35,21 +35,28 @@
     <iframe src="/background.html" frameborder="0"></iframe>
     <% if(pagelist) { %>
         <script>
+            const judge = "<%= data?.judge %>";
             const userdata = JSON.parse(validateStr('<%= jsondata %>'));
-            //console.log(userdata);
             let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
             let data = JSON.parse(localStorage.getItem(key));
             if (userdata) {
-                if (!(data && data.username)) {
+                if (!(data && data?.username)) {
                     csalert("Login Required!", "Please login first to judge pages", function () {
                         document.getElementsByClassName("container")[0].remove();
                         window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
                     });
-                }
-                if (!userdata.jurries.includes(data.username)) {
+                } else if (!userdata.jurries.includes(data.username)) {
                     // redirect to  that wiki page
                     window.location.replace("https://" + userdata.project + ".org/wiki/" + userdata.page);
 
+                } else if (judge !== data?.username) {
+                    /* remove judge part from the location ang reloade the page */
+                    let url = window.location.href.split("?")[0];
+                    let params = new URLSearchParams(window.location.search);
+                    params.delete("judge");
+                    params.append("judge", data.username);
+                    window.history.replaceState({}, document.title, url + "?" + params.toString());
+                    window.location.reload();
                 }
             } else {
                 if (data && data.username) {
@@ -121,16 +128,42 @@
                             <div class="container">
                                 <%-html%>
                             </div>
-                            <div class="sticky">
-                                <ul class="options">
-                                </ul>
-                                <button id="comment-button">comment</button>
-                                <div class="controls">
-                                    <span>Marks:<span id="marks">0</span></span>
-                                    <button type="button" disabled="" class="buttons" id="Save">Save</button><button
-                                        type="button" class="buttons" id="Skip">Skip</button>
+
+                            <% if (!isLocked || (isLocked && isLocked==data.judge)) { %>
+                                <div class="sticky">
+                                    <ul class="options" style="justify-content: flex-start;">
+                                    </ul>
+                                    <div class="controls" style="justify-content: center;">
+                                        <% if (!isLocked) { %>
+                                            <button class="lockbtn" id="lock-button">Lock it!</button>
+                                            <% } else {%>
+                                                <button class="lockbtn" id="unlock-button">Unlock</button>
+                                                <% } %>
+                                                    <button id="comment-button">comment</button>
+                                    </div>
+                                    <div class="controls">
+                                        <span>Marks:<span id="marks">0</span></span>
+                                        <button type="button" disabled="" class="buttons" id="Save">Save</button><button
+                                            type="button" class="buttons" id="Skip">Skip</button>
+                                    </div>
                                 </div>
-                            </div>
+                                <% }else{ %>
+                                    <div class="sticky locked">
+                                        <div>
+                                            <p>
+                                                <a href="https://<%=data.project%>.org/user:<%=isLocked%>">
+                                                    <%=isLocked%>
+                                                </a> is now judging this page. Please judge another page. You can ask
+                                                <i>
+                                                    <%=isLocked%>
+                                                </i> to
+                                                unlock it.
+                                            </p>
+                                        </div>
+                                        <button type="button" class="buttons" id="Skip">Next</button>
+                                    </div>
+                                    <% } %>
+
                         </div>
                         <script src="/assets/scripts/judge.js"></script>
                         <% } %>

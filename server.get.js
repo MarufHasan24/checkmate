@@ -30,12 +30,10 @@ module.exports = {
         /* Make a quick list of queries */
         data = data.key;
         let keys = Object.keys(data);
-
         /* First sort keys according to the date
          * then if hosted day is same, sort according to the key
          * then hosted day is 6 months old then remove it from the list
          */
-
         keys.sort((a, b) => {
           if (data[a].date < data[b].date) return 1;
           if (data[a].date > data[b].date) return -1;
@@ -47,18 +45,18 @@ module.exports = {
         let html = keys
           .map(
             (key) => `<tr>
-                            <td colspan="3">
-                                <div class="patrol-entry">
-                                    <div class="top">
-                                        <a href="/editathon?key=${key}">${data[key].name}</a>
+                                <td colspan="3">
+                                    <div class="patrol-entry">
+                                        <div class="top">
+                                            <a href="/editathon?key=${key}">${data[key].name}</a>
+                                        </div>
+                                        <div class="bottom">
+                                            <span>Host: <a href="/query?host=${data[key].host}">${data[key].host}</a></span> |
+                                            <span>Project: <a href="https://${data[key].project}.org/">${data[key].project}</a></span>
+                                        </div>
                                     </div>
-                                    <div class="bottom">
-                                        <span>Host: <a href="/query?host=${data[key].host}">${data[key].host}</a></span> |
-                                        <span>Project: <a href="https://${data[key].project}.org/">${data[key].project}</a></span>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>`
+                                </td>
+                            </tr>`
           )
           .join("");
 
@@ -230,7 +228,6 @@ module.exports = {
     const name = decodeURIComponent(req.query.name || "");
     const project = req.query?.project;
     const mkey = req.query?.key;
-
     if (!name && !mkey && !host && !project) {
       return res.render("list.ejs", {
         html: "",
@@ -246,63 +243,71 @@ module.exports = {
           }),
         },
       });
-    }
-
-    readFile(
-      join(__dirname, "private", "querylist.json"),
-      (err, parsedData) => {
-        if (err) {
-          //console.error(err);
-          return res.render("error.ejs", {
-            status: 500,
-            error: "Error reading data",
-            redirect: null,
-          });
-        }
-
-        let Data = { name: [], key: [], host: [], date: [], project: [] };
-        // Otherwise, filter based on other parameters
-        const keys = Object.entries(parsedData.key);
-        keys.forEach(([key, keyobj]) => {
-          const matchesHost = host ? keyobj.host === host : true;
-          const matcheskey = mkey ? key.includes(mkey) : true;
-          const matchesName = name
-            ? keyobj.name.toLowerCase() === name.toLowerCase()
-            : true;
-          const matchesProject = project ? keyobj.project === project : true;
-          if (matchesHost && matchesName && matchesProject && matcheskey) {
-            Data.key.push(key);
-            Data.name.push(keyobj.name);
-            Data.host.push(keyobj.host);
-            Data.project.push(keyobj.project);
-            Data.date.push(keyobj.date.split("T")[0]);
+    } else {
+      readFile(
+        join(__dirname, "private", "querylist.json"),
+        (err, parsedData) => {
+          if (err) {
+            //console.error(err);
+            return res.render("error.ejs", {
+              status: 500,
+              error: "Error reading data",
+              redirect: null,
+            });
           }
-        });
 
-        const html = Data.key
-          .map(
-            (_, i) => `<tr>
+          let Data = { name: [], key: [], host: [], date: [], project: [] };
+          // Otherwise, filter based on other parameters
+          const keys = Object.entries(parsedData.key);
+          keys.forEach(([key, keyobj]) => {
+            const matchesHost = host ? keyobj.host === host : true;
+            const matcheskey = mkey ? key.includes(mkey) : true;
+            let matchesName = true;
+            name
+              ? name
+                  .toLowerCase()
+                  .split(" ")
+                  .forEach((n) => {
+                    matchesName =
+                      matchesName && keyobj.name.toLowerCase().includes(n);
+                  })
+              : true;
+
+            const matchesProject = project ? keyobj.project === project : true;
+            if (matchesHost && matchesName && matchesProject && matcheskey) {
+              Data.key.push(key);
+              Data.name.push(keyobj.name);
+              Data.host.push(keyobj.host);
+              Data.project.push(keyobj.project);
+              Data.date.push(keyobj.date.split("T")[0]);
+            }
+          });
+
+          const html = Data.key
+            .map(
+              (_, i) => `<tr>
         <td data-label='Name'>${Data.name[i]}</td>
-        <td data-label='Key'><a href='/editathon?key=${Data.key[i]}'>${
-              Data.key[i]
-            }</a></td>
+        <td data-label='Key'><a href='${"/editathon?key=" + Data.key[i]}'>${
+                Data.key[i]
+              }</a></td>
         <td data-label='Date'>${Data.date[i]}</td>
         <td data-label='Project'><a href='https://${Data.project[i]}.org/'>${
-              Data.project[i]
-            }</a></td>
+                Data.project[i]
+              }</a></td>
         <td data-label='Host'><a href='/query?host=${encodeURIComponent(
           Data.host[i]
         )}'>${Data.host[i]}</a></td>
       </tr>`
-          )
-          .join("");
+            )
+            .join("");
 
-        res.render("list.ejs", {
-          html,
-          data: { key: mkey, project, host, name },
-        });
-      }
-    );
+          res.render("list.ejs", {
+            html,
+            data: { key: mkey, project, host, name },
+          });
+        }
+      );
+    }
   },
   dashboard: function (req, res) {
     let key = (req && req?.query && req?.query?.key) || null;
@@ -571,12 +576,14 @@ module.exports = {
                         pagelist: list,
                         page: page,
                         html: wikidata.text,
+                        isLocked: pagelist[page]?.lock,
                         pagedata: {
                           creator: wikidata.creator,
                           creation: wikidata.creation,
                           ...pagelist[page],
                         },
                         data: {
+                          judge: user,
                           project: rdata.data.base_component,
                           opts: rdata.data.dynamic,
                         },
@@ -590,6 +597,7 @@ module.exports = {
                           template: rdata.data.feedback_template,
                           creator: wikidata.creator,
                           submitter: pagelist[page].sub,
+                          isLocked: pagelist[page]?.lock || false,
                         }),
                       });
                     }

@@ -84,6 +84,7 @@ app.post("/elemination", posts.elemination);
 app.post("/permit", posts.adminP);
 app.post("/result", posts.makeResult);
 app.post("/language", posts.language);
+app.post("/lock", posts.pagelock);
 // 404 handler - Place this AFTER all routes
 app.use(function (req, res) {
   return res.render("error.ejs", {

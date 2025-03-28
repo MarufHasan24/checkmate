@@ -224,10 +224,10 @@ window.onload = () => {
     searchBox.value = languages[langCode || "en"];
     searchBox.langCode = langCode || "en";
     //user is logged in
-    console.log(langCode);
+    user = data || apiuser;
     updateLangdata({
       langcode: langCode,
-      username: data.username,
+      username: data?.username,
     });
     /* onclick change class */
     signInButton.addEventListener("click", () => {
@@ -259,7 +259,7 @@ window.onload = () => {
                 if (data && data.result) {
                   location.replace("/template?data=" + data.data);
                 } else {
-                  //console.log("Fail Data", data)
+                  console.log("Fail Data", data);
                 }
               }
             );
@@ -312,7 +312,6 @@ window.onload = () => {
     }
   });
 };
-
 function updateDropdown(filter = "") {
   languageSelect.innerHTML = "";
   const filteredLanguages = Object.entries(languages).filter(([code, name]) =>
@@ -342,7 +341,6 @@ function updateDropdown(filter = "") {
   });
   languageSelect.style.display = "block";
 }
-
 //generate random keys and pass for user
 function generateRandomKey(len) {
   const timestamp = Date.now().toString(36);
@@ -365,11 +363,9 @@ function generateRandomKey(len) {
   }
   return randomKey;
 }
-
 //check api validity
 function checkWikimediaAPI(projecturl, callback) {
   const url = `https://${projecturl}.org/w/api.php?action=query&meta=siteinfo&format=json&origin=*`;
-  console.log(url);
   fetch(url)
     .then((response) => {
       if (!response.ok) {
@@ -378,7 +374,6 @@ function checkWikimediaAPI(projecturl, callback) {
       return response.json();
     })
     .then((data) => {
-      console.log(data.query.general);
       if (data && data.query && data.query.general) {
         // Valid API
         callback(true);
@@ -392,7 +387,6 @@ function checkWikimediaAPI(projecturl, callback) {
       callback(false); // In case of any error, consider it invalid
     });
 }
-
 function updateLangdata(data) {
   proxyFetch(
     "language",

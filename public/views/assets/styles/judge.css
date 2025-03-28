@@ -76,11 +76,18 @@ div.sticky {
     box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
     border-radius: 20px 20px 0 0;
     display: grid;
-    grid-template-columns: 8fr 2fr 4fr;
+    grid-template-columns: 7fr 3fr 4fr;
     z-index: 10;
     /* Uncomment to ensure it's above other elements */
 }
 
+div.sticky p {
+    overflow: visible;
+}
+
+div.sticky.locked {
+    grid-template-columns: 10fr 4fr;
+}
 
 /* Link Styling */
 .sticky a {
@@ -128,7 +135,8 @@ div.sticky {
 }
 
 /* Comment Button */
-#comment-button {
+#comment-button,
+.lockbtn {
     background-color: var(--tilt);
     color: white;
     padding: 12px 18px;
@@ -140,7 +148,8 @@ div.sticky {
     transition: all 0.3s ease;
 }
 
-#comment-button:hover {
+#comment-button:hover,
+.lockbtn:hover {
     background-color: #3e8c7d;
     transform: translateY(-3px);
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.8);
@@ -198,6 +207,7 @@ div.sticky {
     }
 
     #comment-button,
+    .lockbtn,
     .buttons,
     .options button {
         padding: 8px 12px;
