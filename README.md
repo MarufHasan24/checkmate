@@ -59,4 +59,4 @@ Checkmate was created by [[Md. Maruf Hasan](https://bn.wikipedia.org/wiki/ব্
 
 ## Acknowledgments
 
-Checkmate was inspired by [list any inspirations or dependencies]. Thank you to the open-source community for making this project possible!
+Checkmate was inspired by various open-source projects and tools. Thank you to the open-source community for making this project possible!
