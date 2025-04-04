@@ -156,39 +156,44 @@
         </div>
     </div>
 </body>
-<script>
-    const scripts = document.getElementById('scripts');
-    const deleteKey = document.createElement('a');
-    let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
-    let logindata = JSON.parse(localStorage.getItem(key));
-    deleteKey.href = 'javascript:void';
-    deleteKey.onclick = () => {
-        proxyFetch(
-            "delete",
-            {
-                key: location.search.split("=")[1],
-                user: logindata.username,
-                type: "missing",
-            },
-            (data) => {
-                if (data.error) {
-                    console.error(data.error);
-                } else {
-                    msg({
-                        message: "Key deleted successfully",
-                        type: "info",
-                        duration: 2,
-                        redirect: {
-                            url: "/",
-                            timer: 4,
-                        },
-                    });
+
+<% if (deletable) { %>
+    <script>
+        const scripts = document.getElementById('scripts');
+        let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+        let logindata = JSON.parse(localStorage.getItem(key));
+        let deletable = "<%= deletable.key %>";
+        const deleteKey = document.createElement('a');
+        deleteKey.href = 'javascript:void';
+        deleteKey.onclick = () => {
+            proxyFetch(
+                "delete",
+                {
+                    key: deletable,
+                    user: logindata.username,
+                    type: "<%= deletable.type %>" || "missing",
+                    bin: false,
+                },
+                (data) => {
+                    if (data.error) {
+                        console.error(data.error);
+                    } else {
+                        msg({
+                            message: "Key deleted successfully",
+                            type: "info",
+                            duration: 2,
+                            redirect: {
+                                url: "/",
+                                timer: 4,
+                            },
+                        });
+                    }
                 }
-            }
-        );
-    };
-    deleteKey.innerHTML = 'Delete Key';
-    scripts.appendChild(deleteKey);
-</script>
+            );
+        };
+        deleteKey.innerHTML = 'Delete Key';
+        scripts.appendChild(deleteKey);
+    </script>
+    <% } %>
 
 </html>

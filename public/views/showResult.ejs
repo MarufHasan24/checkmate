@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 29 March, 2025-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= data.name %> - Result page | Checkmate Edit-a-thon Management Tool
+    </title>
+    <link rel="stylesheet" href="/assets/styles/common.css">
+    <link rel="stylesheet" href="/assets/styles/dashboard.css">
+    <!-- <link rel="stylesheet" href="/assets/styles/table.css"> -->
+    <script src="/assets/scripts/tools.js"></script>
+    <script src="/assets/scripts/extraTools.js"></script>
+    <style>
+        #controls {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 96%;
+            border-collapse: collapse;
+            text-align: center;
+            padding: 2%;
+            margin-bottom: 2%;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        th {
+            background: rgb(var(--tilt-rgb));
+            color: white;
+        }
+
+        th.sortable:hover {
+            background: rgb(var(--tilt-rgb));
+        }
+
+        tr:nth-child(even) {
+            background: rgb(var(--tilt-rgb), 0.3);
+        }
+
+        .table-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+    <header>
+        <% if(data) { %>
+            <% if (data.result) { %>
+                <h1>
+                    <%= data.name %> | Result page from archive
+                </h1>
+                <% }else { %>
+                    <h1>
+                        Corrupted data
+                    </h1>
+                    <% } %>
+                        <ul class="menu">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="https://<%= data.project %>.org/wiki/<%=data.resultPages.main%>"
+                                    target="_blank">View
+                                    on
+                                    <%= data.project %>
+                                </a></li>
+                            <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                        </ul>
+                        <% } else { %>
+                            <p>Enter Pages's key first</p>
+                            <ul class="menu">
+                                <li><a href="/">Home</a></li>
+                                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                            </ul>
+                            <% } %>
+    </header>
+</head>
+
+<body>
+    <script>
+        const userdata = JSON.parse(validateStr('<%= jsondata %>'));
+        console.log(userdata);
+    </script>
+    <div class="container">
+        <div class="settings">
+            <div class="card small">
+                <h2 class="value">
+                    <%= data.host %>
+                </h2>
+                <p class="label">Host</p>
+            </div>
+            <div class="card small">
+                <a href="https://<%= data.project %>.org/" target="_blank">
+                    <h2>
+                        <%= data.project %>.org
+                    </h2>
+                </a>
+                <p class="label">Project</p>
+            </div>
+            <div class="card small">
+                <h2>
+                    <%= new Date(data.result.date).toLocaleDateString("en-GB", { year: "numeric" , month: "2-digit" ,
+                        day: "2-digit" , }) %>
+                </h2>
+                <p class="label">Hosted Date</p>
+            </div>
+            <div class="card small">
+                <h2>
+                    <%=data.result.count%>
+                </h2>
+                <p>Total submission</p>
+            </div>
+            <div class="card small">
+                <h2>
+                    <%= data.result.user %>
+                </h2>
+                <p class="label">Result Publisher</p>
+            </div>
+            <div class="card medium">
+                <p style="display: grid; grid-template-columns: 2fr 4fr;"><i>Start
+                        Date:</i>
+                    <b style="font-size: 1.15rem">
+                        <%=data.start_date.split("-").reverse().join(" / ") %> |
+                            <%=data.start_time%>
+                    </b>
+                </p>
+                <p style=" display: grid; grid-template-columns: 2fr 4fr;"><i>End
+                                Date:</i>
+                            <b style="font-size: 1.15rem">
+                                <%=data.end_date.split("-").reverse().join(" / ") %> |
+                            <%=data.end_time%>
+                    </b>
+                </p>
+                <p style=" display: grid; grid-template-columns: 2fr 4fr;"><i>Total
+                                        time</i>
+                                    <b style="font-size: 1.15rem" id="total_time">
+                                    </b>
+                </p>
+            </div>
+            <!-- Group 0: Basic -->
+            <div class="card medium">
+                <h2>Basic</h2>
+                <p><i>Project:</i>
+                    <a href="https://<%= data['base_component']%>.org/">
+                        <%= data["base_component"]%>
+                    </a>
+                </p>
+                <p><i>Title:</i>
+                    <%= data["title"]%>
+                </p>
+                <p><i>langcode:</i>
+                    <%= data["langcode"]%>
+                </p>
+            </div>
+            <!-- Group 1: Page and User Info -->
+            <div class="card medium">
+                <h2>Page and User Info</h2>
+                <p><i>Page Name:</i>
+                    <%= data.page_name ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>User Names:</i>
+                    <%= data.user_names ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Jurry Names:</i>
+                    <%= data.jurry_names ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Reviewers Name:</i>
+                    <%= data['reviewers_name'] ? 'Enabled' : 'Disabled' %>
+                </p>
+            </div>
+
+            <!-- Group 2: Dates -->
+            <div class="card medium">
+                <h2>Dates</h2>
+                <p><i>Upload Date:</i>
+                    <%= data.upload_date ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Creation Date:</i>
+                    <%= data.creation_date ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>User Last Contribution Date:</i>
+                    <%= data.user_last_contribution_date ? 'Enabled' : 'Disabled' %>
+                </p>
+            </div>
+
+            <!-- Group 3: Checks and Reviews -->
+            <div class="card medium">
+                <h2>Checks and Reviews</h2>
+                <p><i>User Edit Count:</i>
+                    <%= data.user_edit_count ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Single Checking:</i>
+                    <%= data.single_checking ? 'Enabled' : 'Disabled' %>
+                </p>
+            </div>
+
+            <!-- Group 4: Feedback and Templates -->
+            <div class="card medium">
+                <h2>Feedback and Templates</h2>
+                <p><i>Send Feedback:</i>
+                    <%= data.send_feedback ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Feedback Template:</i>
+                    <%= data.feedback_template || 'N/A' %>
+                </p>
+            </div>
+
+            <!-- Group 5: Text Options -->
+            <div class="card medium">
+                <h2>Text Options</h2>
+                <p><i>Add Text in Talk Page:</i>
+                    <%= data.add_text_in_talk_page ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Talk page textContent:</i>
+                    <%= data['windowinp-input16-text1'] || 'N/A' %>
+                </p>
+                <p><i>Add Text in Main Pages:</i>
+                    <%= data.add_text_in_main_pages ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Input Text 2:</i>
+                    <%= data['windowinp-input15-text1'] || 'N/A' %>
+                </p>
+            </div>
+
+            <!-- Group 6: Batch Operations and Statistics -->
+            <div class="card medium">
+                <h2>Batch Operations and Statistics</h2>
+                <p><i>Batch Upload:</i>
+                    <%= data.batch_upload ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Statistic:</i>
+                    <%= data.statistic ? 'Enabled' : 'Disabled' %>
+                </p>
+            </div>
+
+            <!-- Group 7: Countdown and Select -->
+            <div class="card medium">
+                <h2>Others</h2>
+                <p><i>Countdown:</i>
+                    <%= data.countdown ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Result on basis of:</i>
+                    <%= data['make_result'] %>
+                </p>
+                <p><i>Dashboard functionality:</i>
+                    <%= data['dashboard_functionality'] %>
+                </p>
+            </div>
+
+            <!-- Group 8: Result Page and User Info -->
+            <div class="card medium">
+                <h2>Result Page and User Info</h2>
+                <p><i>main Result pages:</i>
+                    <%= data.resultPages.main %>
+                        <i>Judge Result pages:</i>
+                        <%= data.resultPages.judge %>
+                            <i>Participent Result pages:</i>
+                            <%= data.resultPages.participent %>
+                </p>
+                <p><i>main Result Page URL:</i>
+                    <a href="https://<%= data.project %>.org/wiki/<%=data.resultPages.main%>" target="_blank">
+                        <%= data.resultPages.main %>
+                    </a>
+                </p>
+                <p><i>Result date:</i>
+                    <%= new Date(data.result.date).toLocaleDateString("en-GB", { year: "numeric" , month: "2-digit" ,
+                        day: "2-digit" , }) %>
+                </p>
+            </div>
+
+            <!-- Group 9: jurries and admin -->
+            <div class="card">
+                <h2>Jurries</h2>
+                <ul>
+                    <% data.jurries.split(",").forEach(element=> { %>
+                        <li>
+                            <a href="http://<%=data.project%>.org/wiki/user:<%=element%>/">
+                                <%= element %>
+                            </a>
+                        </li>
+                        <% })%>
+                </ul>
+                <p><i>Public Jurry performane:</i>
+                    <%= data.jurry_name ? 'Enabled' : 'Disabled' %>
+                </p>
+                <p><i>Define Jurry:</i>
+                    <%= data.reviewers_name ? 'Enabled' : 'Disabled' %>
+                </p>
+            </div>
+        </div>
+        <%- data.result.table %>
+    </div>
+</body>
+<script>
+    function sortTableAdv() {
+        return 0;
+    }
+    document.getElementById("total_time").innerHTML = timeDifference((Date.parse('<%=data.end_date%>' + ' ' + '<%=data.end_time%>')), "date", Date.parse('<%=data.start_date%>' + ' ' + '<%=data.start_time%>'), true);
+</script>
+
+</html>

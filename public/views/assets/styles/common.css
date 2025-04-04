@@ -158,7 +158,7 @@ a {
 }
 
 a:hover {
-    border-bottom: 1px solid #fff;
+    text-decoration: underline;
 }
 
 div.success {

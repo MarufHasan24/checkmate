@@ -21,11 +21,18 @@
             text-align: center;
         }
 
+        #table-container th {
+            cursor: pointer;
+        }
+
+        #table-container th.sortable:hover {
+            background: rgb(var(--tilt-rgb), 0.5);
+        }
+
         th,
         td {
             padding: 10px;
             border: 1px solid #ddd;
-            cursor: pointer;
         }
 
         th {
@@ -160,93 +167,155 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>Summary of Results</h1>
-        <div class="stats">
-            <div class="card small">
-                <strong>Page Count:</strong>
-                <h2>
-                    <%= data.pagecount %>
-                </h2>
-            </div>
-            <div class="card small">
-                <strong>Reviewed:</strong>
-                <h2>
-                    <%= data.reviewed %>
-                </h2>
-            </div>
-            <% if((data.pagecount - data.reviewed)> 0) {%>
-                <div class="card small" style="background-color: rgb(255, 134, 134);">
-                    <%} else {%>
-                        <div class="card small" style="background-color: rgb(144, 255, 141);">
-                            <%}%>
+    <% if (data) { %>
 
-                                <strong>Remaining:</strong>
-                                <h2>
-                                    <%= data.pagecount - data.reviewed %>
-                                </h2>
-                        </div>
-                        <% if(data.reaminingTime> 0) {%>
-                            <div class="card small" style="background-color: rgb(255, 134, 134);">
-                                <%} else {%>
-                                    <div class="card small" style="background-color: rgb(144, 255, 141);">
-                                        <%}%>
-                                            <strong>Remaining Time:</strong>
-                                            <h2 id="remainingTime"></h2>
-                                    </div>
-                                    <div class="card small">
-                                        <strong>Host:</strong>
-                                        <h2>
-                                            <%= data.host %>
-                                        </h2>
-                                    </div>
-                                    <div class="card">
-                                        <strong>Particepents:</strong>
-                                        <ul class="juries-list">
-                                            <% data.usercount.forEach(function(juror) { %>
-                                                <li>
-                                                    <%= juror %>
-                                                </li>
-                                                <% }); %>
-                                        </ul>
-                                    </div>
+        <div class="container">
+            <h1>Summary of Results</h1>
+            <div class="stats">
+                <div class="card small">
+                    <strong>Page Count:</strong>
+                    <h2>
+                        <%= data.pagecount %>
+                    </h2>
+                </div>
+                <div class="card small">
+                    <strong>Reviewed:</strong>
+                    <h2>
+                        <%= data.reviewed %>
+                    </h2>
+                </div>
+                <% if((data.pagecount - data.reviewed)> 0) {%>
+                    <div class="card small" style="background-color: rgb(255, 134, 134);">
+                        <%} else {%>
+                            <div class="card small" style="background-color: rgb(144, 255, 141);">
+                                <%}%>
+
+                                    <strong>Remaining:</strong>
+                                    <h2>
+                                        <%= data.pagecount - data.reviewed %>
+                                    </h2>
                             </div>
-                </div>
-                <div class="settings" style="display: block;">
-                    <div></div>
-                    <div id="controls">
-                        <label><input type="checkbox" class="table-option" value="serial" disabled checked>
-                            Serial</label>
-                        <label><input type="checkbox" class="table-option" value="name" disabled checked> Name</label>
-                        <label><input type="checkbox" class="table-option" value="tr" checked> Total
-                            Submission</label>
-                        <label><input type="checkbox" class="table-option" value="tm" checked> Total
-                            Marks</label>
-                        <label><input type="checkbox" class="table-option" value="wc"> Word Count</label>
-                        <label><input type="checkbox" class="table-option" value="length"> Byte Count</label>
+                            <% if(data.reaminingTime> 0) {%>
+                                <div class="card small" style="background-color: rgb(255, 134, 134);">
+                                    <%} else {%>
+                                        <div class="card small" style="background-color: rgb(144, 255, 141);">
+                                            <%}%>
+                                                <strong>Remaining Time:</strong>
+                                                <h2 id="remainingTime"></h2>
+                                        </div>
+                                        <div class="card small">
+                                            <strong>Host:</strong>
+                                            <h2>
+                                                <%= data.host %>
+                                            </h2>
+                                        </div>
+                                        <div class="card">
+                                            <strong>Particepents:</strong>
+                                            <ul class="juries-list">
+                                                <% data.usercount.forEach(function(juror) { %>
+                                                    <li>
+                                                        <%= juror %>
+                                                    </li>
+                                                    <% }); %>
+                                            </ul>
+                                        </div>
+                                </div>
                     </div>
-                    <div>
-                        <lebel for="resultPage">Result Page</label>
-                            <input type="text" name="resultPage" id="resultPage" value="<%= data.result %>">
+                    <div class="settings">
+                        <input id="submit" type="submit">
+                        <button id="cancel" class="cancel">Cancel</button>
                     </div>
-                    <div id="table-container" class="table-container"></div>
-                </div>
-                <div class="settings">
-                    <input id="submit" type="submit">
-                    <button id="cancel" class="cancel">Cancel</button>
-                </div>
-
+                    <div class="settings" style="display: block;">
+                        <div id="controls">
+                            <label><input type="checkbox" class="table-option" value="serial" disabled checked>
+                                Serial</label>
+                            <label><input type="checkbox" class="table-option" value="name" disabled checked>
+                                Name</label>
+                            <label><input type="checkbox" class="table-option" value="ts"> Total
+                                Submission</label>
+                            <label><input type="checkbox" class="table-option" value="tr" checked> Total
+                                Reviewed</label>
+                            <label><input type="checkbox" class="table-option" value="tm" checked> Total
+                                Marks</label>
+                            <label><input type="checkbox" class="table-option" value="wc"> Word Count</label>
+                            <label><input type="checkbox" class="table-option" value="length"> Byte Count</label>
+                        </div>
+                        <div>
+                            <lebel for="resultPage">Result Page</label>
+                                <input type="text" name="resultPage" id="resultPage" value="<%= data.result %>">
+                        </div>
+                        <div id="table-container" class="table-container"></div>
+                    </div>
+                    <div class="settings" style="display: block;">
+                        <label><input type="checkbox" class="check-option" value="jurries">
+                            Publish juries</label>
+                        <div id="controls2">
+                            <label><input type="checkbox" class="table-option" value="serial" disabled checked>
+                                Serial</label>
+                            <label><input type="checkbox" class="table-option" value="name" disabled checked>
+                                Name</label>
+                            <label><input type="checkbox" class="table-option" value="tr" checked> Total
+                                Reviewed</label>
+                            <label><input type="checkbox" class="table-option" value="tm" checked> Total
+                                Marks</label>
+                            <label><input type="checkbox" class="table-option" value="wc"> Word Count</label>
+                            <label><input type="checkbox" class="table-option" value="length"> Byte Count</label>
+                        </div>
+                        <div>
+                            <lebel for="resultPage">Jurries Performance</label>
+                                <input type="text" name="resultPage" id="resultPage2" value="<%= data.result %>">
+                        </div>
+                        <div id="table-container-jurry" class="table-container"></div>
+                    </div>
+                    <div class="settings" style="display: block;">
+                        <label><input type="checkbox" class="check-option" value="detailes">
+                            Publish detailed</label>
+                        <div id="controls3">
+                            <label><input type="checkbox" class="table-option" value="serial" disabled checked>
+                                Serial</label>
+                            <label><input type="checkbox" class="table-option" value="name" disabled checked> Page
+                                Name</label>
+                            <label><input type="checkbox" class="table-option" value="stat" checked> State</label>
+                            <label><input type="checkbox" class="table-option" value="wc"> Word Count</label>
+                            <label><input type="checkbox" class="table-option" value="length"> Byte Count</label>
+                        </div>
+                        <div>
+                            <lebel for="resultPage">detailed</label>
+                                <input type="text" name="resultPage" id="resultPage3" value="<%= data.result %>">
+                        </div>
+                        <div id="table-container-detaile"></div>
+                    </div>
+            </div>
+        </div>
+        <script>
+            const userdata = JSON.parse(validateStr("<%=jsondata%>"));
+            let jurriesList = userdata.jlist;
+            document.getElementById("remainingTime").innerHTML = timeDifference(Number("<%=data.reaminingTime%>"), "diff");
+            let project = "<%=data.project%>";
+            let key = "<%=key%>";
+            document.getElementById("cancel").addEventListener("click", () => {
+                window.location.href = `/editathon?key=${key}`;
+            });
+            console.log(userdata);
+        </script>
+        <script src="/assets/scripts/result.js"></script>
+        <% } else { %>
+            <div class="container">
+                <section class="checking">
+                    <h2>Enter Your key here.</h2>
+                    <form>
+                        <input type="text" name="key" placeholder="key">
+                        <button onclick="submit()" type="submit">Submit</button>
+                    </form>
+                </section>
+            </div>
+            <script>
+                function submit() {
+                    let key = document.querySelector("input[name='key']").value;
+                    location.href = "/result?key=" + encodeURIComponent(key)
+                }
+            </script>
+            <% } %>
 </body>
-<script>
-    const userdata = JSON.parse(validateStr("<%=jsondata%>"));
-    let jurriesList = userdata.jlist;
-    document.getElementById("remainingTime").innerHTML = timeDifference(Number("<%=data.reaminingTime%>"), "diff");
-    let project = "<%=data.project%>";
-    let key = "<%=key%>";
-    document.getElementById("cancel").addEventListener("click", () => {
-        window.location.href = `/editathon?key=${key}`;
-    });
-</script>
-<script src="/assets/scripts/result.js"></script>
 
 </html>
