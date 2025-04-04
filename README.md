@@ -1,3 +1,4 @@
+
 # Checkmate: A Visual Editor for Administering Competitions
 
 ## 📌 Project Overview
@@ -128,7 +129,7 @@ We welcome contributions! To contribute:
 3. Submit a **pull request (PR)** with a descriptive summary.
 4. Ensure that the code passes tests before merging.
 
-For detailed contribution steps, see [`CONTRIBUTING.md`](CONTRIBUTING.md) (to be created).
+For detailed contribution steps, see [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
 ---
 
