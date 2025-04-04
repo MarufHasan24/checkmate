@@ -14,19 +14,36 @@ document.querySelectorAll(".container a").forEach((e) => {
 });
 const stickydiv = document.querySelector(".options");
 if (stickydiv) {
+  if (userdata.stat) {
+    state = userdata.stat;
+    saveBtn.disabled = false;
+    marks.innerHTML = userdata.opts[state].mark;
+  }
   for (i in userdata.opts) {
     let div = document.createElement("li");
     let input = document.createElement("button");
     input.innerHTML = i;
-    input.class = "radio";
+    if (userdata.stat == i) {
+      input.className = "radio active";
+    } else {
+      input.className = "radio";
+    }
     input.dataset.mark = userdata.opts[i].mark;
     div.appendChild(input);
     input.addEventListener("click", () => {
+      input.className = "radio active";
       saveBtn.disabled = false;
       skipBtn.disabled = true;
       marks.innerHTML = input.dataset.mark;
       state = input.innerHTML;
+      let radios = stickydiv.querySelectorAll(".radio");
+      radios.forEach((radio) => {
+        if (radio !== input) {
+          radio.className = "radio";
+        }
+      });
     });
+    // remove all other active classes
     stickydiv.appendChild(div);
   }
   saveBtn.addEventListener("click", () => {

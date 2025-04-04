@@ -67,9 +67,10 @@ app.get("/result", gets.result);
 app.get("/admin", gets.admin.index);
 app.get("/admin/log", gets.admin.log);
 app.get("/admin/permit", gets.admin.permit);
-/* app.get("/user", gets.user);
+app.get("/user", gets.user);
+app.get("/create", gets.create);
 app.get("/translate", gets.translate);
-app.get("/tools", gets.tools); */
+app.get("/tools", gets.tools);
 // redirect all the post requests post routes
 app.post("/template", posts.template);
 app.post("/dashboard", posts.dashboard);
@@ -91,6 +92,7 @@ app.use(function (req, res) {
     status: 404,
     error: "Looks like you've made a wrong move and checkmate!",
     redirect: null,
+    deletable: false,
   });
 });
 // Start server

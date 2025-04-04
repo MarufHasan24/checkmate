@@ -47,23 +47,30 @@ const getWikitext = function (title, project, callback) {
 };
 const editPage = function (oauth, project, data, callback) {
   const apiUrl = "https://" + project + ".org/w/api.php";
-  getCsrfToken(oauth, apiUrl, (token) => {
-    edit(
-      data.title,
-      oauth,
-      data.text,
-      token,
-      apiUrl,
-      (err, data) => {
-        if (err) {
-          callback(err);
-        } else {
-          callback(null, data?.edit);
-        }
-      },
-      data.place || "append"
-    );
-  });
+  if (!data.title) {
+    return callback(null, {
+      message: "Missing title",
+      type: "error",
+    });
+  } else {
+    getCsrfToken(oauth, apiUrl, (token) => {
+      edit(
+        data.title,
+        oauth,
+        data.text,
+        token,
+        apiUrl,
+        (err, data) => {
+          if (err) {
+            callback(err);
+          } else {
+            callback(null, data?.edit);
+          }
+        },
+        data.place || "append"
+      );
+    });
+  }
 };
 const getinfo = function (title, project, callback, options = {}) {
   const apiUrl = "https://" + project + ".org/w/api.php";
@@ -104,28 +111,79 @@ const getinfo = function (title, project, callback, options = {}) {
   }
 };
 function wikitable(html) {
-  let wikiTable = '{| class="wikitable"\n';
+  if (!html) return "No content found!";
 
-  // Extract all rows
-  let rows = html.match(/<tr[^>]*>(.*?)<\/tr>/gs);
-  if (!rows) return "No table found!";
+  let wikiText = "";
+  let index = 0;
+  html = html
+    .replace(/<code[^>]*>(.*?)<\/code>/gi, "$1")
+    .replace(/<div[^>]*>|<\/div>/gi, "");
+  while (index < html.length) {
+    let remainingHtml = html.slice(index);
 
-  for (let row of rows) {
-    wikiTable += "|-\n";
-
-    // Extract headers and cells
-    let cells = row.match(/<(th|td)[^>]*>(.*?)<\/\1>/gs);
-    if (!cells) continue;
-
-    for (let cell of cells) {
-      let cellText = cell.replace(/<\/?(th|td)[^>]*>/g, "").trim();
-      let cellType = cell.startsWith("<th") ? "!" : "|";
-      wikiTable += `${cellType} ${cellText}\n`;
+    // Match headings
+    let headingMatch = remainingHtml.match(/^<h(\d)>(.*?)<\/h\d>/i);
+    if (headingMatch) {
+      let level = parseInt(headingMatch[1], 10);
+      let text = headingMatch[2].replace(/<[^>]+>/g, "").trim();
+      wikiText +=
+        "=".repeat(level) + " " + text + " " + "=".repeat(level) + "\n\n";
+      index += headingMatch[0].length;
+      continue;
     }
+
+    // Match table
+    let tableMatch = remainingHtml.match(/^<table[^>]*>(.*?)<\/table>/is);
+    if (tableMatch) {
+      let tableContent = tableMatch[1];
+      let wikiTable = '{| class="wikitable"\n';
+
+      let rows = tableContent.match(/<tr[^>]*>(.*?)<\/tr>/gis);
+      if (rows) {
+        for (let row of rows) {
+          wikiTable += "|-\n";
+          let cells = row.match(/<(th|td)[^>]*>(.*?)<\/\1>/gis);
+          if (!cells) continue;
+          for (let cell of cells) {
+            let cellMatch = cell.match(/<(th|td)([^>]*)>(.*?)<\/\1>/i);
+            let tagType = cellMatch[1];
+            let attributes = cellMatch[2].trim();
+            let cellText = cellMatch[3].trim();
+            let cellType = tagType === "th" ? "!" : "|";
+
+            let attrText = "";
+            let colspanMatch = attributes.match(/colspan=["']?(\d+)["']?/i);
+            if (colspanMatch) {
+              attrText += ` colspan="${colspanMatch[1]}"`;
+            }
+
+            let styleMatch = attributes.match(/style=["']?([^"']+)["']?/i);
+            if (styleMatch) {
+              attrText += ` style=\"${styleMatch[1]}\"`;
+            }
+
+            wikiTable += `${cellType}${
+              attrText.length > 0 ? attrText + "|" : ""
+            } ${cellText}\n`;
+          }
+        }
+      }
+      wikiTable += "|}\n";
+      wikiText += wikiTable;
+      index += tableMatch[0].length;
+      continue;
+    }
+    let textMatch = remainingHtml.match(/^[^<]+/);
+    if (textMatch) {
+      wikiText += textMatch[0].trim() + "\n\n";
+      index += textMatch[0].length;
+      continue;
+    }
+    // If no known match is found, move forward
+    index++;
   }
 
-  wikiTable += "|}";
-  return wikiTable;
+  return wikiText.trim();
 }
 function pageinfo(title, url, callback) {
   if (!title) {

@@ -217,6 +217,7 @@ module.exports = {
       let host = "";
       let type = req.body.type;
       let bin = req.body.bin || false;
+      console.log("delete", key, user, type, bin);
       updateFile(
         join(__dirname, "private", "querylist.json"),
         (err, olddata, callback) => {
@@ -236,9 +237,45 @@ module.exports = {
                     user,
                     "delete/permanent",
                     (err) => {
+                      if (err) {
+                        console.error(err);
+                      }
                       return res.status(200).send({
                         success: true,
                       });
+                    },
+                    { key: key || null }
+                  );
+                }
+                if (type === "invalid") {
+                  keepLog(
+                    user,
+                    "delete/permanent",
+                    (err) => {
+                      if (err) {
+                        console.error(err);
+                      }
+                      deleteFile(
+                        join(
+                          __dirname,
+                          "private",
+                          ".bin",
+                          "files",
+                          key + ".json"
+                        ),
+                        (err) => {
+                          if (err) {
+                            console.error(err);
+                          } else {
+                            return res.status(200).send({
+                              success: true,
+                            });
+                          }
+                        },
+                        key,
+                        user,
+                        false
+                      );
                     },
                     { key: key || null }
                   );
@@ -252,14 +289,14 @@ module.exports = {
                     ),
                     (err, uolddata, callback) => {
                       if (err) {
-                        //console.error(err);
+                        console.error(err);
                       } else {
                         uolddata.data = uolddata.data.filter(
                           (e) => e.key !== key
                         );
                         callback(uolddata, (err) => {
                           if (err) {
-                            //console.error(err);
+                            console.error(err);
                           } else {
                             deleteFile(
                               join(
@@ -646,7 +683,9 @@ module.exports = {
               error: err,
             });
           } else {
-            let pdata = oldata.post.page_list[page];
+            let pdata =
+              oldata.post.page_list[page] ||
+              oldata.post.jurries_list[user][page];
             if (pdata) {
               if (pdata.sub == user) {
                 callback(oldata, (err) => {
@@ -673,17 +712,30 @@ module.exports = {
               } else {
                 pdata.rev = user;
                 pdata.stat = jdata.state;
+                if (oldata.post.page_list[page]) {
+                  oldata.post.reviewed++;
+                  delete oldata.post.page_list[page];
+                }
                 oldata.post.jurries_list[user][page] = pdata;
-                delete oldata.post.page_list[page];
-                oldata.post.reviewed++;
                 callback(oldata, (err) => {
                   if (err) {
                     return res.status(200).send({
                       error: err,
                     });
                   } else {
+                    let list = Object.keys(oldata.post.page_list);
                     return res.status(200).send({
-                      result: "success",
+                      message: "Judged successfully!",
+                      type: "success",
+                      redirect: {
+                        url:
+                          "/judge?key=" +
+                          key +
+                          "&page=" +
+                          list[Math.floor(list.length * Math.random())],
+                        timer: null,
+                        button: "Another Random Page",
+                      },
                     });
                   }
                 });
@@ -691,7 +743,7 @@ module.exports = {
             } else {
               let list = Object.keys(oldata.post.page_list);
               return res.status(200).send({
-                message: page + "has been judged already!",
+                message: page + " has been judged already!",
                 type: "info",
                 redirect: {
                   url:
@@ -1286,7 +1338,15 @@ module.exports = {
       if (lerr) {
         console.error(lerr);
       } else {
-        let tableString = wikitable(data.table);
+        let tableString = wikitable(data.table.main.data);
+        let judgeString = "";
+        let detailes = "";
+        if (data.table.judge) {
+          judgeString = "\n\n" + wikitable(data.table.judge.data);
+        }
+        if (data.table.participent) {
+          detailes = "\n\n" + wikitable(data.table.participent.data);
+        }
         readUser(
           join(
             __dirname,
@@ -1305,7 +1365,7 @@ module.exports = {
                 udata.user.oauth,
                 data.project,
                 {
-                  title: data.result,
+                  title: data.table.main.result,
                   text: tableString,
                   place: "append",
                 },
@@ -1316,35 +1376,173 @@ module.exports = {
                       type: "error",
                     });
                   } else {
-                    updateFile(
-                      join(__dirname, "private", "db", "files", key + ".json"),
-                      (err, rdata, callback) => {
+                    editPage(
+                      udata.user.oauth,
+                      data.project,
+                      {
+                        title: data.table?.judge?.result || null,
+                        text: judgeString,
+                        place: "append",
+                      },
+                      (err, edata) => {
                         if (err) {
                           return res.status(200).send({
                             message: JSON.stringify(err, null, 2),
                             type: "error",
                           });
                         } else {
-                          rdata.post.result = {
-                            date: new Date().toISOString(),
-                            page: data.result,
-                            user: user,
-                            isAotuReviewed: rdata.data?.autoReviewed || false,
-                          };
-                          callback(rdata, (err) => {
-                            if (err) {
-                              return res.status(200).send({
-                                message: JSON.stringify(err, null, 2),
-                                type: "error",
-                              });
-                            } else {
-                              return res.status(200).send({
-                                message:
-                                  "Result has been published successfully!",
-                                type: "success",
-                              });
+                          editPage(
+                            udata.user.oauth,
+                            data.project,
+                            {
+                              title: data.table?.judge?.result || null,
+                              text: detailes,
+                              place: "append",
+                            },
+                            (err, edata) => {
+                              if (err) {
+                                return res.status(200).send({
+                                  message: JSON.stringify(err, null, 2),
+                                  type: "error",
+                                });
+                              } else {
+                                updateFile(
+                                  join(
+                                    __dirname,
+                                    "private",
+                                    "db",
+                                    "files",
+                                    key + ".json"
+                                  ),
+                                  (err, rdata, callback) => {
+                                    if (err) {
+                                      return res.status(200).send({
+                                        message: JSON.stringify(err, null, 2),
+                                        type: "error",
+                                      });
+                                    } else {
+                                      rdata.data.resultPages = {
+                                        main: data.table.main.result,
+                                        judge:
+                                          data.table?.judge?.result || null,
+                                        participent:
+                                          data.table?.participent?.result ||
+                                          null,
+                                      };
+                                      rdata.result = {
+                                        date: new Date().toISOString(),
+                                        user: user,
+                                        table: data.table.main.data.replace(
+                                          /"/g,
+                                          "'"
+                                        ),
+                                        project: data.project,
+                                        count: rdata.post.pagecount,
+                                        reviewed:
+                                          rdata.post.pagecount -
+                                          Object.keys(rdata.post.page_list)
+                                            .length,
+                                        isAotuReviewed:
+                                          rdata.data?.autoReviewed || false,
+                                      };
+                                      delete rdata.post;
+                                      callback(rdata, (err) => {
+                                        if (err) {
+                                          return res.status(200).send({
+                                            message: JSON.stringify(
+                                              err,
+                                              null,
+                                              2
+                                            ),
+                                            type: "error",
+                                          });
+                                        } else {
+                                          deleteFile(
+                                            join(
+                                              __dirname,
+                                              "private",
+                                              "db",
+                                              "files",
+                                              key + ".json"
+                                            ),
+                                            (err) => {
+                                              if (err) {
+                                                return res.status(200).send({
+                                                  message: JSON.stringify(
+                                                    err,
+                                                    null,
+                                                    2
+                                                  ),
+                                                  type: "error",
+                                                });
+                                              } else {
+                                                updateFile(
+                                                  join(
+                                                    __dirname,
+                                                    "private",
+                                                    "querylist.json"
+                                                  ),
+                                                  (err, rdata, callback) => {
+                                                    if (err) {
+                                                      return res
+                                                        .status(200)
+                                                        .send({
+                                                          message:
+                                                            JSON.stringify(
+                                                              err,
+                                                              null,
+                                                              2
+                                                            ),
+                                                          type: "error",
+                                                        });
+                                                    } else {
+                                                      delete rdata.key[key];
+                                                      callback(rdata, (err) => {
+                                                        if (err) {
+                                                          return res
+                                                            .status(200)
+                                                            .send({
+                                                              message:
+                                                                JSON.stringify(
+                                                                  err,
+                                                                  null,
+                                                                  2
+                                                                ),
+                                                              type: "error",
+                                                            });
+                                                        } else {
+                                                          return res
+                                                            .status(200)
+                                                            .send({
+                                                              message:
+                                                                "Result has been submited successfully!",
+                                                              type: "success",
+                                                              redirect: {
+                                                                url:
+                                                                  "/editathon?key=" +
+                                                                  key,
+                                                                timer: 5,
+                                                              },
+                                                            });
+                                                        }
+                                                      });
+                                                    }
+                                                  }
+                                                );
+                                              }
+                                            },
+                                            key,
+                                            user,
+                                            true
+                                          );
+                                        }
+                                      });
+                                    }
+                                  }
+                                );
+                              }
                             }
-                          });
+                          );
                         }
                       }
                     );

@@ -3,7 +3,7 @@
     scrollbar-width: none;
     margin: 0;
     padding: 0;
-    overflow: scroll;
+    overflow-y: scroll;
     -moz-scrollbar-width: none;
 }
 
@@ -476,6 +476,53 @@ footer {
     }
 }
 
+#deleted {
+    width: calc(94% - 40px);
+    margin: 2%;
+    background: #fff;
+    padding: 20px;
+    border: 2px solid var(--tilt);
+    border-radius: 8px;
+    box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.patrol-entry {
+    background: #F8F8FF;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid var(--tilt);
+    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+}
+
+.patrol-entry:hover {
+    background: rgb(var(--tilt-rgb), 0.3);
+    transform: scale(1.02);
+}
+
+.top a {
+    text-decoration: none;
+    font-weight: bold;
+    color: rgb(var(--tilt-dark), 0.8);
+    font-size: 16px;
+    font-family: 'exo', Arial, Helvetica, sans-serif;
+}
+
+.top a:hover {
+    color: rgb(var(--tilt-dark));
+}
+
+.details {
+    font-size: 14px;
+    color: #555;
+    margin-top: 4px;
+    font-style: italic;
+}
+
 @media screen and (ma-width: 300px) {
     #app {
         scale: 0.7;
@@ -522,5 +569,13 @@ footer {
     main nav form input,
     main nav form select {
         padding: 5px 7px;
+    }
+
+    #deleted {
+        padding: 15px;
+    }
+
+    .top a {
+        font-size: 14px;
     }
 }
