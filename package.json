@@ -1,7 +1,7 @@
 {
   "name": "checkmate",
-  "version": "1.0.0",
-  "description": "A tool for identifying and addressing issues in Wikipedia articles",
+  "version": "v.1.0.2-beta",
+  "description": "A tool for seamless edit-a-thon management. Track, template, and thrive with ease.",
   "author": "Maruf Hasan",
   "license": "MIT",
   "repository": {
@@ -15,6 +15,8 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
@@ -26,10 +28,10 @@
     "request": "^2.88.2"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
-    "eslint": "^8.53.0"
+    "eslint": "^8.53.0",
+    "nodemon": "^3.0.1"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   }
 }

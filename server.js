@@ -1,9 +1,16 @@
 // Import dependencies
 const express = require("express");
 const session = require("express-session");
+require("dotenv").config();
 const passport = require("passport");
+const cookieParser = require("cookie-parser");
 const MediaWikiStrategy = require("passport-mediawiki-oauth").OAuthStrategy;
-const CONFIG = require("./config.json");
+const CONFIG = {
+  consumer_key: process.env.CONSUMER_KEY,
+  consumer_secret: process.env.CONSUMER_SECRET,
+  algorithm: process.env.ALGORITHM,
+  key: process.env.KEY,
+};
 const app = express();
 const PORT = parseInt(process.env.PORT, 10) || 8000; // IMPORTANT!!
 const crypto = require("crypto");
@@ -18,6 +25,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(CONFIG.key.split(".").join(CONFIG.algorithm)));
 passport.use(
   new MediaWikiStrategy(
     {
