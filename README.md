@@ -1,3 +1,4 @@
+
 # Checkmate: A Visual Editor for Administering Competitions
 
 ## 📌 Project Overview
