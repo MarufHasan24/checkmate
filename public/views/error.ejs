@@ -156,44 +156,45 @@
         </div>
     </div>
 </body>
-
-<% if (deletable) { %>
-    <script>
-        const scripts = document.getElementById('scripts');
-        let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
-        let logindata = JSON.parse(localStorage.getItem(key));
-        let deletable = "<%= deletable.key %>";
-        const deleteKey = document.createElement('a');
-        deleteKey.href = 'javascript:void';
-        deleteKey.onclick = () => {
-            proxyFetch(
-                "delete",
-                {
-                    key: deletable,
-                    user: logindata.username,
-                    type: "<%= deletable.type %>" || "missing",
-                    bin: false,
-                },
-                (data) => {
-                    if (data.error) {
-                        console.error(data.error);
-                    } else {
-                        msg({
-                            message: "Key deleted successfully",
-                            type: "info",
-                            duration: 2,
-                            redirect: {
-                                url: "/",
-                                timer: 4,
-                            },
-                        });
+<% try { %>
+    <% if (deletable) { %>
+        <script>
+            const scripts = document.getElementById('scripts');
+            let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+            let logindata = JSON.parse(localStorage.getItem(key));
+            let deletable = "<%= deletable.key %>";
+            const deleteKey = document.createElement('a');
+            deleteKey.href = 'javascript:void';
+            deleteKey.onclick = () => {
+                proxyFetch(
+                    "delete",
+                    {
+                        key: deletable,
+                        user: logindata.username,
+                        type: "<%= deletable.type %>" || "missing",
+                        bin: false,
+                    },
+                    (data) => {
+                        if (data.error) {
+                            console.error(data.error);
+                        } else {
+                            msg({
+                                message: "Key deleted successfully",
+                                type: "info",
+                                duration: 2,
+                                redirect: {
+                                    url: "/",
+                                    timer: 4,
+                                },
+                            });
+                        }
                     }
-                }
-            );
-        };
-        deleteKey.innerHTML = 'Delete Key';
-        scripts.appendChild(deleteKey);
-    </script>
-    <% } %>
+                );
+            };
+            deleteKey.innerHTML = 'Delete Key';
+            scripts.appendChild(deleteKey);
+        </script>
+        <% } %>
+            <% } catch (e) { console.error(e); } %>
 
 </html>

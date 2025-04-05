@@ -477,7 +477,7 @@ footer {
 }
 
 #deleted {
-    width: calc(94% - 40px);
+    width: calc(96% - 40px);
     margin: 2%;
     background: #fff;
     padding: 20px;
@@ -486,7 +486,7 @@ footer {
     box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.2);
 }
 
-.patrol-entry {
+#deleted .patrol-entry {
     background: #F8F8FF;
     padding: 12px;
     margin: 10px 0;
@@ -499,28 +499,29 @@ footer {
     transition: all 0.3s ease;
 }
 
-.patrol-entry:hover {
+#deleted .patrol-entry:hover {
     background: rgb(var(--tilt-rgb), 0.3);
     transform: scale(1.02);
 }
 
-.top a {
+#deleted a {
     text-decoration: none;
     font-weight: bold;
-    color: rgb(var(--tilt-dark), 0.8);
+    color: #6b6bff;
     font-size: 16px;
     font-family: 'exo', Arial, Helvetica, sans-serif;
 }
 
-.top a:hover {
+#deleted .top a:hover {
     color: rgb(var(--tilt-dark));
 }
 
-.details {
+#deleted .details {
     font-size: 14px;
     color: #555;
     margin-top: 4px;
     font-style: italic;
+    padding: 0 5px;
 }
 
 @media screen and (ma-width: 300px) {
@@ -573,9 +574,22 @@ footer {
 
     #deleted {
         padding: 15px;
+        width: calc(96% - 30px);
     }
 
-    .top a {
+    #deleted .patrol-entry {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: 2%;
+        flex-wrap: wrap;
+    }
+
+    #deleted .patrol-entry:hover {
+        transform: scale(0.92);
+    }
+
+    #deleted a {
         font-size: 14px;
     }
 }

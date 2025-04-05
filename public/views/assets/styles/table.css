@@ -1,6 +1,5 @@
 tr:nth-child(odd) a {
     color: #b9dcff;
-    border-bottom: none;
 }
 
 tr:nth-child(even) a {
@@ -62,15 +61,13 @@ tr:nth-child(odd) {
 table a {
     color: var(--tilt);
     text-decoration: none;
-    transition: color 0.3s, border-bottom 0.3s;
-    border-bottom: 1px solid transparent;
+    transition: color 0.3s;
     font-weight: 550;
     font-family: "bana", "exo", "Arial", sans-serif;
 }
 
 table a:hover {
     color: #45a049;
-    border-bottom: 1px solid #45a049;
 }
 
 .willhide {

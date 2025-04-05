@@ -1,86 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset 
+    xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+    xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"
+    xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
     <url>
         <loc>https://checkmate.toolforge.org/</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
+        <image:image>
+            <image:loc>https://checkmate.toolforge.org/imgs/logo.jpg</image:loc>
+            <image:caption>Checkmate Logo</image:caption>
+        </image:image>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/login</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/template</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.5</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/oauth</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.2</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/query</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.5</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/dashboard</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>always</changefreq>
         <priority>0.8</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/logout</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.2</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/editathon</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>always</changefreq>
-        <priority>1</priority>
+        <priority>1.0</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/submit</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.5</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/judge</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.5</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/remove</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.5</priority>
     </url>
+
     <url>
         <loc>https://checkmate.toolforge.org/result</loc>
         <lastmod>2025-03-23</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.5</priority>
     </url>
-    <loc>https://checkmate.toolforge.org/underConst.html</loc>
-    <video:video>
-        <video:content_loc>https://checkmate.toolforge.org/underConst.html</video:content_loc>
-        <video:title>Checkmate - Under Construction</video:title>
-        <video:description>Checkmate is currently under construction. Please check back later.</video:description>
-        <video:thumbnail_loc>https://checkmate.toolforge.org/imgs/underConstruction.jpeg</video:thumbnail_loc>
-        <video:publication_date>2025-03-23T00:00:00Z</video:publication_date>
-        <video:duration>120</video:duration>
-        <video:rating>5</video:rating>
-    </video:video>
-  </url>
+
+    <url>
+        <loc>https://checkmate.toolforge.org/underConst.html</loc>
+        <video:video>
+  <video:content_loc>https://checkmate.toolforge.org/videos/construction2.mp4</video:content_loc>
+  <video:title>Checkmate - Under Construction</video:title>
+  <video:description>Checkmate is currently under construction. Please check back later.</video:description>
+  <video:thumbnail_loc>https://checkmate.toolforge.org/imgs/underConstruction.jpeg</video:thumbnail_loc>
+  <video:publication_date>2025-03-23T00:00:00Z</video:publication_date>
+  <video:duration>120</video:duration>
+  <video:rating>5</video:rating>
+</video:video>
+
+        <image:image>
+            <image:loc>https://checkmate.toolforge.org/imgs/underConstruction.jpeg</image:loc>
+            <image:caption>Page under construction</image:caption>
+        </image:image>
+    </url>
+
 </urlset>

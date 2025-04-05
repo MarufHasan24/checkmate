@@ -28,7 +28,6 @@ module.exports = {
         });
       } else {
         //dirData is an array of file's data, we need to map it to get the data structure
-
         let oldHtml = dirdata
           .map((obj) => {
             return `<tr>
@@ -39,8 +38,9 @@ module.exports = {
                     </div>
                     <div class="details">Date: ${new Date(
                       obj.date
-                    ).toDateString("en-US", {
-                      weekday: "short",
+                    ).toLocaleDateString("en-GB", {
+                      weekday: "long",
+                      day: "2-digit",
                       year: "numeric",
                       month: "2-digit",
                     })} | Project: <a href="https://${obj.project}.org/">${
@@ -112,7 +112,7 @@ module.exports = {
     res.redirect(req.baseUrl + "/oauth-callback");
   },
   oauth: function (req, res, next) {
-    /*  passport.authenticate("mediawiki", function (err, usr) {
+    passport.authenticate("mediawiki", function (err, usr) {
       if (err) {
         return next(err);
       }
@@ -127,89 +127,92 @@ module.exports = {
           let temp = usr._json;
           delete usr._json;
           let user = { ...temp, ...usr };
-          /* Start  */
+          /* Start 
     let usr = require("./private/data.json");
     delete usr._raw;
     let temp = { ...usr._json };
     delete usr._json;
     let user = { ...temp, ...usr };
     /* End */
-    const filePath = join(
-      __dirname,
-      "private",
-      "user",
-      `usr-${encodeURIComponent(user.username)}.json`
-    );
-    stat(filePath, (err, stats) => {
-      if (err) {
-        keepLog(
-          user.username,
-          "create user",
-          (lerr) => {
-            if (lerr) {
-              //console.error(lerr);
-            }
-            writeFileOwn(filePath, JSON.stringify(user), (err) => {
-              if (err) {
-                //console.error(err);
-              }
-              req.session.user = user;
-              res.redirect(req.baseUrl + "/");
-            });
-          },
-          {
-            ip:
-              req.headers["x-forwarded-for"] ||
-              req.ip ||
-              req.headers["x-client-ip"] ||
-              req.socket.remoteAddress ||
-              null,
-          }
-        );
-      } else {
-        keepLog(
-          user.username,
-          "login" + (req.session?.callback ? "/" + req.session.callback : ""),
-          (lerr) => {
-            if (lerr) {
-              //console.error(lerr);
-            }
-            updateFile(filePath, (err, data, callback) => {
-              if (err) {
-                //console.error(err);
-              } else {
-                data.user = user;
-                data.lastModified = new Date().toISOString();
-                callback(data, (err) => {
-                  if (err) {
-                    //console.error(err);
-                  } else {
-                    req.session.user = user;
-                    return res.render("callback.ejs", {
-                      user,
-                      jsonuser: JSON.stringify(user),
-                      url: encodeURIComponent(req.session?.callback || ""),
-                    });
+          const filePath = join(
+            __dirname,
+            "private",
+            "user",
+            `usr-${encodeURIComponent(user.username)}.json`
+          );
+          stat(filePath, (err, stats) => {
+            if (err) {
+              keepLog(
+                user.username,
+                "create user",
+                (lerr) => {
+                  if (lerr) {
+                    //console.error(lerr);
                   }
-                });
-              }
-            });
-          },
-          {
-            ...stats,
-            ip:
-              req.headers["x-forwarded-for"] ||
-              req.ip ||
-              req.headers["x-client-ip"] ||
-              req.socket.remoteAddress ||
-              null,
-          }
-        );
-      }
-    });
-    /*    }
+                  writeFileOwn(filePath, JSON.stringify(user), (err) => {
+                    if (err) {
+                      //console.error(err);
+                    }
+                    req.session.user = user;
+                    res.redirect(req.baseUrl + "/");
+                  });
+                },
+                {
+                  ip:
+                    req.headers["x-forwarded-for"] ||
+                    req.ip ||
+                    req.headers["x-client-ip"] ||
+                    req.socket.remoteAddress ||
+                    null,
+                }
+              );
+            } else {
+              keepLog(
+                user.username,
+                "login" +
+                  (req.session?.callback ? "/" + req.session.callback : ""),
+                (lerr) => {
+                  if (lerr) {
+                    //console.error(lerr);
+                  }
+                  updateFile(filePath, (err, data, callback) => {
+                    if (err) {
+                      //console.error(err);
+                    } else {
+                      data.user = user;
+                      data.lastModified = new Date().toISOString();
+                      callback(data, (err) => {
+                        if (err) {
+                          //console.error(err);
+                        } else {
+                          req.session.user = user;
+                          return res.render("callback.ejs", {
+                            user,
+                            jsonuser: JSON.stringify(user),
+                            url: encodeURIComponent(
+                              req.session?.callback || ""
+                            ),
+                          });
+                        }
+                      });
+                    }
+                  });
+                },
+                {
+                  ...stats,
+                  ip:
+                    req.headers["x-forwarded-for"] ||
+                    req.ip ||
+                    req.headers["x-client-ip"] ||
+                    req.socket.remoteAddress ||
+                    null,
+                }
+              );
+            }
+          });
+        }
       });
-    })(req, res, next); */
+    })(req, res, next);
   },
   template: function (req, res) {
     if (req.query && req.query.data) {
@@ -591,143 +594,167 @@ module.exports = {
               redirect: null,
             });
           } else {
-            let pagelist = rdata.post.page_list;
-            let list = Object.keys(pagelist);
-            let temp = [...list];
-            for (let i = temp.length - 1; i >= 0; i--) {
-              if (pagelist[temp[i]].sub == user) {
-                list.splice(i, 1);
-              }
-            }
-            const page =
-              req.query?.page || list[Math.floor(list.length * Math.random())];
-            if (!req.query?.page) {
-              res.redirect(
-                "/judge?key=" +
-                  key +
-                  "&page=" +
-                  list[Math.floor(list.length * Math.random())]
-              );
-            } else {
-              if (list.length) {
-                if (
-                  !list.includes(page) &&
-                  !Object.keys(rdata.post.jurries_list[user]).includes(page)
-                ) {
-                  res.render("error.ejs", {
-                    status: 400,
-                    error:
-                      page +
-                      " is not in the waiting list. May be it's never submitted by anyone or already judged by someone.",
-                    redirect: {
-                      url:
-                        "/judge?key=" +
-                        key +
-                        "&page=" +
-                        list[Math.floor(list.length * Math.random())],
-                      name: "Judge another page",
-                    },
-                  });
+            if (rdata.data.jurries.split(",").includes(user)) {
+              let pagelist = rdata.post.page_list;
+              let list = Object.keys(pagelist);
+              let temp = [...list];
+              for (let i = temp.length - 1; i >= 0; i--) {
+                if (pagelist[temp[i]].sub == user) {
+                  list.splice(i, 1);
                 }
-                getWikitext(
-                  page,
-                  rdata.data.base_component,
-                  (error, wikidata) => {
-                    if (error) {
-                      res.render("error.ejs", {
-                        status: 400,
-                        error: page + "<br>" + error.code + " : " + error.info,
-                        redirect: {
-                          url:
-                            "/judge?key=" +
-                            key +
-                            "&page=" +
-                            list[Math.floor(list.length * Math.random())],
-                          name: "Judge another page",
-                        },
-                      });
-                    } else {
-                      let dsobj = {};
-                      if (
-                        Object.keys(rdata.post.jurries_list[user]).includes(
-                          page
-                        )
-                      ) {
-                        dsobj = rdata.post.jurries_list[user][page];
-                      } else {
-                        dsobj = pagelist[page];
-                      }
-                      res.render("judge.ejs", {
-                        key: key,
-                        user,
-                        pagelist: list,
-                        page: page,
-                        html: wikidata.text,
-                        isLocked: dsobj?.lock,
-                        pagedata: {
-                          creator: wikidata.creator,
-                          creation: wikidata.creation,
-                          ...dsobj,
-                        },
-                        data: {
-                          judge: user,
-                          project: rdata.data.base_component,
-                          opts: rdata.data.dynamic,
-                        },
-                        jsondata: JSON.stringify({
-                          project: rdata.data.base_component,
-                          opts: rdata.data.dynamic,
-                          jurries: rdata.data.jurries.split(","),
-                          key,
-                          pagelist: list,
-                          page,
-                          template: rdata.data.feedback_template,
-                          creator: wikidata.creator,
-                          stat: dsobj?.stat || "",
-                          submitter: dsobj.sub,
-                          isLocked: dsobj?.lock || false,
-                        }),
-                      });
-                    }
-                  }
+              }
+              const page =
+                req.query?.page ||
+                list[Math.floor(list.length * Math.random())];
+              if (!req.query?.page) {
+                res.redirect(
+                  "/judge?key=" +
+                    key +
+                    "&page=" +
+                    list[Math.floor(list.length * Math.random())] +
+                    "&judge=" +
+                    user
                 );
               } else {
-                if (temp.length) {
-                  res.render("message.ejs", {
-                    message: "you are the only left submittor here!",
-                    type: "info",
-                    redirect: {
-                      url: "/editathon?key=" + key,
-                      timer: null,
-                      button: "Editathon",
-                    },
-                  });
+                if (list.length) {
+                  if (
+                    !list.includes(page) &&
+                    !Object.keys(rdata.post.jurries_list[user]).includes(page)
+                  ) {
+                    res.render("error.ejs", {
+                      status: 400,
+                      error:
+                        page +
+                        " is not in the waiting list. May be it's never submitted by anyone or already judged by someone.",
+                      redirect: {
+                        url:
+                          "/judge?key=" +
+                          key +
+                          "&page=" +
+                          list[Math.floor(list.length * Math.random())],
+                        name: "Judge another page",
+                      },
+                    });
+                  }
+                  getWikitext(
+                    page,
+                    rdata.data.base_component,
+                    (error, wikidata) => {
+                      if (error) {
+                        res.render("error.ejs", {
+                          status: 400,
+                          error:
+                            page + "<br>" + error.code + " : " + error.info,
+                          redirect: {
+                            url:
+                              "/judge?key=" +
+                              key +
+                              "&page=" +
+                              list[Math.floor(list.length * Math.random())],
+                            name: "Judge another page",
+                          },
+                        });
+                      } else {
+                        let dsobj = {};
+                        if (
+                          Object.keys(rdata.post.jurries_list[user]).includes(
+                            page
+                          )
+                        ) {
+                          dsobj = rdata.post.jurries_list[user][page];
+                        } else {
+                          dsobj = pagelist[page];
+                        }
+                        res.render("judge.ejs", {
+                          key: key,
+                          user,
+                          pagelist: list,
+                          page: page,
+                          html: wikidata.text,
+                          isLocked: dsobj?.lock,
+                          pagedata: {
+                            creator: wikidata.creator,
+                            creation: wikidata.creation,
+                            ...dsobj,
+                          },
+                          data: {
+                            judge: user,
+                            project: rdata.data.base_component,
+                            opts: rdata.data.dynamic,
+                          },
+                          jsondata: JSON.stringify({
+                            project: rdata.data.base_component,
+                            opts: rdata.data.dynamic,
+                            jurries: rdata.data.jurries.split(","),
+                            key,
+                            pagelist: list,
+                            page,
+                            template: rdata.data.feedback_template,
+                            creator: wikidata.creator,
+                            stat: dsobj?.stat || "",
+                            submitter: dsobj.sub,
+                            isLocked: dsobj?.lock || false,
+                          }),
+                        });
+                      }
+                    }
+                  );
                 } else {
-                  res.render("message.ejs", {
-                    message: "Their is no page to judge here!",
-                    type: "info",
-                    redirect: {
-                      url: "/editathon?key=" + key,
-                      timer: null,
-                      button: "Editathon",
-                    },
-                  });
+                  if (temp.length) {
+                    res.render("message.ejs", {
+                      message: "you are the only left submittor here!",
+                      type: "info",
+                      redirect: {
+                        url: "/editathon?key=" + key,
+                        timer: null,
+                        button: "Editathon",
+                      },
+                    });
+                  } else {
+                    res.render("message.ejs", {
+                      message: "Their is no page to judge here!",
+                      type: "info",
+                      redirect: {
+                        url: "/editathon?key=" + key,
+                        timer: null,
+                        button: "Editathon",
+                      },
+                    });
+                  }
                 }
               }
+            } else {
+              res.render("error.ejs", {
+                status: 403,
+                error:
+                  "You are not allowed to judge this page. Please contact the host.",
+                redirect: {
+                  url: "/editathon?key=" + key,
+                  name: "Editathon",
+                },
+                deletable: false,
+              });
             }
           }
         }
       );
     } else {
-      res.render("judge.ejs", {
-        user: null,
-        key: key,
-        pagelist: [],
-        page: null,
-        html: "",
-        data: null,
-        jsondata: JSON.stringify(null),
-      });
+      if (!user) {
+        if (req.session.user) {
+          return res.redirect(
+            "/judge?key=" + key + "&judge=" + req.session.user.displayName
+          );
+        } else {
+          return res.redirect("/editathon?key=" + key);
+        }
+      }
+      if (!key) {
+        res.render("error.ejs", {
+          status: 400,
+          error: "Missing params",
+          redirect: null,
+        });
+      }
     }
   },
   remove: function (req, res) {
