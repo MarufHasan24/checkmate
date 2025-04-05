@@ -412,7 +412,7 @@ module.exports = {
                 status: 400,
                 error: "Invalid File.",
                 redirect: null,
-                deletable: key,
+                deletable: { key, type: "invalid" },
               });
             }
           }
@@ -522,7 +522,7 @@ module.exports = {
                 status: 400,
                 error: "Invalid File.",
                 redirect: null,
-                deletable: key,
+                deletable: { key, type: "invalid" },
               });
             } else {
               let sdata = {

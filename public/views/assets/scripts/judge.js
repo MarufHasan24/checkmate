@@ -163,5 +163,7 @@ skipBtn.addEventListener("click", () => {
     "/judge?key=" +
     userdata.key +
     "&page=" +
-    userdata.pagelist[Math.floor(Math.random() * userdata.pagelist.length)];
+    userdata.pagelist[Math.floor(Math.random() * userdata.pagelist.length)] +
+    "&judge=" +
+    data.username;
 });
