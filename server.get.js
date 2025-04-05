@@ -8,7 +8,6 @@ const CONFIG = {
   admin: process.env.ADMIN.split(","),
   creator: process.env.CREATOR,
 };
-console.log(CONFIG);
 const passport = require("passport");
 // lib
 const {
