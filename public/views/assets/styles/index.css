@@ -513,7 +513,7 @@ footer {
 }
 
 #deleted .top a:hover {
-    color: rgb(var(--tilt-dark));
+    color: rgb(var(--tilt-dark), 0.8);
 }
 
 #deleted .details {
