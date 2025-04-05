@@ -732,7 +732,9 @@ module.exports = {
                           "/judge?key=" +
                           key +
                           "&page=" +
-                          list[Math.floor(list.length * Math.random())],
+                          list[Math.floor(list.length * Math.random())] +
+                          "&judge=" +
+                          user,
                         timer: null,
                         button: "Another Random Page",
                       },
@@ -750,7 +752,9 @@ module.exports = {
                     "/judge?key=" +
                     key +
                     "&page=" +
-                    list[Math.floor(list.length * Math.random())],
+                    list[Math.floor(list.length * Math.random())] +
+                    "&judge=" +
+                    user,
                   timer: null,
                   button: "Random Page",
                 },

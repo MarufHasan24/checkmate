@@ -66,7 +66,9 @@ if (stickydiv) {
               "&page=" +
               userdata.pagelist[
                 Math.floor(Math.random() * userdata.pagelist.length)
-              ];
+              ] +
+              "&judge=" +
+              data.username;
           } else if (data.message) {
             msg(data);
           }
