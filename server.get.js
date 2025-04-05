@@ -1,5 +1,13 @@
 //dependencies
-const CONFIG = require("./config.json");
+require("dotenv").config();
+const CONFIG = {
+  consumer_key: process.env.CONSUMER_KEY,
+  consumer_secret: process.env.CONSUMER_SECRET,
+  algorithm: process.env.ALGORITHM,
+  key: process.env.KEY,
+  admin: process.env.ADMIN.split(","),
+  creator: process.env.CREATOR,
+};
 const passport = require("passport");
 // lib
 const {
