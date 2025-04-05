@@ -135,7 +135,7 @@
 </head>
 
 <body>
-    <iframe src="/background.html" frameborder="0"></iframe>
+    <iframe title="background" src="/background.html" frameborder="0"></iframe>
     <div class="container">
         <h1><span style="border-right: 5px solid #ff8809;">&#x2658;</span><span>
                 <%- status %>
@@ -162,21 +162,20 @@
             const scripts = document.getElementById('scripts');
             let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
             let logindata = JSON.parse(localStorage.getItem(key));
-            let deletable = "<%= deletable.key %>";
             const deleteKey = document.createElement('a');
             deleteKey.href = 'javascript:void';
             deleteKey.onclick = () => {
                 proxyFetch(
                     "delete",
                     {
-                        key: deletable,
+                        key: "<%= deletable.key %>",
                         user: logindata.username,
                         type: "<%= deletable.type %>" || "missing",
                         bin: false,
                     },
-                    (data) => {
-                        if (data.error) {
-                            console.error(data.error);
+                    (error, data) => {
+                        if (error) {
+                            console.error(error);
                         } else {
                             msg({
                                 message: "Key deleted successfully",
@@ -184,7 +183,7 @@
                                 duration: 2,
                                 redirect: {
                                     url: "/",
-                                    timer: 4,
+                                    timer: 5
                                 },
                             });
                         }

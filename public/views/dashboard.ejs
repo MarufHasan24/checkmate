@@ -26,7 +26,7 @@
 </head>
 
 <body>
-    <iframe src="/background.html" frameborder="0"></iframe>
+    <iframe title="background" src="/background.html" frameborder="0"></iframe>
     <div class="container">
         <% if (!key && !pass) { %>
             <!-- If retake is true, ask for both key and password -->
@@ -133,8 +133,8 @@
                                         </h1>
                                         <!-- main works go here -->
                                         <!-- Countdown section -->
-                                        <iframe class="countdown" src="./countdown.html" id="countdown"
-                                            frameborder="0"></iframe>
+                                        <iframe title="countdown" class="countdown" src="./countdown.html"
+                                            id="countdown" frameborder="0"></iframe>
                                         <script>
                                             // Ensure the iframe is fully loaded before accessing its content
                                             document.getElementById('countdown').onload = function () {

@@ -82,7 +82,7 @@
 </header>
 
 <body>
-    <iframe src="/background.html" frameborder="0"></iframe>
+    <iframe title="background" src="/background.html" frameborder="0"></iframe>
     <% if(data && Object.keys(data).length> 0 ) {%>
         <script>
             const key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
@@ -188,8 +188,8 @@
                 <div class="container">
                     <div class="settings">
                         <% if(data.countdown) {%>
-                            <div class="card countdown"><iframe class="countdown" src="./countdown.html" id="countdown"
-                                    frameborder="0"></iframe></div>
+                            <div class="card countdown"><iframe title="countdown" class="countdown"
+                                    src="./countdown.html" id="countdown" frameborder="0"></iframe></div>
                             <script>
                                 // Ensure the iframe is fully loaded before accessing its content
                                 document.getElementById('countdown').onload = function () {
