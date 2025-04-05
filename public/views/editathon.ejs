@@ -228,7 +228,7 @@
 
                             if ((userdata.jurries).split(",").includes(username)) {
                                 let judgeLink = document.createElement('a');
-                                judgeLink.href = `/judge?key=${userdata.key}`;
+                                judgeLink.href = `/judge?key=${userdata.key}&judge=${username}`;
                                 judgeLink.textContent = translate('Judge');
                                 psudo.appendChild(judgeLink);  // Append link to the body or a specific container
                                 let removeLink = document.createElement('a');
