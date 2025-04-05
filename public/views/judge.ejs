@@ -33,7 +33,7 @@
 
 <body>
     <iframe src="/background.html" frameborder="0"></iframe>
-    <% if(pagelist) { %>
+    <% if(pagelist && pagelist?.length> 0) { %>
         <script>
             const judge = "<%= data?.judge %>";
             const userdata = JSON.parse(validateStr('<%= jsondata %>'));
