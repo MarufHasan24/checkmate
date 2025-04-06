@@ -20,16 +20,12 @@ const {
   keepLog,
   logTable,
   readDirOwn,
-  writeFile,
 } = require("./public/lib/node.js");
 const { getWikitext } = require("./public/lib/mwiki.js");
 // Routes to handle GET requests
 module.exports = {
   index: function (req, res) {
-    //get data from cookie and session
-    const user =
-      (req && req.session && req.session.user) ||
-      (req.cookies && req.cookies?.user ? JSON.parse(req.cookies.user) : null);
+    const user = req && req.session && req.session.user;
     readDirOwn(join(__dirname, "private", ".bin", "files"), (err, dirdata) => {
       if (err) {
         //console.error(err);
@@ -124,7 +120,7 @@ module.exports = {
     res.redirect(req.baseUrl + "/oauth-callback");
   },
   oauth: function (req, res, next) {
-    /* passport.authenticate("mediawiki", function (err, usr) {
+    passport.authenticate("mediawiki", function (err, usr) {
       if (err) {
         return next(err);
       }
@@ -139,97 +135,92 @@ module.exports = {
           let temp = usr._json;
           delete usr._json;
           let user = { ...temp, ...usr };
-          /* Start  */
+          /* Start 
     let usr = require("./private/data.json");
     delete usr._raw;
     let temp = { ...usr._json };
     delete usr._json;
     let user = { ...temp, ...usr };
     /* End */
-    const filePath = join(
-      __dirname,
-      "private",
-      "user",
-      `usr-${encodeURIComponent(user.username)}.json`
-    );
-    stat(filePath, (err, stats) => {
-      if (err) {
-        keepLog(
-          user.username,
-          "create user",
-          (lerr) => {
-            if (lerr) {
-              //console.error(lerr);
-            }
-            writeFileOwn(filePath, JSON.stringify(user), (err) => {
-              if (err) {
-                //console.error(err);
-              }
-              res.cookie("user", JSON.stringify(user), {
-                maxAge: 60 * 60 * 24 * 7, // 1 week
-                httpOnly: true,
-              });
-              req.session.user = user;
-              res.redirect(req.baseUrl + "/");
-            });
-          },
-          {
-            ip:
-              req.headers["x-forwarded-for"] ||
-              req.ip ||
-              req.headers["x-client-ip"] ||
-              req.socket.remoteAddress ||
-              null,
-          }
-        );
-      } else {
-        keepLog(
-          user.username,
-          "login" + (req.session?.callback ? "/" + req.session.callback : ""),
-          (lerr) => {
-            if (lerr) {
-              //console.error(lerr);
-            }
-            updateFile(filePath, (err, data, callback) => {
-              if (err) {
-                //console.error(err);
-              } else {
-                data.user = user;
-                data.lastModified = new Date().toISOString();
-                callback(data, (err) => {
-                  if (err) {
-                    //console.error(err);
-                  } else {
-                    res.cookie("user", JSON.stringify(user), {
-                      maxAge: 60 * 60 * 24 * 7, // 1 week
-                      httpOnly: true,
-                    });
-                    req.session.user = user;
-                    return res.render("callback.ejs", {
-                      user,
-                      jsonuser: JSON.stringify(user),
-                      url: encodeURIComponent(req.session?.callback || ""),
-                    });
+          const filePath = join(
+            __dirname,
+            "private",
+            "user",
+            `usr-${encodeURIComponent(user.username)}.json`
+          );
+          stat(filePath, (err, stats) => {
+            if (err) {
+              keepLog(
+                user.username,
+                "create user",
+                (lerr) => {
+                  if (lerr) {
+                    //console.error(lerr);
                   }
-                });
-              }
-            });
-          },
-          {
-            ...stats,
-            ip:
-              req.headers["x-forwarded-for"] ||
-              req.ip ||
-              req.headers["x-client-ip"] ||
-              req.socket.remoteAddress ||
-              null,
-          }
-        );
-      }
-    });
-    /* }
+                  writeFileOwn(filePath, JSON.stringify(user), (err) => {
+                    if (err) {
+                      //console.error(err);
+                    }
+                    req.session.user = user;
+                    res.redirect(req.baseUrl + "/");
+                  });
+                },
+                {
+                  ip:
+                    req.headers["x-forwarded-for"] ||
+                    req.ip ||
+                    req.headers["x-client-ip"] ||
+                    req.socket.remoteAddress ||
+                    null,
+                }
+              );
+            } else {
+              keepLog(
+                user.username,
+                "login" +
+                  (req.session?.callback ? "/" + req.session.callback : ""),
+                (lerr) => {
+                  if (lerr) {
+                    //console.error(lerr);
+                  }
+                  updateFile(filePath, (err, data, callback) => {
+                    if (err) {
+                      //console.error(err);
+                    } else {
+                      data.user = user;
+                      data.lastModified = new Date().toISOString();
+                      callback(data, (err) => {
+                        if (err) {
+                          //console.error(err);
+                        } else {
+                          req.session.user = user;
+                          return res.render("callback.ejs", {
+                            user,
+                            jsonuser: JSON.stringify(user),
+                            url: encodeURIComponent(
+                              req.session?.callback || ""
+                            ),
+                          });
+                        }
+                      });
+                    }
+                  });
+                },
+                {
+                  ...stats,
+                  ip:
+                    req.headers["x-forwarded-for"] ||
+                    req.ip ||
+                    req.headers["x-client-ip"] ||
+                    req.socket.remoteAddress ||
+                    null,
+                }
+              );
+            }
+          });
+        }
       });
-    })(req, res, next); */
+    })(req, res, next);
   },
   template: function (req, res) {
     if (req.query && req.query.data) {
@@ -447,7 +438,6 @@ module.exports = {
           //console.error(lerr);
         }
         delete req.session.user;
-        res.clearCookie("user");
         res
           .status(200)
           .redirect("/" + (callback ? decodeURIComponent(callback) : ""));
@@ -758,9 +748,6 @@ module.exports = {
       );
     } else {
       if (!user) {
-        req.cookies && req.cookies.user
-          ? (req.session.user = JSON.parse(req.cookies.user))
-          : null;
         if (req.session.user) {
           return res.redirect(
             "/judge?key=" + key + "&judge=" + req.session.user.displayName
@@ -852,9 +839,6 @@ module.exports = {
               deletable: false,
             });
           } else {
-            req.cookies && req.cookies.user
-              ? (req.session.user = JSON.parse(req.cookies.user))
-              : null;
             if (req.session.user) {
               let participent = {};
               //marge rdata.post.page_list and rdata.data.jurries_list in page_list
