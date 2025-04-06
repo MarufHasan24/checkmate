@@ -1,4 +1,4 @@
-//dependencies
+// dependencies
 require("dotenv").config();
 const CONFIG = {
   consumer_key: process.env.CONSUMER_KEY,
@@ -124,7 +124,7 @@ module.exports = {
     res.redirect(req.baseUrl + "/oauth-callback");
   },
   oauth: function (req, res, next) {
-    /* passport.authenticate("mediawiki", function (err, usr) {
+    passport.authenticate("mediawiki", function (err, usr) {
       if (err) {
         return next(err);
       }
@@ -139,97 +139,100 @@ module.exports = {
           let temp = usr._json;
           delete usr._json;
           let user = { ...temp, ...usr };
-          /* Start  */
+          /* Start 
     let usr = require("./private/data.json");
     delete usr._raw;
     let temp = { ...usr._json };
     delete usr._json;
     let user = { ...temp, ...usr };
     /* End */
-    const filePath = join(
-      __dirname,
-      "private",
-      "user",
-      `usr-${encodeURIComponent(user.username)}.json`
-    );
-    stat(filePath, (err, stats) => {
-      if (err) {
-        keepLog(
-          user.username,
-          "create user",
-          (lerr) => {
-            if (lerr) {
-              //console.error(lerr);
-            }
-            writeFileOwn(filePath, JSON.stringify(user), (err) => {
-              if (err) {
-                //console.error(err);
-              }
-              res.cookie("user", JSON.stringify(user), {
-                maxAge: 60 * 60 * 24 * 7, // 1 week
-                httpOnly: true,
-              });
-              req.session.user = user;
-              res.redirect(req.baseUrl + "/");
-            });
-          },
-          {
-            ip:
-              req.headers["x-forwarded-for"] ||
-              req.ip ||
-              req.headers["x-client-ip"] ||
-              req.socket.remoteAddress ||
-              null,
-          }
-        );
-      } else {
-        keepLog(
-          user.username,
-          "login" + (req.session?.callback ? "/" + req.session.callback : ""),
-          (lerr) => {
-            if (lerr) {
-              //console.error(lerr);
-            }
-            updateFile(filePath, (err, data, callback) => {
-              if (err) {
-                //console.error(err);
-              } else {
-                data.user = user;
-                data.lastModified = new Date().toISOString();
-                callback(data, (err) => {
-                  if (err) {
-                    //console.error(err);
-                  } else {
+          const filePath = join(
+            __dirname,
+            "private",
+            "user",
+            `usr-${encodeURIComponent(user.username)}.json`
+          );
+          stat(filePath, (err, stats) => {
+            if (err) {
+              keepLog(
+                user.username,
+                "create user",
+                (lerr) => {
+                  if (lerr) {
+                    //console.error(lerr);
+                  }
+                  writeFileOwn(filePath, JSON.stringify(user), (err) => {
+                    if (err) {
+                      //console.error(err);
+                    }
                     res.cookie("user", JSON.stringify(user), {
                       maxAge: 60 * 60 * 24 * 7, // 1 week
                       httpOnly: true,
                     });
                     req.session.user = user;
-                    return res.render("callback.ejs", {
-                      user,
-                      jsonuser: JSON.stringify(user),
-                      url: encodeURIComponent(req.session?.callback || ""),
-                    });
+                    res.redirect(req.baseUrl + "/");
+                  });
+                },
+                {
+                  ip:
+                    req.headers["x-forwarded-for"] ||
+                    req.ip ||
+                    req.headers["x-client-ip"] ||
+                    req.socket.remoteAddress ||
+                    null,
+                }
+              );
+            } else {
+              keepLog(
+                user.username,
+                "login" +
+                  (req.session?.callback ? "/" + req.session.callback : ""),
+                (lerr) => {
+                  if (lerr) {
+                    //console.error(lerr);
                   }
-                });
-              }
-            });
-          },
-          {
-            ...stats,
-            ip:
-              req.headers["x-forwarded-for"] ||
-              req.ip ||
-              req.headers["x-client-ip"] ||
-              req.socket.remoteAddress ||
-              null,
-          }
-        );
-      }
-    });
-    /* }
+                  updateFile(filePath, (err, data, callback) => {
+                    if (err) {
+                      //console.error(err);
+                    } else {
+                      data.user = user;
+                      data.lastModified = new Date().toISOString();
+                      callback(data, (err) => {
+                        if (err) {
+                          //console.error(err);
+                        } else {
+                          res.cookie("user", JSON.stringify(user), {
+                            maxAge: 60 * 60 * 24 * 7, // 1 week
+                            httpOnly: true,
+                          });
+                          req.session.user = user;
+                          return res.render("callback.ejs", {
+                            user,
+                            jsonuser: JSON.stringify(user),
+                            url: encodeURIComponent(
+                              req.session?.callback || ""
+                            ),
+                          });
+                        }
+                      });
+                    }
+                  });
+                },
+                {
+                  ...stats,
+                  ip:
+                    req.headers["x-forwarded-for"] ||
+                    req.ip ||
+                    req.headers["x-client-ip"] ||
+                    req.socket.remoteAddress ||
+                    null,
+                }
+              );
+            }
+          });
+        }
       });
-    })(req, res, next); */
+    })(req, res, next);
   },
   template: function (req, res) {
     if (req.query && req.query.data) {
@@ -405,10 +408,28 @@ module.exports = {
                   host: rdata.host,
                   adminList: CONFIG.admin,
                 };
+                let wastranslation = req.session?.trans;
+                req.cookies && req.cookies.trans
+                  ? (req.session.trans = JSON.parse(req.cookies.trans))
+                  : null;
                 getTranslation(
                   req.session,
                   rdata.data.langcode,
                   (terr, trns) => {
+                    if (terr) {
+                      //console.error(terr);
+                    } else {
+                      if (!wastranslation) {
+                        res.cookie(
+                          "trans",
+                          JSON.stringify(req.session?.trans),
+                          {
+                            maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
+                            httpOnly: true,
+                          }
+                        );
+                      }
+                    }
                     //console.log(rdata.post.jurries_list);
                     res.render("dashboard.ejs", {
                       key: key,
@@ -553,7 +574,21 @@ module.exports = {
                 host: rdata.host,
                 adminList: CONFIG.admin,
               };
+              let wastranslation = req.session?.trans;
+              req.cookies && req.cookies.trans
+                ? (req.session.trans = JSON.parse(req.cookies.trans))
+                : null;
               getTranslation(req.session, rdata.data.langcode, (terr, trns) => {
+                if (terr) {
+                  //console.error(terr);
+                } else {
+                  if (!wastranslation) {
+                    res.cookie("trans", JSON.stringify(req.session?.trans), {
+                      maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
+                      httpOnly: true,
+                    });
+                  }
+                }
                 res.render("editathon.ejs", {
                   key,
                   trns: trns,
@@ -810,7 +845,21 @@ module.exports = {
               }
             } else {
               let sdata = rdata.data;
+              let wastranslation = req.session?.trans;
+              req.cookies && req.cookies.trans
+                ? (req.session.trans = JSON.parse(req.cookies.trans))
+                : null;
               getTranslation(req.session, rdata.data.langcode, (terr, trns) => {
+                if (terr) {
+                  //console.error(terr);
+                } else {
+                  if (!wastranslation) {
+                    res.cookie("trans", JSON.stringify(req.session?.trans), {
+                      maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
+                      httpOnly: true,
+                    });
+                  }
+                }
                 res.render("deletePage.ejs", {
                   key,
                   trns: trns,
