@@ -1,4 +1,4 @@
-//dependencies
+// dependencies
 require("dotenv").config();
 const CONFIG = {
   consumer_key: process.env.CONSUMER_KEY,
