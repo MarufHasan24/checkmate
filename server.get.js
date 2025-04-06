@@ -408,10 +408,28 @@ module.exports = {
                   host: rdata.host,
                   adminList: CONFIG.admin,
                 };
+                let wastranslation = req.session?.trans;
+                req.cookies && req.cookies.trans
+                  ? (req.session.trans = JSON.parse(req.cookies.trans))
+                  : null;
                 getTranslation(
                   req.session,
                   rdata.data.langcode,
                   (terr, trns) => {
+                    if (terr) {
+                      //console.error(terr);
+                    } else {
+                      if (!wastranslation) {
+                        res.cookie(
+                          "trans",
+                          JSON.stringify(req.session?.trans),
+                          {
+                            maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
+                            httpOnly: true,
+                          }
+                        );
+                      }
+                    }
                     //console.log(rdata.post.jurries_list);
                     res.render("dashboard.ejs", {
                       key: key,
@@ -556,7 +574,21 @@ module.exports = {
                 host: rdata.host,
                 adminList: CONFIG.admin,
               };
+              let wastranslation = req.session?.trans;
+              req.cookies && req.cookies.trans
+                ? (req.session.trans = JSON.parse(req.cookies.trans))
+                : null;
               getTranslation(req.session, rdata.data.langcode, (terr, trns) => {
+                if (terr) {
+                  //console.error(terr);
+                } else {
+                  if (!wastranslation) {
+                    res.cookie("trans", JSON.stringify(req.session?.trans), {
+                      maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
+                      httpOnly: true,
+                    });
+                  }
+                }
                 res.render("editathon.ejs", {
                   key,
                   trns: trns,
@@ -813,7 +845,21 @@ module.exports = {
               }
             } else {
               let sdata = rdata.data;
+              let wastranslation = req.session?.trans;
+              req.cookies && req.cookies.trans
+                ? (req.session.trans = JSON.parse(req.cookies.trans))
+                : null;
               getTranslation(req.session, rdata.data.langcode, (terr, trns) => {
+                if (terr) {
+                  //console.error(terr);
+                } else {
+                  if (!wastranslation) {
+                    res.cookie("trans", JSON.stringify(req.session?.trans), {
+                      maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
+                      httpOnly: true,
+                    });
+                  }
+                }
                 res.render("deletePage.ejs", {
                   key,
                   trns: trns,
