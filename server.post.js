@@ -423,7 +423,6 @@ module.exports = {
                           sub: username,
                           rev: "",
                           stat: "",
-                          length: 0,
                         };
                         if (
                           wordcount || //wikitext page section + page info

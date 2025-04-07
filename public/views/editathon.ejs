@@ -208,10 +208,8 @@
                                         <p class="label">Total Submission</p>
                                     </div>
                                     <div id="psudo" class="psudo-card" style="flex-direction: column;">
-                                        <% if(Date.now() < Date.parse(data.end_date + " " + data.end_time) &&
-                                            Date.now()>
-                                            Date.parse(data.start_date
-                                            + " " + data.start_time)) { %>
+                                        <% if((Date.now() < Date.parse(data.end_date + " " + data.end_time)) &&
+                                            (Date.parse(data.start_date + " " + data.start_time) < Date.now())) { %>
                                             <a style="background-color: rgb(24, 119, 235); color: white;"
                                                 href="/submit?key=<%=data.key%>">
                                                 <%=trns.lebel.submit%>
