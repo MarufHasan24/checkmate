@@ -211,6 +211,7 @@ const languages = {
   sju: "Ume Sami - Ume Sami",
   smn: "Anarâškielâ - Inari Sami",
 };
+let slangCode = "";
 let user = {};
 //let's go
 window.onload = () => {
@@ -301,7 +302,9 @@ window.onload = () => {
     location.replace("/query?" + query);
   };
   searchBox.addEventListener("click", () => {
-    updateDropdown(searchBox.value);
+    slangCode = searchBox.value;
+    searchBox.value = "";
+    updateDropdown();
   });
   document.addEventListener("click", (event) => {
     if (
@@ -309,6 +312,7 @@ window.onload = () => {
       !languageSelect.contains(event.target)
     ) {
       languageSelect.style.display = "none";
+      searchBox.value = slangCode;
     }
   });
 };
@@ -328,6 +332,7 @@ function updateDropdown(filter = "") {
     div.classList.add("language-option");
     div.textContent = name;
     div.onclick = () => {
+      slangCode = name;
       searchBox.value = name;
       searchBox.langCode = code;
       localStorage.setItem("langcode", code);
