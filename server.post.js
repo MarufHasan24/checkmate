@@ -141,7 +141,7 @@ module.exports = {
     // Create an empty object to store the filtered data
     let post = {};
     let newData = {};
-    let changes = [];
+    let changes = {};
     // Iterate through the data object and separate based on filterKeys
     for (let [key, value] of Object.entries(data)) {
       if (filterKeys.includes(key)) {
@@ -160,7 +160,10 @@ module.exports = {
         }
         if (pass && !data) {
           rdata.pass = pass;
-          changes.push(["pass", "updated", "hidden"]);
+          changes.pass = {
+            pass,
+            old: "hidden",
+          };
         } else {
           if (!rdata.post) {
             rdata.post = {};
@@ -189,9 +192,11 @@ module.exports = {
           // Compare and track changes before merging
           for (const [key, value] of Object.entries(data)) {
             if (JSON.stringify(oldData[key]) !== JSON.stringify(value)) {
-              changes.push([key, value, oldData[key]]); // Track changes
+              changes[key] = { value, old: oldData[key] }; // Track changes
             }
           }
+          delete changes.key; // Remove key from changes if it exists
+          delete changes.host; // Remove host from changes if it exists
           // Merge existing data instead of overwriting
           rdata.data = {
             ...rdata.data, // Preserve existing values
@@ -217,23 +222,7 @@ module.exports = {
               },
               {
                 host: data.host,
-                changes: changes
-                  .map(([key, value, oldval]) => {
-                    if (key === "jurries") {
-                      return {
-                        key: "jurries",
-                        value: value.split(",").map((e) => e.trim()),
-                        old: oldval.split(",").map((e) => e.trim()),
-                      };
-                    } else if (key === "key") {
-                      return null;
-                    } else if (key === "host") {
-                      return null;
-                    } else {
-                      return { key, value, old: oldval };
-                    }
-                  })
-                  .filter((e) => e),
+                changes: changes,
               }
             );
           }
@@ -897,7 +886,6 @@ module.exports = {
       });
     }
   },
-  /* intarnal post requests */
   //comment on user pages
   comment: function (req, res) {
     let key = req.body.key;

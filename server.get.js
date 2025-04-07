@@ -18,6 +18,7 @@ const {
   stat,
   join,
   keepLog,
+  logTableKey,
   logTable,
   readDirOwn,
 } = require("./public/lib/node.js");
@@ -123,7 +124,7 @@ module.exports = {
     res.redirect(req.baseUrl + "/oauth-callback");
   },
   oauth: function (req, res, next) {
-    passport.authenticate("mediawiki", function (err, usr) {
+    /* passport.authenticate("mediawiki", function (err, usr) {
       if (err) {
         return next(err);
       }
@@ -138,100 +139,97 @@ module.exports = {
           let temp = usr._json;
           delete usr._json;
           let user = { ...temp, ...usr };
-          /* Start 
+          /* Start  */
     let usr = require("./private/data.json");
     delete usr._raw;
     let temp = { ...usr._json };
     delete usr._json;
     let user = { ...temp, ...usr };
     /* End */
-          const filePath = join(
-            __dirname,
-            "private",
-            "user",
-            `usr-${encodeURIComponent(user.username)}.json`
-          );
-          stat(filePath, (err, stats) => {
-            if (err) {
-              keepLog(
-                user.username,
-                "create user",
-                (lerr) => {
-                  if (lerr) {
-                    //console.error(lerr);
-                  }
-                  writeFileOwn(filePath, JSON.stringify(user), (err) => {
-                    if (err) {
-                      //console.error(err);
-                    }
+    const filePath = join(
+      __dirname,
+      "private",
+      "user",
+      `usr-${encodeURIComponent(user.username)}.json`
+    );
+    stat(filePath, (err, stats) => {
+      if (err) {
+        keepLog(
+          user.username,
+          "create user",
+          (lerr) => {
+            if (lerr) {
+              //console.error(lerr);
+            }
+            writeFileOwn(filePath, JSON.stringify(user), (err) => {
+              if (err) {
+                //console.error(err);
+              }
+              res.cookie("user", JSON.stringify(user), {
+                maxAge: 60 * 60 * 24 * 7, // 1 week
+                httpOnly: true,
+              });
+              req.session.user = user;
+              res.redirect(req.baseUrl + "/");
+            });
+          },
+          {
+            ip:
+              req.headers["x-forwarded-for"] ||
+              req.ip ||
+              req.headers["x-client-ip"] ||
+              req.socket.remoteAddress ||
+              null,
+          }
+        );
+      } else {
+        keepLog(
+          user.username,
+          "login" + (req.session?.callback ? "/" + req.session.callback : ""),
+          (lerr) => {
+            if (lerr) {
+              //console.error(lerr);
+            }
+            updateFile(filePath, (err, data, callback) => {
+              if (err) {
+                //console.error(err);
+              } else {
+                data.user = user;
+                data.lastModified = new Date().toISOString();
+                callback(data, (err) => {
+                  if (err) {
+                    //console.error(err);
+                  } else {
                     res.cookie("user", JSON.stringify(user), {
                       maxAge: 60 * 60 * 24 * 7, // 1 week
                       httpOnly: true,
                     });
                     req.session.user = user;
-                    res.redirect(req.baseUrl + "/");
-                  });
-                },
-                {
-                  ip:
-                    req.headers["x-forwarded-for"] ||
-                    req.ip ||
-                    req.headers["x-client-ip"] ||
-                    req.socket.remoteAddress ||
-                    null,
-                }
-              );
-            } else {
-              keepLog(
-                user.username,
-                "login" +
-                  (req.session?.callback ? "/" + req.session.callback : ""),
-                (lerr) => {
-                  if (lerr) {
-                    //console.error(lerr);
+                    return res.render("callback.ejs", {
+                      user,
+                      jsonuser: JSON.stringify(user),
+                      url: encodeURIComponent(req.session?.callback || ""),
+                    });
                   }
-                  updateFile(filePath, (err, data, callback) => {
-                    if (err) {
-                      //console.error(err);
-                    } else {
-                      data.user = user;
-                      data.lastModified = new Date().toISOString();
-                      callback(data, (err) => {
-                        if (err) {
-                          //console.error(err);
-                        } else {
-                          res.cookie("user", JSON.stringify(user), {
-                            maxAge: 60 * 60 * 24 * 7, // 1 week
-                            httpOnly: true,
-                          });
-                          req.session.user = user;
-                          return res.render("callback.ejs", {
-                            user,
-                            jsonuser: JSON.stringify(user),
-                            url: encodeURIComponent(
-                              req.session?.callback || ""
-                            ),
-                          });
-                        }
-                      });
-                    }
-                  });
-                },
-                {
-                  ...stats,
-                  ip:
-                    req.headers["x-forwarded-for"] ||
-                    req.ip ||
-                    req.headers["x-client-ip"] ||
-                    req.socket.remoteAddress ||
-                    null,
-                }
-              );
-            }
-          });
-        }
+                });
+              }
+            });
+          },
+          {
+            ...stats,
+            ip:
+              req.headers["x-forwarded-for"] ||
+              req.ip ||
+              req.headers["x-client-ip"] ||
+              req.socket.remoteAddress ||
+              null,
+          }
+        );
+      }
+    });
+    /* }
       });
-    })(req, res, next);
+    })(req, res, next); */
   },
   template: function (req, res) {
     if (req.query && req.query.data) {
@@ -585,6 +583,74 @@ module.exports = {
                 });
               });
             }
+          }
+        }
+      );
+    }
+  },
+  editathonLog: function (req, res) {
+    let key = req.query.key;
+    if (!key) {
+      readDirOwn(
+        join(__dirname, "private", "db", "log"),
+        (err, dirdata, files) => {
+          if (err) {
+            //console.error(err);
+            return res.render("error.ejs", {
+              status: 500,
+              error: "Error reading data",
+              redirect: null,
+              deletable: false,
+            });
+          } else {
+            let html =
+              "<table>" +
+              files
+                .map((obj) => {
+                  obj = obj.replace(".json", "");
+                  return `<tr>
+            <td colspan="3">
+                <div class="patrol-entry">
+                    <div class="top">
+                        <a href="/editathon/log?key=${obj}">${obj}</a>
+                    </div>
+                    </div>
+            </td>
+        </tr>`;
+                })
+                .join("") +
+              "</table>";
+            res.render("editathonLog.ejs", {
+              key: null,
+              data: null,
+              html: null,
+              list: html,
+              jsondata: JSON.stringify(null),
+            });
+          }
+        },
+        false
+      );
+    } else {
+      readFile(
+        join(__dirname, "private", "db", "log", key + ".json"),
+        (err, rdata) => {
+          if (err) {
+            //console.error(err);
+            return res.render("error.ejs", {
+              status: 404,
+              error: "File not found!",
+              redirect: null,
+              deletable: false,
+            });
+          } else {
+            res.render("editathonLog.ejs", {
+              key,
+              data: rdata,
+              html: logTableKey(rdata),
+              list: null,
+              jsondata: JSON.stringify(rdata),
+            });
           }
         }
       );
