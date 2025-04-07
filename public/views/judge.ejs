@@ -40,27 +40,34 @@
             let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
             let data = JSON.parse(localStorage.getItem(key));
             if (userdata) {
-                if (!(data && data?.username)) {
-                    csalert("Login Required!", "Please login first to judge pages", function () {
-                        document.getElementsByClassName("container")[0].remove();
-                        window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
-                    });
-                } else if (!userdata.jurries.includes(data.username)) {
-                    // redirect to  that wiki page
-                    window.location.replace("https://" + userdata.project + ".org/wiki/" + userdata.page);
+                if (!judge) {
+                    if (data && data.username && userdata.jurries.includes(data.username)) {
+                        window.location.href += "&judge=" + data.username;
+                    } else {
+                        csalert("Login Required!", "Please login first to judge pages", function () {
+                            document.getElementsByClassName("container")[0].remove();
+                            window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
+                        });
+                    }
+                } else {
+                    if (!(data && data?.username)) {
+                        csalert("Login Required!", "Please login first to judge pages", function () {
+                            document.getElementsByClassName("container")[0].remove();
+                            window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
+                        });
+                    } else if (!userdata.jurries.includes(data.username)) {
+                        // redirect to  that wiki page
+                        window.location.replace("https://" + userdata.project + ".org/wiki/" + userdata.page);
 
-                } else if (judge !== data?.username) {
-                    /* remove judge part from the location ang reloade the page */
-                    let url = window.location.href.split("?")[0];
-                    let params = new URLSearchParams(window.location.search);
-                    params.delete("judge");
-                    params.append("judge", data.username);
-                    window.history.replaceState({}, document.title, url + "?" + params.toString());
-                    window.location.reload();
-                }
-            } else {
-                if (data && data.username) {
-                    window.location.href += "&judge=" + data.username;
+                    } else if (judge !== data?.username) {
+                        /* remove judge part from the location ang reloade the page */
+                        let url = window.location.href.split("?")[0];
+                        let params = new URLSearchParams(window.location.search);
+                        params.delete("judge");
+                        params.append("judge", data.username);
+                        window.history.replaceState({}, document.title, url + "?" + params.toString());
+                        window.location.reload();
+                    }
                 }
             }
         </script>
@@ -153,7 +160,8 @@
                                             <p>
                                                 <a href="https://<%=data.project%>.org/user:<%=isLocked%>">
                                                     <%=isLocked%>
-                                                </a> is now judging this page. Please judge another page. You can ask
+                                                </a> is now judging this page. Please judge another page. You can
+                                                ask
                                                 <i>
                                                     <%=isLocked%>
                                                 </i> to
