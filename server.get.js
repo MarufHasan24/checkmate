@@ -1,4 +1,4 @@
-//dependencies
+// dependencies
 require("dotenv").config();
 const CONFIG = {
   consumer_key: process.env.CONSUMER_KEY,
@@ -571,29 +571,7 @@ module.exports = {
                 host: rdata.host,
                 adminList: CONFIG.admin,
               };
-              let wastranslation = req.session?.trans;
-              console.log("wastranslation", req.cookies);
-              req.cookies && req.cookies.trans
-                ? (req.session.trans = JSON.parse(req.cookies.trans))
-                : null;
               getTranslation(req.session, rdata.data.langcode, (terr, trns) => {
-                if (terr) {
-                  console.error(terr);
-                } else {
-                  if (!wastranslation) {
-                    res.cookie(
-                      "tran",
-                      JSON.stringify({
-                        trans: trns,
-                        langcode: rdata.data.langcode,
-                      }),
-                      {
-                        maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
-                        httpOnly: true,
-                      }
-                    );
-                  }
-                }
                 res.render("editathon.ejs", {
                   key,
                   trns: trns,

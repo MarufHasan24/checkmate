@@ -935,10 +935,6 @@ module.exports = {
     readFile(
       join(__dirname, "private", "db", "files", key + ".json"),
       (err, rdata) => {
-        let wastranslation = req.session?.trans;
-        req.cookies && req.cookies.trans
-          ? (req.session.trans = JSON.parse(req.cookies.trans))
-          : null;
         getTranslation(
           req.session,
           rdata.data.langcode,
@@ -947,13 +943,6 @@ module.exports = {
               return res.status(500).send({
                 error: "Internal server error",
               });
-            } else {
-              if (!wastranslation) {
-                res.cookie("trans", JSON.stringify(req.session?.trans), {
-                  maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
-                  httpOnly: true,
-                });
-              }
             }
             if (err) {
               console.error(err); // Log the error
@@ -1113,10 +1102,6 @@ module.exports = {
                   type: "error",
                 });
               } else {
-                let wastranslation = req.session?.trans;
-                req.cookies && req.cookies.trans
-                  ? (req.session.trans = JSON.parse(req.cookies.trans))
-                  : null;
                 getTranslation(
                   req.session,
                   rdata.data.langcode,
@@ -1129,16 +1114,6 @@ module.exports = {
                         type: "error",
                       });
                     } else {
-                      if (!wastranslation) {
-                        res.cookie(
-                          "trans",
-                          JSON.stringify(req.session?.trans),
-                          {
-                            maxAge: 60 * 60 * 1000 * 24 * 30, // 30 days
-                            httpOnly: true,
-                          }
-                        );
-                      }
                       if (type == "eleminate") {
                         rdata.data.eleminated = {
                           date: Date.now(),
@@ -1275,9 +1250,6 @@ module.exports = {
   },
   adminP: function (req, res) {
     let data = req.body;
-    req.cookies && req.cookies.user
-      ? (req.session.user = JSON.parse(req.cookies.user))
-      : null;
     if (req.session?.user) {
       let user = req.session?.user?.displayName;
       updateFile(
