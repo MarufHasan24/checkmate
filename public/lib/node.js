@@ -512,6 +512,59 @@ function keepLog(username, action, callback, rdata) {
     callback(null);
   }
 }
+function keepKeyLog(key, username, action, callback, rdata = null) {
+  if (username) {
+    const date = new Date();
+    const filePath = `${__dirname}/../../private/db/log/${key}.json`;
+    console.log(filePath);
+    fs.stat(filePath, (err, stats) => {
+      if (err) {
+        // File does not exist, create it with primary data
+        writeFile(
+          filePath,
+          JSON.stringify([
+            {
+              user: username,
+              action: action,
+              date: date.toString(),
+              data: rdata || null,
+            },
+          ]),
+          (err) => {
+            if (err) {
+              callback(err); // Log any errors
+            } else {
+              callback(null);
+            }
+          }
+        );
+      } else {
+        // File exists, update the existing data
+        updateFile(filePath, (err, data, ucallback) => {
+          if (err) {
+            callback(err);
+          } else {
+            data.push({
+              user: username,
+              date: date.toString(),
+              data: rdata || null,
+              action: action,
+            });
+            ucallback(data, (err) => {
+              if (err) {
+                callback(err);
+              } else {
+                callback(null);
+              }
+            });
+          }
+        });
+      }
+    });
+  } else {
+    callback(null);
+  }
+}
 function formatDate(date, translationObj) {
   const day = translationObj
     ? String(date.getDate())
@@ -641,4 +694,5 @@ module.exports = {
   readUser,
   stat: fs.stat,
   join,
+  keepKeyLog,
 };
