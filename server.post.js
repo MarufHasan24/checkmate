@@ -10,7 +10,6 @@ const {
   keepLog,
   editathonTable,
   readUser,
-  keepKeyLog,
 } = require("./public/lib/node.js");
 const {
   getinfo,
@@ -129,6 +128,7 @@ module.exports = {
   },
   dashboard: function (req, res) {
     let { data, key, pass } = req.body;
+
     // Define the keys you want to filter out
     const filterKeys = [
       "pagecount",
@@ -141,7 +141,7 @@ module.exports = {
     // Create an empty object to store the filtered data
     let post = {};
     let newData = {};
-    let changes = {};
+
     // Iterate through the data object and separate based on filterKeys
     for (let [key, value] of Object.entries(data)) {
       if (filterKeys.includes(key)) {
@@ -158,12 +158,9 @@ module.exports = {
         if (err) {
           return;
         }
+
         if (pass && !data) {
           rdata.pass = pass;
-          changes.pass = {
-            pass,
-            old: "hidden",
-          };
         } else {
           if (!rdata.post) {
             rdata.post = {};
@@ -188,43 +185,22 @@ module.exports = {
               }
             });
           }
-          const oldData = JSON.parse(JSON.stringify(rdata.data)); // Deep copy of old data
-          // Compare and track changes before merging
-          for (const [key, value] of Object.entries(data)) {
-            if (JSON.stringify(oldData[key]) !== JSON.stringify(value)) {
-              changes[key] = { value, old: oldData[key] }; // Track changes
-            }
-          }
-          delete changes.key; // Remove key from changes if it exists
-          delete changes.host; // Remove host from changes if it exists
           // Merge existing data instead of overwriting
           rdata.data = {
             ...rdata.data, // Preserve existing values
             ...data, // Merge new values
           };
         }
+
         // Ensure existing keys are not deleted
         delete rdata.data?.key;
         delete rdata.data?.host;
+
         callback(rdata, (err) => {
           if (err) {
             return res.status(200).send({ error: err });
           } else {
-            keepKeyLog(
-              key,
-              data.host,
-              "dashboard",
-              (klerr) => {
-                if (klerr) {
-                  console.error(klerr);
-                }
-                return res.status(200).send({ error: null });
-              },
-              {
-                host: data.host,
-                changes: changes,
-              }
-            );
+            return res.status(200).send({ error: null });
           }
         });
       });
@@ -241,6 +217,7 @@ module.exports = {
       let host = "";
       let type = req.body.type;
       let bin = req.body.bin || false;
+      console.log("delete", key, user, type, bin);
       updateFile(
         join(__dirname, "private", "querylist.json"),
         (err, olddata, callback) => {
@@ -670,20 +647,7 @@ module.exports = {
                         type: "error",
                       });
                     } else {
-                      keepKeyLog(
-                        data.key,
-                        username,
-                        "submit",
-                        (klerr) => {
-                          if (klerr) {
-                            console.error(klerr);
-                          }
-                          return res.status(200).send(data);
-                        },
-                        {
-                          count: Object.keys(state).length,
-                        }
-                      );
+                      return res.status(200).send(data);
                     }
                   });
                 });
@@ -759,22 +723,20 @@ module.exports = {
                     });
                   } else {
                     let list = Object.keys(oldata.post.page_list);
-                    keepKeyLog(key, user, "judge", (klerr) => {
-                      return res.status(200).send({
-                        message: "Judged successfully!",
-                        type: "success",
-                        redirect: {
-                          url:
-                            "/judge?key=" +
-                            key +
-                            "&page=" +
-                            list[Math.floor(list.length * Math.random())] +
-                            "&judge=" +
-                            user,
-                          timer: null,
-                          button: "Another Random Page",
-                        },
-                      });
+                    return res.status(200).send({
+                      message: "Judged successfully!",
+                      type: "success",
+                      redirect: {
+                        url:
+                          "/judge?key=" +
+                          key +
+                          "&page=" +
+                          list[Math.floor(list.length * Math.random())] +
+                          "&judge=" +
+                          user,
+                        timer: null,
+                        button: "Another Random Page",
+                      },
                     });
                   }
                 });
@@ -807,8 +769,7 @@ module.exports = {
     let user = req.body?.username;
     let pagelist = req.body?.list; // list of pages to remove
     if (mainkey) {
-      keepKeyLog(
-        key,
+      keepLog(
         user,
         "remove pages",
         (lerr) => {
@@ -886,6 +847,7 @@ module.exports = {
       });
     }
   },
+  /* intarnal post requests */
   //comment on user pages
   comment: function (req, res) {
     let key = req.body.key;
@@ -928,17 +890,12 @@ module.exports = {
                     redirect: null,
                   });
                 } else {
-                  keepKeyLog(key, user, "comment", (klerr) => {
-                    if (klerr) {
-                      console.error(klerr);
-                    }
-                    return res.status(200).send({
-                      message:
-                        "Message sent successfully. return body: <br>" +
-                        JSON.stringify(edata, null, 2),
-                      type: "success",
-                      redirect: null,
-                    });
+                  return res.status(200).send({
+                    message:
+                      "Message sent successfully. return body: <br>" +
+                      JSON.stringify(edata, null, 2),
+                    type: "success",
+                    redirect: null,
                   });
                 }
               }
@@ -1693,38 +1650,23 @@ module.exports = {
                     type: "error",
                   });
                 } else {
-                  keepKeyLog(
-                    key,
-                    user,
-                    "pagelock",
-                    (lerr) => {
-                      if (lerr) {
-                        console.error(lerr);
-                      }
-                      console.timeEnd("pagelock");
-                      return res.status(200).send({
-                        message:
-                          type == "lock"
-                            ? `<b>${page}</b> is locked to you. Only you can judge it now.`
-                            : `<b>${page}</b> is unlocked. Anyone can judge it now.`,
-                        type: "success",
-                        redirect: {
-                          url:
-                            "/judge?key=" +
-                            key +
-                            "&page=" +
-                            page +
-                            "&judge=" +
-                            encodeURIComponent(user),
-                          timer: 3,
-                        },
-                      });
+                  return res.status(200).send({
+                    message:
+                      type == "lock"
+                        ? `<b>${page}</b> is locked to you. Only you can judge it now.`
+                        : `<b>${page}</b> is unlocked. Anyone can judge it now.`,
+                    type: "success",
+                    redirect: {
+                      url:
+                        "/judge?key=" +
+                        key +
+                        "&page=" +
+                        page +
+                        "&judge=" +
+                        encodeURIComponent(user),
+                      timer: 3,
                     },
-                    {
-                      page: page,
-                      type: type,
-                    }
-                  );
+                  });
                 }
               });
             }
