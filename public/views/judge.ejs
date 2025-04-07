@@ -33,166 +33,149 @@
 
 <body>
     <iframe title="background" src="/background.html" frameborder="0"></iframe>
-    <% if (!user) { %>
+    <% if(pagelist && pagelist?.length> 0) { %>
         <script>
-            (function () {
-                let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
-                let data = JSON.parse(localStorage.getItem(key));
-                if (data && data.username) {
-                    window.location.href += "&judge=" + data.username;
-                } else {
-                    csalert("Login Required!", "Please login first to judge pages", function () {
-                        document.getElementsByClassName("container")[0].remove();
-                        window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>&page=<%=page%>")
-                    });
-                }
-            })()
-        </script>
-        <% } else if(pagelist && pagelist?.length> 0) { %>
-            <script>
-                const judge = "<%= data?.judge %>";
-                const userdata = JSON.parse(validateStr('<%= jsondata %>'));
-                let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
-                let data = JSON.parse(localStorage.getItem(key));
-                if (userdata) {
-                    if (!judge) {
-                        if (data && data.username && userdata.jurries.includes(data.username)) {
-                            window.location.href += "&judge=" + data.username;
-                        } else {
-                            csalert("Login Required!", "Please login first to judge pages", function () {
-                                document.getElementsByClassName("container")[0].remove();
-                                window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
-                            });
-                        }
+            const judge = "<%= data?.judge %>";
+            const userdata = JSON.parse(validateStr('<%= jsondata %>'));
+            let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+            let data = JSON.parse(localStorage.getItem(key));
+            if (userdata) {
+                if (!judge) {
+                    if (data && data.username && userdata.jurries.includes(data.username)) {
+                        window.location.href += "&judge=" + data.username;
                     } else {
-                        if (!(data && data?.username)) {
-                            csalert("Login Required!", "Please login first to judge pages", function () {
-                                document.getElementsByClassName("container")[0].remove();
-                                window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
-                            });
-                        } else if (!userdata.jurries.includes(data.username)) {
-                            // redirect to  that wiki page
-                            window.location.replace("https://" + userdata.project + ".org/wiki/" + userdata.page);
-                        } else if (judge !== data?.username) {
-                            /* remove judge part from the location ang reloade the page */
-                            let url = window.location.href.split("?")[0];
-                            let params = new URLSearchParams(window.location.search);
-                            params.delete("judge");
-                            params.append("judge", data.username);
-                            window.history.replaceState({}, document.title, url + "?" + params.toString());
-                            window.location.reload();
-                        }
+                        csalert("Login Required!", "Please login first to judge pages", function () {
+                            document.getElementsByClassName("container")[0].remove();
+                            window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
+                        });
+                    }
+                } else {
+                    if (!(data && data?.username)) {
+                        csalert("Login Required!", "Please login first to judge pages", function () {
+                            document.getElementsByClassName("container")[0].remove();
+                            window.location.href = "/login?callback=" + encodeURIComponent("judge?key=<%=key%>")
+                        });
+                    } else if (!userdata.jurries.includes(data.username)) {
+                        // redirect to  that wiki page
+                        window.location.replace("https://" + userdata.project + ".org/wiki/" + userdata.page);
+
+                    } else if (judge !== data?.username) {
+                        /* remove judge part from the location ang reloade the page */
+                        let url = window.location.href.split("?")[0];
+                        let params = new URLSearchParams(window.location.search);
+                        params.delete("judge");
+                        params.append("judge", data.username);
+                        window.history.replaceState({}, document.title, url + "?" + params.toString());
+                        window.location.reload();
                     }
                 }
-            </script>
-            <button class="collups">Show</button>
-            <% if(page) { %>
-                <ul class="flex">
-                    <li class="this"><a href="/judge?key=<%=key%>&page=<%=encodeURIComponent(page)%>">
-                            <%=page%>
-                        </a></li>
-                    <% for(i in pagelist) {%>
-                        <% if(page!==pagelist[i]) { %>
-                            <li><a href="/judge?key=<%=key%>&page=<%=encodeURIComponent(pagelist[i])%>">
-                                    <%=pagelist[i]%>
-                                </a></li>
-                            <% } %>
-                                <%}%>
-                </ul>
-                <div class="header">
-                    <h3>
-                        <a target="_blank" href="https://<%=data.project%>.org/wiki/<%=page%>">
-                            <%=page%>
+            }
+        </script>
+        <button class="collups">Show</button>
+        <% if(page) { %>
+            <ul class="flex">
+                <li class="this"><a href="/judge?key=<%=key%>&page=<%=encodeURIComponent(page)%>">
+                        <%=page%>
+                    </a></li>
+                <% for(i in pagelist) {%>
+                    <% if(page!==pagelist[i]) { %>
+                        <li><a href="/judge?key=<%=key%>&page=<%=encodeURIComponent(pagelist[i])%>">
+                                <%=pagelist[i]%>
+                            </a></li>
+                        <% } %>
+                            <%}%>
+            </ul>
+            <div class="header">
+                <h3>
+                    <a target="_blank" href="https://<%=data.project%>.org/wiki/<%=page%>">
+                        <%=page%>
+                    </a>
+                </h3>
+                <div>
+                    <p>Creator: <a target="_blank"
+                            href="https://<%=data.project%>.org/wiki/user:<%= pagedata.creator %>">
+                            <%= pagedata.creator %>
                         </a>
-                    </h3>
-                    <div>
-                        <p>Creator: <a target="_blank"
-                                href="https://<%=data.project%>.org/wiki/user:<%= pagedata.creator %>">
-                                <%= pagedata.creator %>
-                            </a>
+                    </p>
+                    <p>Creation Date: <%= new Date(pagedata.creation).toLocaleString() %>
+                    </p>
+                    <p>Submission Date: <%= new Date(pagedata.sd).toLocaleString() %>
+                    </p>
+                    <p>Submitter:<a target="_blank" href="https://<%=data.project%>.org/wiki/user:<%= pagedata.sub %>">
+                            <%= pagedata.sub %>
+                        </a>
+                    </p>
+                    <% if(pagedata.wc) { %>
+                        <p>Word Count: <%=pagedata.wc%>
                         </p>
-                        <p>Creation Date: <%= new Date(pagedata.creation).toLocaleString() %>
-                        </p>
-                        <p>Submission Date: <%= new Date(pagedata.sd).toLocaleString() %>
-                        </p>
-                        <p>Submitter:<a target="_blank"
-                                href="https://<%=data.project%>.org/wiki/user:<%= pagedata.sub %>">
-                                <%= pagedata.sub %>
-                            </a>
-                        </p>
-                        <% if(pagedata.wc) { %>
-                            <p>Word Count: <%=pagedata.wc%>
-                            </p>
-                            <% } %>
-                                <% if(pagedata.length) { %>
-                                    <p>Size: <%=pagedata.length%> bytes
-                                    </p>
-                                    <% } %>
-                    </div>
-                </div>
-                <script>
-                    let btn = document.querySelector(".collups");
-                    let ul = document.querySelector("ul.flex");
-                    btn.addEventListener("click", (e) => {
-                        if (ul.classList.contains("show")) {
-                            ul.classList.remove("show");
-                            btn.innerHTML = "Show";
-                        } else {
-                            ul.classList.add("show");
-                            btn.innerHTML = "Hide"
-                        }
-                    })
-                </script>
-                <% } else { %>
-                    <% } %>
-                        <% if(html) { %>
-                            <div>
-                                <div class="container">
-                                    <%-html%>
-                                </div>
-
-                                <% if (!isLocked || (isLocked && isLocked==data.judge)) { %>
-                                    <div class="sticky">
-                                        <ul class="options" style="justify-content: flex-start;">
-                                        </ul>
-                                        <div class="controls" style="justify-content: center;">
-                                            <% if (!isLocked) { %>
-                                                <button class="lockbtn" id="lock-button">Lock it!</button>
-                                                <% } else {%>
-                                                    <button class="lockbtn" id="unlock-button">Unlock</button>
-                                                    <% } %>
-                                                        <button id="comment-button">comment</button>
-                                        </div>
-                                        <div class="controls">
-                                            <span>Marks:<span id="marks">0</span></span>
-                                            <button type="button" disabled="" class="buttons"
-                                                id="Save">Save</button><button type="button" class="buttons"
-                                                id="Skip">Skip</button>
-                                        </div>
-                                    </div>
-                                    <% }else{ %>
-                                        <div class="sticky locked">
-                                            <div>
-                                                <p>
-                                                    <a href="https://<%=data.project%>.org/user:<%=isLocked%>">
-                                                        <%=isLocked%>
-                                                    </a> is now judging this page. Please judge another page. You
-                                                    can
-                                                    ask
-                                                    <i>
-                                                        <%=isLocked%>
-                                                    </i> to
-                                                    unlock it.
-                                                </p>
-                                            </div>
-                                            <button type="button" class="buttons" id="Skip">Next</button>
-                                        </div>
-                                        <% } %>
-
-                            </div>
-                            <script src="/assets/scripts/judge.js"></script>
-                            <% } %>
+                        <% } %>
+                            <% if(pagedata.length) { %>
+                                <p>Size: <%=pagedata.length%> bytes
+                                </p>
                                 <% } %>
+                </div>
+            </div>
+            <script>
+                let btn = document.querySelector(".collups");
+                let ul = document.querySelector("ul.flex");
+                btn.addEventListener("click", (e) => {
+                    if (ul.classList.contains("show")) {
+                        ul.classList.remove("show");
+                        btn.innerHTML = "Show";
+                    } else {
+                        ul.classList.add("show");
+                        btn.innerHTML = "Hide"
+                    }
+                })
+            </script>
+            <% } else { %>
+                <% } %>
+                    <% if(html) { %>
+                        <div>
+                            <div class="container">
+                                <%-html%>
+                            </div>
+
+                            <% if (!isLocked || (isLocked && isLocked==data.judge)) { %>
+                                <div class="sticky">
+                                    <ul class="options" style="justify-content: flex-start;">
+                                    </ul>
+                                    <div class="controls" style="justify-content: center;">
+                                        <% if (!isLocked) { %>
+                                            <button class="lockbtn" id="lock-button">Lock it!</button>
+                                            <% } else {%>
+                                                <button class="lockbtn" id="unlock-button">Unlock</button>
+                                                <% } %>
+                                                    <button id="comment-button">comment</button>
+                                    </div>
+                                    <div class="controls">
+                                        <span>Marks:<span id="marks">0</span></span>
+                                        <button type="button" disabled="" class="buttons" id="Save">Save</button><button
+                                            type="button" class="buttons" id="Skip">Skip</button>
+                                    </div>
+                                </div>
+                                <% }else{ %>
+                                    <div class="sticky locked">
+                                        <div>
+                                            <p>
+                                                <a href="https://<%=data.project%>.org/user:<%=isLocked%>">
+                                                    <%=isLocked%>
+                                                </a> is now judging this page. Please judge another page. You can
+                                                ask
+                                                <i>
+                                                    <%=isLocked%>
+                                                </i> to
+                                                unlock it.
+                                            </p>
+                                        </div>
+                                        <button type="button" class="buttons" id="Skip">Next</button>
+                                    </div>
+                                    <% } %>
+
+                        </div>
+                        <script src="/assets/scripts/judge.js"></script>
+                        <% } %>
+                            <% } %>
 </body>
 
 </html>

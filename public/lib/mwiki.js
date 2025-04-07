@@ -352,7 +352,7 @@ function userIsAdmin(username, langcode, callback) {
               code: "Invalid username",
               error: true,
             });
-          } else if (data?.groups?.includes("sysop")) {
+          } else if (data.groups.includes("sysop")) {
             callback(null, true);
           } else {
             callback(null, false);
@@ -432,7 +432,7 @@ function edit(page, oauthdata, data, token, url, callback, where, summary) {
         action: "edit",
         title: page,
         text: updatedData,
-        summary: summary || "",
+        summary: summary || "edits usinging checkmate",
         token: token,
         format: "json",
       };

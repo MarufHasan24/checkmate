@@ -68,7 +68,6 @@ app.get("/query", gets.query);
 app.get("/dashboard", gets.dashboard);
 app.get("/logout", gets.logout);
 app.get("/editathon", gets.editathon);
-app.get("/editathon/log", gets.editathonLog);
 app.get("/submit", gets.submit);
 app.get("/judge", gets.judge);
 app.get("/remove", gets.remove);
