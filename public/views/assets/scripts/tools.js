@@ -347,21 +347,21 @@ function createPromptElement(type, value, placeholder, buttonTexts) {
   const buttonContainer = document.createElement("div");
   buttonContainer.classList.add("custom-prompt-buttons");
 
-  // OK button
-  const okButton = document.createElement("button");
-  okButton.classList.add("custom-prompt-button");
-  okButton.textContent = buttonTexts[0]?.text || buttonTexts[0] || "Ok";
-  okButton.value = buttonTexts[0]?.value || buttonTexts[0] || "Ok";
-
   // Cancel button
   const cancelButton = document.createElement("button");
   cancelButton.classList.add("custom-prompt-button", "custom-prompt-cancel");
   cancelButton.textContent = buttonTexts[1]?.text || buttonTexts[1] || "Cancel";
   cancelButton.value = buttonTexts[1]?.value || buttonTexts[1] || "Cancel";
 
+  // OK button
+  const okButton = document.createElement("button");
+  okButton.classList.add("custom-prompt-button");
+  okButton.textContent = buttonTexts[0]?.text || buttonTexts[0] || "Ok";
+  okButton.value = buttonTexts[0]?.value || buttonTexts[0] || "Ok";
+
   // Append elements to the prompt box
-  buttonContainer.appendChild(okButton);
   buttonContainer.appendChild(cancelButton);
+  buttonContainer.appendChild(okButton);
   promptBox.appendChild(promptTitle);
   promptBox.appendChild(promptMessage);
   promptBox.appendChild(promptInput);
