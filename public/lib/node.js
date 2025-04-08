@@ -345,7 +345,13 @@ function generateTables(json) {
 
   return html;
 }
-function editathonTable(page_list, mkey, startindex = 0, translation = null) {
+function editathonTable(
+  page_list,
+  mkey,
+  startindex = 0,
+  translation = null,
+  project = "meta.wikimedia"
+) {
   let table = "";
   // Get all keys (page names) from page_list
   const pageKeys = Object.keys(page_list).filter((e) => e);
@@ -388,9 +394,13 @@ function editathonTable(page_list, mkey, startindex = 0, translation = null) {
               translation?.lebel?.counts
             )}</td>`;
           } else if (field == "sub") {
-            td = `<td data-label='User'>${pageData[field]}</td>`;
+            td = `<td data-label='User'><a target="_blank" href='https://${project}.org/wiki/User_talk:${encodeURIComponent(
+              pageData[field]
+            )}'>${pageData[field]}</a></td>`;
           } else if (field == "rev") {
-            td = `<td data-label='Reviewer'>${pageData[field]}</td>`;
+            td = `<td data-label='Reviewer'><a target="_blank" href='https://${project}.org/wiki/User_talk:${encodeURIComponent(
+              pageData[field]
+            )}'>${pageData[field]}</a></td>`;
           } else if (field == "stat") {
             td = `<td data-label='Status'>${pageData[field]}</td>`;
           } else if (field == "ec") {

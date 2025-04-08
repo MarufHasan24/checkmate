@@ -288,7 +288,9 @@ window.addEventListener("DOMContentLoaded", function () {
     let callbackurl = encodeURIComponent(window.location.href.split("/").pop());
     if (data) {
       logout.innerHTML = `<a onclick="localStorage.removeItem('${key}')" href="/logout?username=${data.username}&callback=${callbackurl}">Logout</a>`;
-      user.innerHTML = `<span style="display: flex; align-items: center; flex-dirrection: row;"><img height="25px" width="25px" src="/assets/imgs/user.png" />&nbsp;${data.username}</span>`;
+      user.innerHTML = `<span style="display: flex; align-items: center; flex-dirrection: row;"><img height="25px" width="25px" src="/assets/imgs/user.png" /><a href="/user?user=${encodeURIComponent(
+        data.username
+      )}">&nbsp;${data.username}</a></span>`;
       menu.appendChild(logout);
       menu.appendChild(user);
       window.username = data.username;

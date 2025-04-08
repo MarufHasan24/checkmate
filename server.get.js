@@ -1093,7 +1093,38 @@ module.exports = {
     },
   },
   user: function (req, res) {
-    res.sendFile(`${__dirname}/public/views/underConst.html`);
+    let user = req.query.user || null;
+    if (user) {
+      readFile(
+        join(
+          __dirname,
+          "private",
+          "user",
+          "usr-" + encodeURIComponent(user) + ".json"
+        ),
+        (err, rdata) => {
+          if (err) {
+            console.error(err);
+            return res.render("error.ejs", {
+              status: 404,
+              error: "User not found!",
+              redirect: null,
+            });
+          } else {
+            delete rdata.user.oauth;
+            res.render("user.ejs", {
+              user: rdata.user.displayName,
+              jsondata: JSON.stringify(rdata),
+            });
+          }
+        }
+      );
+    } else {
+      res.render("user.ejs", {
+        user: null,
+        jsondata: JSON.stringify(null),
+      });
+    }
   },
   translate: function (req, res) {
     res.sendFile(`${__dirname}/public/views/underConst.html`);
