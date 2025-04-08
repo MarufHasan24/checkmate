@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 08 April, 2025-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <% if (user) {%>
+        <title><%-user%>'s profile</title>
+        <header>
+            <h1>
+                <%=user%>
+            </h1>
+            <ul class="menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+            </ul>
+        </header>
+
+        <script src="/assets/scripts/tools.js"></script>
+        <link rel="stylesheet" href="/assets/styles/common.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <style>
+            .container {
+                margin: 10px auto;
+                width: calc(100% - 40px);
+                padding: 10px;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 1rem;
+                overflow-x: visible;
+            }
+
+            .card {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+                transition: transform 0.3s ease, background 0.3s ease;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card .top {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+                background: rgba(var(--tilt-rgb), 0.1);
+            }
+
+            .card .icon {
+                font-size: 1.5rem;
+                margin-bottom: 0.5rem;
+                display: inline-block;
+            }
+
+            .card .name {
+                font-weight: bold;
+                display: block;
+                color: #333;
+                overflow-wrap: break-word;
+            }
+
+            .card .type {
+                font-size: 0.9rem;
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                padding: 2px 5px;
+                border-radius: 5px;
+            }
+
+            .category {
+                text-align: center;
+                margin-top: 2rem;
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: var(--tilt);
+                text-transform: uppercase;
+            }
+
+            /* Type-based styles */
+            .common {
+                border-left: 5px solid #ccc;
+                background-color: #f9f9f9;
+                color: #555;
+            }
+
+            .uncommon {
+                border-left: 5px solid #a3d1a0;
+                background-color: #e5f5e1;
+                color: #2e7d32;
+            }
+
+            .rare {
+                border-left: 5px solid #82b1ff;
+                background-color: #e3f2fd;
+                color: #0d47a1;
+            }
+
+            .epic {
+                border-left: 5px solid #ab47bc;
+                background-color: #f3e5f5;
+                color: #5d1888;
+            }
+
+            .legendary {
+                border-left: 5px solid #ffbd17;
+                background-color: #fffbd3;
+                color: #906c10;
+            }
+
+            i {
+                padding-right: 5px;
+            }
+
+            .dashboard {
+                margin: 30px auto;
+                padding: 20px;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            }
+
+            .header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 20px;
+            }
+
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .avatar {
+                background: var(--tilt);
+                color: white;
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                font-weight: bold;
+            }
+
+            .name-section {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .username {
+                font-size: 22px;
+                font-weight: bold;
+            }
+
+            .badge {
+                background: #e0f7e9;
+                color: #2e7d32;
+                padding: 4px 10px;
+                border-radius: 8px;
+                font-size: 12px;
+                display: inline-block;
+                margin-top: 4px;
+            }
+
+            .email-status {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                margin-top: 5px;
+            }
+
+            .email-status i {
+                color: green;
+            }
+
+            .stats {
+                display: flex;
+                gap: 20px;
+                text-align: right;
+                font-size: 14px;
+            }
+
+            .stat b {
+                font-size: 16px;
+                color: #333;
+            }
+
+            .details {
+                margin-top: 10px;
+                font-size: 14px;
+                color: #555;
+            }
+
+            .projects {
+                margin-top: 30px;
+            }
+
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 10px;
+                font-weight: 600;
+                color: #333;
+            }
+
+            .project {
+                background: #f8f9fb;
+                border-radius: 10px;
+                padding: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 20px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.326);
+                margin-bottom: 10px;
+                transition: all 0.3s;
+            }
+
+            .project:hover {
+                background: #e4efff;
+            }
+
+            .left {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                width: 60%;
+                justify-content: flex-start;
+            }
+
+            .flag {
+                width: 36px;
+                height: 24px;
+                border-radius: 4px;
+                object-fit: cover;
+            }
+
+            .project-info {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .project-name {
+                font-weight: 500;
+                font-size: 16px;
+            }
+
+            .project-meta {
+                font-size: 13px;
+                color: #666;
+            }
+
+            .icon {
+                font-size: 20px;
+                color: #555;
+            }
+
+            .key-box {
+                font-size: 13px;
+                background: #eaeaea;
+                padding: 4px 8px;
+                border-radius: 6px;
+                margin-top: 4px;
+                cursor: pointer;
+                user-select: all;
+            }
+
+            .badge-type {
+                font-size: 11px;
+                background: #d0ebff;
+                color: #1c7ed6;
+                padding: 2px 6px;
+                border-radius: 6px;
+                display: inline-block;
+                margin-top: 5px;
+            }
+
+            .project-flag {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .project-actions {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 6px;
+            }
+
+            .btn {
+                background: #007bff;
+                color: white;
+                padding: 5px 10px;
+                font-size: 12px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+
+            .btn:hover {
+                background: #005dc4;
+            }
+
+            .stats .stat {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            @media screen and (max-width: 470px) {
+                div {
+                    word-wrap: break-word;
+                }
+
+                .dashboard {
+                    padding: 10px;
+                }
+
+                .header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .stats {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 10px;
+                    width: 100%;
+                }
+
+                .stats .stat {
+                    text-align: left;
+                    flex-direction: row-reverse;
+                    gap: 5px;
+
+                }
+
+                .project {
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .project-actions {
+                    align-items: center;
+                }
+
+            }
+        </style>
+        <% } %>
+</head>
+<% if (user) {%>
+
+    <body>
+        <div class="container">
+            <div class="dashboard" id="dashboard"></div>
+            <h2>User Rights Showcase</h2>
+            <p>
+                This is a showcase of the user rights you have on various Wikimedia projects. Click on the icons to
+                learn
+                more
+                about each right. <span id="total-rights" style="color:rgba(var(--tilt-rgb))"></span>.
+            </p>
+            <div id="rights-container"></div>
+        </div>
+    </body>
+    <script>
+        const data = JSON.parse(validateStr('<%= jsondata %>'));
+        console.log(data);
+        const projects = {
+            "wikipedia": { label: "Wikipedia", icon: "fab fa-wikipedia-w" },
+            "wikiquote": { label: "Wikiquote", icon: "fas fa-quote-left" },
+            "wiktionary": { label: "Wiktionary", icon: "fas fa-book" },
+            "wikivoyage": { label: "Wikivoyage", icon: "fas fa-route" },
+            "wikibooks": { label: "Wikibooks", icon: "fas fa-book" },
+            "mediawiki": { label: "MediaWiki", icon: "fas fa-code" },
+            "wikidata": { label: "Wikidata", icon: "fas fa-database" },
+            "wikinews": { label: "Wikinews", icon: "fas fa-newspaper" },
+            "wikisource": { label: "Wikisource", icon: "fas fa-scroll" },
+            "wikimedia": { label: "Wikimedia", icon: "fas fa-university" },
+            "wikiversity": { label: "Wikiversity", icon: "fas fa-graduation-cap" },
+        }
+
+        const languageFlags = {
+            "en": { flag: "https://flagcdn.com/w40/gb.png", name: "English" },
+            "bn": { flag: "https://flagcdn.com/w40/bd.png", name: "Bengali" },
+            "es": { flag: "https://flagcdn.com/w40/es.png", name: "Spanish" },
+            "fr": { flag: "https://flagcdn.com/w40/fr.png", name: "French" },
+            "de": { flag: "https://flagcdn.com/w40/de.png", name: "German" },
+            "ar": { flag: "https://flagcdn.com/w40/sa.png", name: "Arabic" },
+            "zh": { flag: "https://flagcdn.com/w40/cn.png", name: "Chinese" },
+            "ru": { flag: "https://flagcdn.com/w40/ru.png", name: "Russian" },
+            "hi": { flag: "https://flagcdn.com/w40/in.png", name: "Hindi" },
+            "ja": { flag: "https://flagcdn.com/w40/jp.png", name: "Japanese" },
+            "pt": { flag: "https://flagcdn.com/w40/pt.png", name: "Portuguese" },
+            "it": { flag: "https://flagcdn.com/w40/it.png", name: "Italian" },
+            "tr": { flag: "https://flagcdn.com/w40/tr.png", name: "Turkish" },
+            "ko": { flag: "https://flagcdn.com/w40/kr.png", name: "Korean" },
+            "fa": { flag: "https://flagcdn.com/w40/ir.png", name: "Persian" },
+            "ur": { flag: "https://flagcdn.com/w40/pk.png", name: "Urdu" },
+            "vi": { flag: "https://flagcdn.com/w40/vn.png", name: "Vietnamese" },
+            "pl": { flag: "https://flagcdn.com/w40/pl.png", name: "Polish" },
+            "nl": { flag: "https://flagcdn.com/w40/nl.png", name: "Dutch" },
+            "uk": { flag: "https://flagcdn.com/w40/ua.png", name: "Ukrainian" },
+            "id": { flag: "https://flagcdn.com/w40/id.png", name: "Indonesian" },
+            "ro": { flag: "https://flagcdn.com/w40/ro.png", name: "Romanian" },
+            "sv": { flag: "https://flagcdn.com/w40/se.png", name: "Swedish" },
+            "cs": { flag: "https://flagcdn.com/w40/cz.png", name: "Czech" },
+            "fi": { flag: "https://flagcdn.com/w40/fi.png", name: "Finnish" },
+            "he": { flag: "https://flagcdn.com/w40/il.png", name: "Hebrew" },
+            "th": { flag: "https://flagcdn.com/w40/th.png", name: "Thai" },
+            "no": { flag: "https://flagcdn.com/w40/no.png", name: "Norwegian" },
+            "el": { flag: "https://flagcdn.com/w40/gr.png", name: "Greek" },
+            "hu": { flag: "https://flagcdn.com/w40/hu.png", name: "Hungarian" },
+            "sr": { flag: "https://flagcdn.com/w40/rs.png", name: "Serbian" },
+            "da": { flag: "https://flagcdn.com/w40/dk.png", name: "Danish" },
+            "sk": { flag: "https://flagcdn.com/w40/sk.png", name: "Slovak" },
+            "bg": { flag: "https://flagcdn.com/w40/bg.png", name: "Bulgarian" },
+            "ms": { flag: "https://flagcdn.com/w40/my.png", name: "Malay" },
+            "hr": { flag: "https://flagcdn.com/w40/hr.png", name: "Croatian" },
+            "sl": { flag: "https://flagcdn.com/w40/si.png", name: "Slovenian" },
+            "et": { flag: "https://flagcdn.com/w40/ee.png", name: "Estonian" },
+            "lt": { flag: "https://flagcdn.com/w40/lt.png", name: "Lithuanian" },
+            "lv": { flag: "https://flagcdn.com/w40/lv.png", name: "Latvian" },
+            "gl": { flag: "https://flagcdn.com/w40/es.png", name: "Galician" },
+            "ca": { flag: "https://flagcdn.com/w40/es.png", name: "Catalan" },
+            "eu": { flag: "https://flagcdn.com/w40/es.png", name: "Basque" },
+            "is": { flag: "https://flagcdn.com/w40/is.png", name: "Icelandic" },
+            "ga": { flag: "https://flagcdn.com/w40/ie.png", name: "Irish" },
+            "mt": { flag: "https://flagcdn.com/w40/mt.png", name: "Maltese" },
+            "az": { flag: "https://flagcdn.com/w40/az.png", name: "Azerbaijani" },
+            "ka": { flag: "https://flagcdn.com/w40/ge.png", name: "Georgian" },
+            "be": { flag: "https://flagcdn.com/w40/by.png", name: "Belarusian" },
+            "ta": { flag: "https://flagcdn.com/w40/lk.png", name: "Tamil" },
+            "te": { flag: "https://flagcdn.com/w40/in.png", name: "Telugu" },
+            "ml": { flag: "https://flagcdn.com/w40/in.png", name: "Malayalam" },
+            "kn": { flag: "https://flagcdn.com/w40/in.png", name: "Kannada" },
+            "mr": { flag: "https://flagcdn.com/w40/in.png", name: "Marathi" },
+            "gu": { flag: "https://flagcdn.com/w40/in.png", name: "Gujarati" },
+            "pa": { flag: "https://flagcdn.com/w40/in.png", name: "Punjabi" },
+            "si": { flag: "https://flagcdn.com/w40/lk.png", name: "Sinhala" },
+            "ne": { flag: "https://flagcdn.com/w40/np.png", name: "Nepali" },
+            "lo": { flag: "https://flagcdn.com/w40/la.png", name: "Lao" },
+            "my": { flag: "https://flagcdn.com/w40/mm.png", name: "Burmese" },
+            "km": { flag: "https://flagcdn.com/w40/kh.png", name: "Khmer" },
+            "hy": { flag: "https://flagcdn.com/w40/am.png", name: "Armenian" },
+            "am": { flag: "https://flagcdn.com/w40/et.png", name: "Amharic" },
+            "ps": { flag: "https://flagcdn.com/w40/af.png", name: "Pashto" },
+            "tg": { flag: "https://flagcdn.com/w40/tj.png", name: "Tajik" },
+            "kk": { flag: "https://flagcdn.com/w40/kz.png", name: "Kazakh" },
+            "uz": { flag: "https://flagcdn.com/w40/uz.png", name: "Uzbek" },
+            "mn": { flag: "https://flagcdn.com/w40/mn.png", name: "Mongolian" },
+            "tk": { flag: "https://flagcdn.com/w40/tm.png", name: "Turkmen" },
+            "ky": { flag: "https://flagcdn.com/w40/kg.png", name: "Kyrgyz" },
+            "bs": { flag: "https://flagcdn.com/w40/ba.png", name: "Bosnian" },
+            "mk": { flag: "https://flagcdn.com/w40/mk.png", name: "Macedonian" },
+            "sq": { flag: "https://flagcdn.com/w40/al.png", name: "Albanian" },
+            "af": { flag: "https://flagcdn.com/w40/za.png", name: "Afrikaans" },
+            "xh": { flag: "https://flagcdn.com/w40/za.png", name: "Xhosa" },
+            "zu": { flag: "https://flagcdn.com/w40/za.png", name: "Zulu" },
+            "st": { flag: "https://flagcdn.com/w40/ls.png", name: "Sesotho" },
+            "tn": { flag: "https://flagcdn.com/w40/bw.png", name: "Setswana" },
+            "sw": { flag: "https://flagcdn.com/w40/tz.png", name: "Swahili" },
+            "rw": { flag: "https://flagcdn.com/w40/rw.png", name: "Kinyarwanda" },
+            "so": { flag: "https://flagcdn.com/w40/so.png", name: "Somali" },
+            "om": { flag: "https://flagcdn.com/w40/et.png", name: "Oromo" },
+            "ti": { flag: "https://flagcdn.com/w40/er.png", name: "Tigrinya" },
+            "yo": { flag: "https://flagcdn.com/w40/ng.png", name: "Yoruba" },
+            "ig": { flag: "https://flagcdn.com/w40/ng.png", name: "Igbo" },
+            "ha": { flag: "https://flagcdn.com/w40/ng.png", name: "Hausa" },
+            "sn": { flag: "https://flagcdn.com/w40/zw.png", name: "Shona" },
+            "nd": { flag: "https://flagcdn.com/w40/zw.png", name: "Ndebele" },
+            "ny": { flag: "https://flagcdn.com/w40/mw.png", name: "Chichewa" },
+            "ss": { flag: "https://flagcdn.com/w40/sz.png", name: "Swazi" },
+            "ts": { flag: "https://flagcdn.com/w40/za.png", name: "Tswana" },
+            "ve": { flag: "https://flagcdn.com/w40/za.png", name: "Venda" },
+            "nr": { flag: "https://flagcdn.com/w40/za.png", name: "Ndebele" },
+            "fil": { flag: "https://flagcdn.com/w40/ph.png", name: "Filipino" },
+            "ceb": { flag: "https://flagcdn.com/w40/ph.png", name: "Cebuano" },
+            "ilo": { flag: "https://flagcdn.com/w40/ph.png", name: "Ilokano" },
+            "jv": { flag: "https://flagcdn.com/w40/id.png", name: "Javanese" },
+            "su": { flag: "https://flagcdn.com/w40/id.png", name: "Sundanese" }
+        };
+        const fallbackFlag = "https://flagcdn.com/w40/un.png";
+
+        const formatDate = (raw) => {
+            const d = new Date(raw);
+            return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+        }
+
+        const registeredDate = () => {
+            const raw = data.user.registered;
+            const yyyy = raw.slice(0, 4);
+            const mm = raw.slice(4, 6);
+            const dd = raw.slice(6, 8);
+            return `${dd}-${mm}-${yyyy}`;
+        }
+
+        const dashboard = document.getElementById("dashboard");
+
+        dashboard.innerHTML = `
+<div class="header">
+  <div class="user-info">
+    <div class="avatar">${data.user.displayName.charAt(0)}</div>
+    <div class="name-section">
+      <div class="username">${data.user.displayName}</div>
+      <div class="badge"><i class="fa-solid fa-circle-check"></i><span>Verified</span></div>
+      <div class="email-status">
+        <i class="fa fa-envelope"></i> ${data.user.email_verified ? 'Email Verified' : 'Email Not Verified'}
+      </div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><i>${data.user.editcount}</i><b>Edits</b></div>
+    <div class="stat"><i>${data.user.groups.length}</i><b>Groups</b></div>
+    <div class="stat"><i>${registeredDate()}</i><b>Joined</b></div>
+  </div>
+</div>
+<div>
+    All data provided here is fetched from <a style="color:var(--tilt)" href="${data.user.iss}">${data.user.provider}</a>.
+</div>
+<div class="details">
+  <b>User ID:</b> ${data.user.sub}<br>
+  <b>Audit ID:</b> ${data.user.aud}<br>
+  <b>First login:</b> ${new Date(data.createdAt).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}<br>
+<b>Last login:</b> ${new Date(data.lastModified).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}<br>
+  <b>Groups:</b> ${data.user.groups.join(", ")}
+</div>`
+        if (data.data && data.data.length > 0 && data.data[0].project) {
+            dashboard.innerHTML += `<div class="projects">
+  <div class="section-title"><i class="fa fa-folder-open"></i> Hosted Projects</div>
+  ${data.data.map(p => {
+                const lang = p.project.split('.')[0];
+                const domain = p.project.split('.')[1];
+                const icon = projects[domain] ? projects[domain].icon : "fas fa-globe";
+                return `
+      <div class="project">
+        <div class="left">
+            <div class="project-flag">
+          <img class="flag" src="${languageFlags[lang] ? languageFlags[lang].flag : fallbackFlag}" />
+            <span>${languageFlags[lang] ? languageFlags[lang].name : ""}</span>
+          </div>
+          <div class="project-info">
+            <div class="project-name">${p.name}</div>
+            <div class="project-meta">${formatDate(p.date)}</div>
+            <div class="key-box" onclick="navigator.clipboard.writeText('${p.key}')">Key: ${p.key}</div>
+            <div class="badge-type" onclick="window.open('https://${p.project}.org/', '_blank')">${projects[domain].label || "Unknown"}</div>
+          </div>
+        </div>
+        <div class="project-actions">
+          <i class="fa ${icon} icon"></i>
+          <button class="btn" onclick="window.open('/editathon?key=${p.key}', '_blank')">Visit</button>
+        </div>
+      </div>
+    `;
+            }).join("")}
+</div>
+`;
+        }
+        const categories = {
+            "Basic Access": [
+                {
+                    "icon": "fas fa-book-open",
+                    "name": "read",
+                    "description": "Engage with comprehensive wiki content compiled by contributors worldwide, offering diverse perspectives and detailed information across a wide range of topics.",
+                    "type": "common"
+                },
+            ],
+            "Page Management": [
+                {
+                    icon: "fas fa-arrows-alt",
+                    name: "move",
+                    description: "Rename pages",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-lock",
+                    name: "movestable",
+                    description: "Move pages with stable versions",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-user-shield",
+                    name: "move-rootuserpages",
+                    description: "Move root user pages",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-folder",
+                    name: "move-categorypages",
+                    description: "Move category pages",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-sitemap",
+                    name: "move-subpages",
+                    description: "Move pages with subpages",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-eye-slash",
+                    name: "suppressredirect",
+                    description: "Suppress move redirects",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-code-branch",
+                    name: "mergehistory",
+                    description: "Merge page histories",
+                    type: "epic",
+                },
+            ],
+            "Special Rights": [
+                {
+                    icon: "fas fa-crown",
+                    name: "bureaucrat",
+                    description: "Promote users to admin/bureaucrat",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-globe",
+                    name: "steward",
+                    description: "Global rights management",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-users-cog",
+                    name: "userrights",
+                    description: "Modify user groups",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-graduation-cap",
+                    name: "setmentor",
+                    description: "Assign mentor status",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-chalkboard-teacher",
+                    name: "managementors",
+                    description: "Manage mentor program",
+                    type: "epic",
+                },
+            ],
+            "User Account": [
+                {
+                    icon: "fas fa-user-cog",
+                    name: "editmyoptions",
+                    description: "Modify personal preferences",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-user-secret",
+                    name: "viewmyprivateinfo",
+                    description: "View own private data",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-user-pen",
+                    name: "editmyprivateinfo",
+                    description: "Edit own private data",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-user-plus",
+                    name: "createaccount",
+                    description: "Create new accounts",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-users-gear",
+                    name: "accountcreator",
+                    description: "Create accounts for others",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-user-shield",
+                    name: "confirmed",
+                    description: "Auto-granted trusted status",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-mobile-screen-button",
+                    name: "oathauth-enable",
+                    description: "Enable two-factor authentication",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-code",
+                    name: "editmyuserjs",
+                    description: "Edit personal JavaScript",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-palette",
+                    name: "editmyusercss",
+                    description: "Edit personal CSS",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-gear",
+                    name: "editmyuserjson",
+                    description: "Edit personal JSON",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-eye",
+                    name: "viewmywatchlist",
+                    description: "View personal watchlist",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-pen-to-square",
+                    name: "editmywatchlist",
+                    description: "Edit personal watchlist",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-shield-keyhole",
+                    name: "mwoauthmanagemygrants",
+                    description: "Manage OAuth grants",
+                    type: "rare",
+                },
+            ],
+            Editing: [
+                {
+                    "icon": "fas fa-file-circle-plus",
+                    "name": "createpagemainns",
+                    "description": "Create pages in main namespace",
+                    "type": "common"
+                },
+                {
+                    icon: "fas fa-file-lines",
+                    name: "editmytalk",
+                    description: "Edit own talk pages",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-edit",
+                    name: "edit",
+                    description: "Edit existing pages",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-shield-alt",
+                    name: "editsemiprotected",
+                    description: "Edit semi-protected pages",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-pen-fancy",
+                    name: "editprotected",
+                    description: "Edit fully protected pages",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-cog",
+                    name: "editcontentmodel",
+                    description: "Change content model",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-pencil-alt",
+                    name: "minoredit",
+                    description: "Mark edits as minor",
+                    type: "common",
+                },
+            ],
+            Moderation: [
+                {
+                    icon: "fas fa-undo",
+                    name: "rollback",
+                    description: "Quickly revert edits",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-user-clock",
+                    name: "rollbacker",
+                    description: "Rollback user rights",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-check-double",
+                    name: "autoreview",
+                    description: "Auto-approve edits",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-check-circle",
+                    name: "patrol",
+                    description: "Mark edits as patrolled",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-clipboard-check",
+                    name: "review",
+                    description: "Review pending changes",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-user-check",
+                    name: "reviewer",
+                    description: "Reviewer user rights",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-star",
+                    name: "autopatrol",
+                    description: "Auto-mark edits as patrolled",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-check",
+                    name: "autopatrolled",
+                    description: "Auto-patrolled edits",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-book",
+                    name: "stablesettings",
+                    description: "Configure stable versions",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-file-exclamation",
+                    name: "unreviewedpages",
+                    description: "View unreviewed pages",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-comment-slash",
+                    name: "nominornewtalk",
+                    description: "Post without minor tag on talk",
+                    type: "rare",
+                },
+                { index: 0, icon: "fas fa-filter", name: "abusefilter-modify", description: "Modify abuse filters", type: "epic" },
+                { index: 1, icon: "fas fa-earth-americas", name: "abusefilter-modify-blocked-external-domains", description: "Modify external domain blocks", type: "legendary" },
+                { index: 2, icon: "fas fa-rotate-left", name: "abusefilter-revert", description: "Revert filter changes", type: "epic" },
+                { index: 3, icon: "fas fa-filter-circle-xmark", name: "abusefilter-modify-global", description: "Modify global abuse filters", type: "legendary" },
+                {
+                    "icon": "fas fa-gavel",
+                    "name": "pagetriage-copyvio",
+                    "description": "Handle copyright violation cases",
+                    "type": "epic"
+                },
+                {
+                    "icon": "fas fa-check-double",
+                    "name": "validate",
+                    "description": "Validate content",
+                    "type": "rare"
+                },
+                {
+                    "icon": "fas fa-trash-arrow-up",
+                    "name": "delete-redirect",
+                    "description": "Delete redirect pages",
+                    "type": "epic"
+                }
+            ],
+            "Account Management": [
+                {
+                    icon: "fas fa-user-merge",
+                    name: "centralauth-merge",
+                    description: "Merge global accounts",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-user-plus",
+                    name: "centralauth-createlocal",
+                    description: "Create local linked accounts",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-user-shield",
+                    name: "checkuser-temporary-account",
+                    description: "Inspect temporary accounts",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-user-ninja",
+                    name: "checkuser-temporary-account-no-preference",
+                    description: "Inspect temp accounts without preference",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-id-card",
+                    name: "override-antispoof",
+                    description: "Bypass username spoofing checks",
+                    type: "legendary",
+                },
+                {
+                    "icon": "fas fa-user-plus",
+                    "name": "autocreateaccount",
+                    "description": "Automatically create accounts",
+                    "type": "rare"
+                },
+                {
+                    "icon": "fas fa-user-graduate",
+                    "name": "enrollasmentor",
+                    "description": "Enroll as a user mentor",
+                    "type": "uncommon"
+                },
+                {
+                    "icon": "fas fa-chalkboard-teacher",
+                    "name": "setmento",
+                    "description": "Set user mentoring status",
+                    "type": "rare"
+                }
+            ],
+            "Restriction Tools": [
+                {
+                    icon: "fas fa-ban",
+                    name: "block",
+                    description: "Block/unblock users",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-envelope-ban",
+                    name: "blockemail",
+                    description: "Block email access",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-user-secret",
+                    name: "hideuser",
+                    description: "Suppress user identities",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-ghost",
+                    name: "suppress",
+                    description: "Hide sensitive actions",
+                    type: "legendary",
+                },
+            ],
+            Communication: [
+                {
+                    icon: "fas fa-mail-bulk",
+                    name: "massmessage",
+                    description: "Send bulk messages to users",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-paper-plane",
+                    name: "sendemail",
+                    description: "Send emails to users",
+                    type: "epic",
+                },
+            ],
+            "Abuse Filter": [
+                {
+                    icon: "fas fa-filter",
+                    name: "abusefilter-view",
+                    description: "View abuse filters",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-filter-circle-xmark",
+                    name: "abusefilter-modify-restricted",
+                    description: "Modify restricted abuse filters",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-eye-slash",
+                    name: "abusefilter-view-private",
+                    description: "View private filter details",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-bypass",
+                    name: "abusefilter-bypass-blocked-external-domains",
+                    description: "Bypass external domain blocks",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-lock-open",
+                    name: "abusefilter-access-protected-vars",
+                    description: "Access protected filter variables",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-file-lock",
+                    name: "abusefilter-privatedetails",
+                    description: "View private filter data",
+                    type: "legendary",
+                },
+            ],
+            "Logs & Visibility": [
+                {
+                    icon: "fas fa-scroll",
+                    name: "abusefilter-log",
+                    description: "View abuse filter logs",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-scroll-old",
+                    name: "abusefilter-hidden-log",
+                    description: "View hidden filter logs",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-user-secret",
+                    name: "abusefilter-privatedetails-log",
+                    description: "View private filter logs",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-code-lock",
+                    name: "abusefilter-protected-vars-log",
+                    description: "View protected variables logs",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-eye-low-vision",
+                    name: "viewsuppressed",
+                    description: "View suppressed content",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-archive",
+                    name: "suppressionlog",
+                    description: "View suppression logs",
+                    type: "legendary",
+                },
+            ],
+            "IP & CheckUser": [
+                {
+                    icon: "fas fa-magnifying-glass",
+                    name: "checkuser",
+                    description: "Investigate user accounts",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-magnifying-glass-chart",
+                    name: "ipinfo-view-full",
+                    description: "View full IP information",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-magnifying-glass-location",
+                    name: "ipinfo-view-basic",
+                    description: "View basic IP information",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-network-wired",
+                    name: "ipinfo",
+                    description: "Access IP information tools",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-clock-rotate-left",
+                    name: "ipinfo-view-log",
+                    description: "View IP investigation logs",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-user-clock",
+                    name: "checkuser-temporary-account-log",
+                    description: "View temp account check logs",
+                    type: "legendary",
+                },
+            ],
+            "Block Overrides": [
+                {
+                    icon: "fas fa-unlock",
+                    name: "ipblock-exempt",
+                    description: "Bypass IP blocks",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-shield-virus",
+                    name: "sfsblock-bypass",
+                    description: "Bypass spam filters",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-onion",
+                    name: "torunblocked",
+                    description: "Bypass Tor blocks",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-eye-slash",
+                    name: "no-ipinfo",
+                    description: "Hide IP information",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-globe",
+                    name: "globalblock-whitelist",
+                    description: "Bypass global blocks",
+                    type: "legendary",
+                },
+            ],
+            "Special Rights & Overrides": [
+                { index: 0, icon: "fas fa-user-check", name: "extendedconfirmed", description: "Extended confirmed status", type: "uncommon" },
+                { index: 1, icon: "fas fa-flag", name: "tboverride-account", description: "Override title blacklist for accounts", type: "epic" },
+                { index: 2, icon: "fas fa-unlock-keyhole", name: "unblockself", description: "Unblock oneself", type: "rare" },
+                { index: 3, icon: "fas fa-eye-slash", name: "unwatchedpages", description: "View unwatched pages", type: "epic" },
+                { index: 4, icon: "fas fa-cloud-arrow-down", name: "upload_by_url", description: "Upload from URL", type: "rare" },
+                { index: 5, icon: "fas fa-mobile-screen", name: "oathauth-verify-user", description: "Verify 2FA for users", type: "epic" },
+                { index: 6, icon: "fas fa-scroll-old", name: "oathauth-view-log", description: "View 2FA logs", type: "epic" },
+                { index: 7, icon: "fas fa-clipboard-check", name: "patrolmarks", description: "View patrol marks", type: "rare" },
+                { index: 8, icon: "fas fa-stamp", name: "templateeditor", description: "Edit protected templates", type: "epic" },
+                { index: 9, icon: "fas fa-arrows-rotate", name: "autoreviewrestore", description: "Auto-review restored pages", type: "rare" },
+                { index: 10, icon: "fas fa-users-gear", name: "userrights-interwiki", description: "Modify interwiki user rights", type: "legendary" },
+                { index: 11, icon: "fas fa-globe-users", name: "globalgroupmembership", description: "Manage global group membership", type: "legendary" },
+                { index: 12, icon: "fas fa-globe-shield", name: "globalgrouppermissions", description: "Manage global group permissions", type: "legendary" },
+                {
+                    icon: "fas fa-flag-banner",
+                    name: "sboverride",
+                    description: "Override spam blacklist",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-flag-checkered",
+                    name: "tboverride",
+                    description: "Override title blacklist",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-eraser",
+                    name: "suppressrevision",
+                    description: "Permanently hide revisions",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-book-secret",
+                    name: "abusefilter-log-private",
+                    description: "View private filter logs",
+                    type: "legendary",
+                },
+            ],
+            "API & Rate Limits": [
+                {
+                    icon: "fas fa-bolt",
+                    name: "noratelimit",
+                    description: "Bypass API rate limits",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-infinity",
+                    name: "apihighlimits",
+                    description: "Higher API query limits",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-link",
+                    name: "urlshortener-create-url",
+                    description: "Create short URLs",
+                    type: "rare",
+                },
+            ],
+            "Import/Export": [
+                {
+                    icon: "fas fa-file-import",
+                    name: "import",
+                    description: "Import wiki pages",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-file-arrow-up",
+                    name: "importupload",
+                    description: "Import pages from uploads",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-right-left",
+                    name: "transwiki",
+                    description: "Cross-wiki imports",
+                    type: "legendary",
+                },
+            ],
+            "Interface Management": [
+                {
+                    icon: "fas fa-paint-roller",
+                    name: "interface-admin",
+                    description: "Full interface editing rights",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-code",
+                    name: "editinterface",
+                    description: "Edit interface messages",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-globe",
+                    name: "editsitecss",
+                    description: "Edit site-wide CSS",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-globe-europe",
+                    name: "editsitejs",
+                    description: "Edit site-wide JavaScript",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-globe-americas",
+                    name: "editsitejson",
+                    description: "Edit site-wide JSON",
+                    type: "epic",
+                },
+            ],
+            "Change Tags": [
+                {
+                    icon: "fas fa-tags",
+                    name: "changetags",
+                    description: "Create and manage tags",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-tag",
+                    name: "applychangetags",
+                    description: "Apply tags to revisions",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-trash-can-tags",
+                    name: "deletechangetags",
+                    description: "Delete change tags",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-tags-slash",
+                    name: "managechangetags",
+                    description: "Manage tag permissions",
+                    type: "epic",
+                },
+            ],
+            "Deleted Content": [
+                {
+                    icon: "fas fa-archive",
+                    name: "browsearchive",
+                    description: "Search deleted pages",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-history",
+                    name: "deletedhistory",
+                    description: "View deletion logs",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-file-lines",
+                    name: "deletedtext",
+                    description: "View deleted content",
+                    type: "legendary",
+                },
+            ],
+            "Special Tools": [
+                {
+                    icon: "fas fa-water",
+                    name: "flood",
+                    description: "Use flood control tools",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-vial",
+                    name: "vipsscaler-test",
+                    description: "Access testing tools",
+                    type: "legendary",
+                },
+                {
+                    "icon": "fas fa-language",
+                    "name": "pagelang",
+                    "description": "Change page language",
+                    "type": "rare"
+                },
+                {
+                    "icon": "fas fa-scale-balanced",
+                    "name": "edit-legal",
+                    "description": "Edit legal pages",
+                    "type": "epic"
+                },
+                {
+                    "icon": "fas fa-filter",
+                    "name": "abusefilter-hide-log",
+                    "description": "Hide abuse filter logs",
+                    "type": "legendary"
+                },
+                {
+                    "icon": "fas fa-key",
+                    "name": "oathauth-api-all",
+                    "description": "Full OAuth API access",
+                    "type": "legendary"
+                },
+                {
+                    "icon": "fas fa-magnifying-glass",
+                    "name": "checkuser-log",
+                    "description": "View CheckUser logs",
+                    "type": "legendary"
+                }
+            ],
+            "Media Handling": [
+                {
+                    icon: "fas fa-upload",
+                    name: "upload",
+                    description: "Upload new media files",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-file-arrow-up",
+                    name: "reupload",
+                    description: "Overwrite existing files",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-file-circle-plus",
+                    name: "reupload-shared",
+                    description: "Overwrite shared repository files",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-file-pen",
+                    name: "reupload-own",
+                    description: "Overwrite own uploaded files",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-file-export",
+                    name: "filemover",
+                    description: "Move files between wikis",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-arrows-up-down-left-right",
+                    name: "movefile",
+                    description: "Rename media files",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-rotate-left",
+                    name: "transcode-reset",
+                    description: "Reset media transcodes",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-hourglass-half",
+                    name: "transcode-status",
+                    description: "Check transcode status",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-book-user",
+                    name: "collectionsaveasuserpage",
+                    description: "Save collections as user pages",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-book-medical",
+                    name: "collectionsaveascommunitypage",
+                    description: "Save collections as community pages",
+                    type: "rare",
+                },
+            ],
+            Automation: [
+                {
+                    icon: "fas fa-robot",
+                    name: "bot",
+                    description: "Make automated edits",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-robot-astromech",
+                    name: "markbotedits",
+                    description: "Mark edits as bot-made",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-key",
+                    name: "skipcaptcha",
+                    description: "Bypass CAPTCHA requirements",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-user-check",
+                    name: "autoconfirmed",
+                    description: "Auto-granted after account maturation",
+                    type: "uncommon",
+                },
+            ],
+            "Content Creation": [
+                {
+                    icon: "fas fa-comment-dots",
+                    name: "createtalk",
+                    description: "Create talk pages",
+                    type: "common",
+                },
+                {
+                    icon: "fas fa-file-circle-plus",
+                    name: "createpage",
+                    description: "Create new articles",
+                    type: "common",
+                },
+            ],
+            "Specialized Logs/Data": [
+                {
+                    icon: "fas fa-file-magnifying-glass",
+                    name: "abusefilter-log-detail",
+                    description: "View detailed abuse filter logs",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-shield-halved",
+                    name: "spamblacklistlog",
+                    description: "View spam blacklist logs",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-list-ol",
+                    name: "titleblacklistlog",
+                    description: "View title blacklist logs",
+                    type: "rare",
+                },
+                {
+                    icon: "fas fa-trash-can-arrow-up",
+                    name: "deletelogentry",
+                    description: "Delete log entries",
+                    type: "legendary",
+                },
+            ],
+            "Interface Customization": [
+                {
+                    icon: "fas fa-paintbrush",
+                    name: "editusercss",
+                    description: "Edit personal CSS",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-code",
+                    name: "edituserjs",
+                    description: "Edit personal JavaScript",
+                    type: "uncommon",
+                },
+                {
+                    icon: "fas fa-gear",
+                    name: "edituserjson",
+                    description: "Edit personal JSON",
+                    type: "uncommon",
+                },
+            ],
+            "Deletion & Restoration": [
+                {
+                    icon: "fas fa-trash",
+                    name: "delete",
+                    description: "Delete regular pages",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-trash-arrow-up",
+                    name: "undelete",
+                    description: "Restore deleted content",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-bomb",
+                    name: "nuke",
+                    description: "Mass delete pages",
+                    type: "legendary",
+                },
+                {
+                    icon: "fas fa-file-minus",
+                    name: "deleterevision",
+                    description: "Delete specific revisions",
+                    type: "epic",
+                },
+                {
+                    icon: "fas fa-trash-can-list",
+                    name: "bigdelete",
+                    description: "Delete large pages",
+                    type: "legendary",
+                },
+            ],
+            "Protection": [
+                { index: 0, icon: "fas fa-shield-virus", name: "editautopatrolprotected", description: "Edit auto-patrolled protected pages", type: "epic" },
+                { index: 1, icon: "fas fa-shield-check", name: "editautoreviewprotected", description: "Edit auto-reviewed protected pages", type: "epic" },
+                { index: 2, icon: "fas fa-shield-halved", name: "editeditorprotected", description: "Edit editor-protected pages", type: "epic" },
+                { index: 3, icon: "fas fa-shield-plus", name: "editextendedsemiprotected", description: "Edit extended semi-protected pages", type: "rare" },
+                { index: 4, icon: "fas fa-shield-star", name: "edittrustedprotected", description: "Edit trusted-protected pages", type: "epic" },
+                { index: 5, icon: "fas fa-flag", name: "banner-protect", description: "Protect site notice banners", type: "epic" },
+                {
+                    icon: "fas fa-shield-alt",
+                    name: "protect",
+                    description: "Change protection levels",
+                    type: "epic",
+                },
+            ],
+            "Wikidata": [
+                {
+                    "icon": "fas fa-cubes",
+                    "name": "item-term",
+                    "description": "Edit Wikidata item terms",
+                    "type": "rare"
+                },
+                {
+                    "icon": "fas fa-tag",
+                    "name": "property-term",
+                    "description": "Edit Wikidata property terms",
+                    "type": "epic"
+                },
+                {
+                    "icon": "fas fa-signs-post",
+                    "name": "item-redirect",
+                    "description": "Create Wikidata redirects",
+                    "type": "rare"
+                },
+                {
+                    "icon": "fas fa-object-group",
+                    "name": "item-merge",
+                    "description": "Merge Wikidata items",
+                    "type": "epic"
+                },
+                {
+                    "icon": "fas fa-plus-square",
+                    "name": "property-create",
+                    "description": "Create Wikidata properties",
+                    "type": "epic"
+                }
+            ],
+            "Global Account Management": [
+                { index: 0, icon: "fas fa-user-group-crown", name: "centralnotice-admin", description: "Manage global notices", type: "legendary" },
+                { index: 1, icon: "fas fa-user-pen", name: "renameuser", description: "Rename global accounts", type: "legendary" },
+                { index: 2, icon: "fas fa-user-lock", name: "centralauth-lock", description: "Lock global accounts", type: "legendary" },
+                { index: 3, icon: "fas fa-user-xmark", name: "centralauth-suppress", description: "Suppress global accounts", type: "legendary" },
+                { index: 4, icon: "fas fa-user-minus", name: "centralauth-unmerge", description: "Unmerge global accounts", type: "legendary" },
+                { index: 5, icon: "fas fa-globe", name: "globalblock", description: "Apply global blocks", type: "legendary" },
+                { index: 6, icon: "fas fa-user-shield", name: "globalblock-exempt", description: "Bypass global blocks", type: "legendary" }
+            ],
+            "Translation & Content Tools": [
+                { index: 0, icon: "fas fa-language", name: "pagetranslation", description: "Manage page translations", type: "epic" },
+                { index: 1, icon: "fas fa-exchange", name: "translate", description: "Use translation interface", type: "rare" },
+                { index: 2, icon: "fas fa-file-import", name: "translate-import", description: "Import translations", type: "epic" },
+                { index: 3, icon: "fas fa-list-check", name: "translate-messagereview", description: "Review translations", type: "rare" },
+                { index: 4, icon: "fas fa-people-arrows", name: "translate-groupreview", description: "Manage translation groups", type: "epic" },
+                { index: 5, icon: "fas fa-spell-check", name: "unfuzzy", description: "Mark translations as current", type: "rare" }
+            ],
+            "Special Technical Permissions": [
+                { index: 0, icon: "fas fa-plug", name: "writeapi", description: "Use write API", type: "epic" },
+                { index: 1, icon: "fas fa-link", name: "urlshortener-manage-url", description: "Manage short URLs", type: "epic" },
+                { index: 2, icon: "fas fa-scroll", name: "urlshortener-view-log", description: "View URL shortening logs", type: "rare" },
+                { index: 3, icon: "fas fa-recycle", name: "purge", description: "Purge page caches", type: "rare" },
+                { index: 4, icon: "fas fa-database", name: "gwtoolset", description: "Use GWToolset", type: "epic" }
+            ],
+            "OAuth & API Management": [
+                { index: 0, icon: "fas fa-key", name: "mwoauthmanageconsumer", description: "Manage OAuth consumers", type: "legendary" },
+                { index: 1, icon: "fas fa-key-skeleton", name: "mwoauthproposeconsumer", description: "Propose OAuth consumers", type: "epic" },
+                { index: 2, icon: "fas fa-eye-slash", name: "mwoauthsuppress", description: "Suppress OAuth data", type: "legendary" },
+                { index: 3, icon: "fas fa-keyhole", name: "mwoauthviewprivate", description: "View private OAuth info", type: "epic" },
+                { index: 4, icon: "fas fa-eye-low-vision", name: "mwoauthviewsuppressed", description: "View suppressed OAuth data", type: "legendary" },
+                { index: 5, icon: "fas fa-keyboard", name: "mwoauthupdateownconsumer", description: "Update own OAuth consumers", type: "rare" }
+            ],
+            "Newsletter & Flow": [
+                { index: 0, icon: "fas fa-newspaper", name: "newsletter-create", description: "Create newsletters", type: "rare" },
+                { index: 1, icon: "fas fa-trash-can", name: "newsletter-delete", description: "Delete newsletters", type: "epic" },
+                { index: 2, icon: "fas fa-gear", name: "newsletter-manage", description: "Manage newsletters", type: "epic" },
+                { index: 3, icon: "fas fa-clock-rotate-left", name: "newsletter-restore", description: "Restore newsletters", type: "epic" },
+                { index: 4, icon: "fas fa-comments", name: "flow-create-board", description: "Create Flow boards", type: "rare" },
+                { index: 5, icon: "fas fa-comment-xmark", name: "flow-delete", description: "Delete Flow content", type: "epic" },
+                { index: 6, icon: "fas fa-comment-pen", name: "flow-edit-post", description: "Edit Flow posts", type: "rare" },
+                { index: 7, icon: "fas fa-comment-slash", name: "flow-hide", description: "Hide Flow content", type: "epic" },
+                { index: 8, icon: "fas fa-comment-dots", name: "flow-suppress", description: "Suppress Flow content", type: "legendary" }
+            ],
+        };
+        let rightsData = data.user.rights;
+        window.onload = function () {
+            const container = document.getElementById("rights-container");
+            const userRightsCount = document.getElementById("total-rights");
+            userRightsCount.innerHTML = `Total <b>${rightsData.length}</b> rights granted`;
+            for (const [category, rights] of Object.entries(categories)) {
+                const heading = document.createElement("div");
+                heading.className = "category";
+                heading.innerHTML = `<h3>${category}</h3>`;
+                container.appendChild(heading);
+                const grid = document.createElement("div");
+                grid.className = "grid";
+                rights.forEach(({ icon, name, description, type }) => {
+                    if (!rightsData.includes(name)) {
+                        return;
+                    } else {
+                        //remove the item from the rightsData array
+                        rightsData = rightsData.filter(item => item !== name);
+                    } // Skip if not in rightsData
+                    const card = document.createElement("div");
+                    card.className = `card`;  // Add type class for specific styling
+                    card.innerHTML = `<div class="top "><div class='icon'><i class="${icon}"></i></div><span class="type ${type}">${type}</span></div><span class="name">${name}</span><p class="description">${description}</p>`;
+                    grid.appendChild(card);
+                });
+                container.appendChild(grid);
+            }
+        };
+    </script>
+    <% } %>
+
+</html>

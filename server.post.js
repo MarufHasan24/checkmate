@@ -53,7 +53,9 @@ module.exports = {
         let finaldata = JSON.stringify({
           key: key,
           date: date,
-          pass: password,
+          name: compname,
+          template: template,
+          project: project,
         });
         updateFileOwn(userdata.username, finaldata, (err) => {
           if (err) {
@@ -1031,7 +1033,8 @@ module.exports = {
                   tempagelist,
                   key,
                   startindex,
-                  translation
+                  translation,
+                  rdata.project
                 );
               } else {
                 table.json = tempagelist;
