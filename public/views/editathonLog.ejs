@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--Code created by Maruf hasan-->
+<!--Date: 07 April, 2025-->
+<html>
+<meta name="author" content="Maruf hasan" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta content="width=device-width, initial-scale=1" name="viewport" />
+
+<head>
+    <title>Log</title>
+    <link rel="stylesheet" href="/assets/styles/common.css" />
+    <link rel="stylesheet" href="/assets/styles/editathon.css" />
+    <script src="/assets/scripts/tools.js"></script>
+    <header>
+        <h1>Log</h1>
+        <ul class="menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/dashboard?key=<%=key%>">Dashboard</a></li>
+            <li><a href="/editathon?key=<%=key%>">Edithathon</a></li>
+        </ul>
+    </header>
+    <style>
+        #log-container {
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .log-entry {
+            border: 1px solid #ccc;
+            border-left: 5px solid var(--tilt);
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px 5px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .log-meta {
+            font-size: 14px;
+            color: #333;
+            margin: 5px 0;
+        }
+
+        .changes {
+            display: none;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 6px 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #eee;
+        }
+
+        .nested-table {
+            margin-left: 20px;
+            border: none;
+        }
+
+        .toggle-btn {
+            background: var(--tilt);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        a {
+            text-decoration: none;
+            color: var(--tilt);
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <%if (list) { %>
+        <div id="log-container">
+            <%-list%>
+        </div>
+        <%} else if(html){%>
+            <div id="log-container">
+                <%-html%>
+            </div>
+            <script>
+                // Add toggle listeners
+                document.querySelectorAll('.toggle-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const id = button.getAttribute('data-id');
+                        const changesBox = document.getElementById(`change-${id}`);
+                        if (changesBox.style.display === 'block') {
+                            changesBox.style.display = 'none';
+                            button.textContent = 'Show Changes';
+                        } else {
+                            changesBox.style.display = 'block';
+                            button.textContent = 'Hide Changes';
+                        }
+                    });
+                });
+            </script>
+            <%}%>
+</body>
+
+</html>
