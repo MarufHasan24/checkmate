@@ -345,83 +345,6 @@ function generateTables(json) {
 
   return html;
 }
-function createNestedTable(data) {
-  let html = "<table>";
-  for (const key in data) {
-    html += "<tr>";
-    html += `<td>${key}</td>`;
-    html += "<td>";
-    if (typeof data[key] === "object" && data[key] !== null) {
-      html += `<div class="nested-table">${createNestedTable(data[key])}</div>`;
-    } else {
-      html += `${data[key]}`;
-    }
-    html += "</td></tr>";
-  }
-  html += "</table>";
-  return html;
-}
-function buildChangesTable(changes) {
-  let html = "<table>";
-  html += `<tr><th>Field</th><th>Old</th><th>New</th></tr>`;
-  for (const key in changes) {
-    html += "<tr>";
-    html += `<td>${key}</td>`;
-
-    const oldValue = changes[key].old;
-    const newValue = changes[key].value;
-
-    if (typeof oldValue === "object" && oldValue !== null) {
-      html += `<td>${createNestedTable(oldValue)}</td>`;
-    } else {
-      html += `<td>${oldValue}</td>`;
-    }
-
-    if (typeof newValue === "object" && newValue !== null) {
-      html += `<td>${createNestedTable(newValue)}</td>`;
-    } else {
-      html += `<td>${newValue}</td>`;
-    }
-
-    html += "</tr>";
-  }
-  html += "</table>";
-  return html;
-}
-function renderLogs(logs) {
-  let html = "";
-  logs.forEach((log, index) => {
-    let date = new Date(log.date);
-    html += '<div class="log-entry">';
-
-    html += `<div class="log-header"><div>${log.action}</div><button class="toggle-btn" data-id="${index}">Show Changes</button></div>`;
-
-    html +=
-      `<div class="log-meta"><strong>Date:</strong> ${date.toLocaleDateString(
-        "en-GB",
-        {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        }
-      )} : ${date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      })}<br><strong>user:</strong> ${log.user}<br>` +
-      (log.data.key ? `<strong>Key:</strong> ${log.data.key}<br>` : "") +
-      (log.data.ip ? `<strong>IP:</strong> ${log.data.ip}<br>` : "") +
-      (log.data.host ? `<strong>Host:</strong> ${log.data.host}<br>` : "") +
-      "</div>";
-
-    html += `<div class="changes" id="change-${index}" style="display:none;">`;
-    html += buildChangesTable(log.data.changes);
-    html += `</div>`;
-    html += `</div>`;
-  });
-
-  return html;
-}
 function editathonTable(
   page_list,
   mkey,
@@ -599,59 +522,6 @@ function keepLog(username, action, callback, rdata) {
     callback(null);
   }
 }
-function keepKeyLog(key, username, action, callback, rdata = null) {
-  if (username) {
-    const date = new Date();
-    const filePath = `${__dirname}/../../private/db/log/${key}.json`;
-    console.log(filePath);
-    fs.stat(filePath, (err, stats) => {
-      if (err) {
-        // File does not exist, create it with primary data
-        writeFile(
-          filePath,
-          JSON.stringify([
-            {
-              user: username,
-              action: action,
-              date: date.toString(),
-              data: rdata || null,
-            },
-          ]),
-          (err) => {
-            if (err) {
-              callback(err); // Log any errors
-            } else {
-              callback(null);
-            }
-          }
-        );
-      } else {
-        // File exists, update the existing data
-        updateFile(filePath, (err, data, ucallback) => {
-          if (err) {
-            callback(err);
-          } else {
-            data.push({
-              user: username,
-              date: date.toString(),
-              data: rdata || null,
-              action: action,
-            });
-            ucallback(data, (err) => {
-              if (err) {
-                callback(err);
-              } else {
-                callback(null);
-              }
-            });
-          }
-        });
-      }
-    });
-  } else {
-    callback(null);
-  }
-}
 function formatDate(date, translationObj) {
   const day = translationObj
     ? String(date.getDate())
@@ -714,58 +584,54 @@ function formatDate(date, translationObj) {
 
   return `${day} ${month} ${year} | ${hours}:${minutes}`;
 }
-function readDirectoryThenFiles(directory, callback, readall = true) {
+function readDirectoryThenFiles(directory, callback) {
   // Step 1: Read the directory
   fs.readdir(directory, (err, files) => {
     if (err) {
-      callback([err], null, null);
+      callback([err], null);
     } else {
-      if (readall) {
-        let mdata = [];
-        let merr = [];
-        let index = 0;
+      let mdata = [];
+      let merr = [];
+      let index = 0;
 
-        // Step 2: Process files one by one
-        function processFile(index) {
-          if (index >= files.length) {
-            // If all files are processed, return the result
-            if (merr.length) {
-              callback(merr, null, files);
-            } else {
-              callback(null, mdata, files);
-            }
+      // Step 2: Process files one by one
+      function processFile(index) {
+        if (index >= files.length) {
+          // If all files are processed, return the result
+          if (merr.length) {
+            callback(merr, null);
           } else {
-            const file = files[index];
-            const filePath = join(directory, file);
-
-            // Step 3: Get file stats to check if it's a file
-            fs.stat(filePath, (err, stats) => {
-              if (err) {
-                merr.push([`Error getting stats of file: ${file}`, err]);
-                processFile(index + 1); // Move to the next file
-              } else if (stats.isFile()) {
-                // Step 4: If it's a file, read its content
-                fs.readFile(filePath, "utf8", (err, data) => {
-                  if (err) {
-                    merr.push([`Error reading file: ${file}`, err]);
-                  } else {
-                    mdata.push(JSON.parse(data)); // Store file content
-                  }
-                  processFile(index + 1); // Move to the next file
-                });
-              } else {
-                // If not a file, move to the next
-                processFile(index + 1);
-              }
-            });
+            callback(null, mdata);
           }
+        } else {
+          const file = files[index];
+          const filePath = join(directory, file);
+
+          // Step 3: Get file stats to check if it's a file
+          fs.stat(filePath, (err, stats) => {
+            if (err) {
+              merr.push([`Error getting stats of file: ${file}`, err]);
+              processFile(index + 1); // Move to the next file
+            } else if (stats.isFile()) {
+              // Step 4: If it's a file, read its content
+              fs.readFile(filePath, "utf8", (err, data) => {
+                if (err) {
+                  merr.push([`Error reading file: ${file}`, err]);
+                } else {
+                  mdata.push(JSON.parse(data)); // Store file content
+                }
+                processFile(index + 1); // Move to the next file
+              });
+            } else {
+              // If not a file, move to the next
+              processFile(index + 1);
+            }
+          });
         }
-        // Start processing the first file
-        processFile(index);
-      } else {
-        // If readall is false, just return the file names
-        callback(null, null, files);
       }
+
+      // Start processing the first file
+      processFile(index);
     }
   });
 }
@@ -780,11 +646,9 @@ module.exports = {
   deleteFile,
   keepLog,
   logTable: generateTables,
-  logTableKey: renderLogs,
   editathonTable,
   readDirOwn: readDirectoryThenFiles,
   readUser,
   stat: fs.stat,
   join,
-  keepKeyLog,
 };
