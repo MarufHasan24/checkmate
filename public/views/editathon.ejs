@@ -242,6 +242,12 @@
                                 resultLink.textContent = translate('Make result');
                                 psudo.appendChild(resultLink);  // Append link to the body or a specific container
                             }
+                            if (username === userdata.host || userdata.adminList.includes(username) || (userdata.jurries).split(",").includes(username)) {
+                                let loglink = document.createElement('a');
+                                loglink.href = `/editathon/log?key=${userdata.key}`;
+                                loglink.textContent = translate('log');
+                                psudo.appendChild(loglink);  // Append link to the body or a specific container
+                            }
                             if (userdata.adminList.includes(username)) {
                                 let eliminate = document.createElement('a');
                                 eliminate.href = `#`;
