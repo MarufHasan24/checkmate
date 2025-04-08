@@ -672,6 +672,19 @@ module.exports = {
                         type: "error",
                       });
                     } else {
+                      // filter satate object in warn, info, error and success catagories
+                      let error = Object.values(data.state).filter(
+                        (e) => e.result == "error"
+                      );
+                      let info = Object.values(data.state).filter(
+                        (e) => e.result == "info"
+                      );
+                      let warn = Object.values(data.state).filter(
+                        (e) => e.result == "warn"
+                      );
+                      let success = Object.values(data.state).filter(
+                        (e) => e.result == "success"
+                      );
                       keepKeyLog(
                         data.key,
                         username,
@@ -683,7 +696,10 @@ module.exports = {
                           return res.status(200).send(data);
                         },
                         {
-                          count: Object.keys(state).length,
+                          error: error.length ? error : null,
+                          info: info.length ? info : null,
+                          warn: warn.length ? warn : null,
+                          success: success.length ? success : null,
                         }
                       );
                     }
@@ -761,23 +777,31 @@ module.exports = {
                     });
                   } else {
                     let list = Object.keys(oldata.post.page_list);
-                    keepKeyLog(key, user, "judge", (klerr) => {
-                      return res.status(200).send({
-                        message: "Judged successfully!",
-                        type: "success",
-                        redirect: {
-                          url:
-                            "/judge?key=" +
-                            key +
-                            "&page=" +
-                            list[Math.floor(list.length * Math.random())] +
-                            "&judge=" +
-                            user,
-                          timer: null,
-                          button: "Another Random Page",
-                        },
-                      });
-                    });
+                    keepKeyLog(
+                      key,
+                      user,
+                      "judge",
+                      (klerr) => {
+                        return res.status(200).send({
+                          message: "Judged successfully!",
+                          type: "success",
+                          redirect: {
+                            url:
+                              "/judge?key=" +
+                              key +
+                              "&page=" +
+                              list[Math.floor(list.length * Math.random())] +
+                              "&judge=" +
+                              user,
+                            timer: null,
+                            button: "Another Random Page",
+                          },
+                        });
+                      },
+                      {
+                        data: pdata,
+                      }
+                    );
                   }
                 });
               }
@@ -809,76 +833,71 @@ module.exports = {
     let user = req.body?.username;
     let pagelist = req.body?.list; // list of pages to remove
     if (mainkey) {
-      keepKeyLog(
-        key,
-        user,
-        "remove pages",
-        (lerr) => {
-          if (lerr) {
-            // console.error(lerr);
-          }
-          updateFile(
-            join(__dirname, "private", "db", "files", mainkey + ".json"),
-            (err, data, callback) => {
+      updateFile(
+        join(__dirname, "private", "db", "files", mainkey + ".json"),
+        (err, data, callback) => {
+          if (err) {
+            return res.status(200).send({
+              message: JSON.stringify(err, null, 2),
+              type: "error",
+            });
+          } else {
+            let page_List = data.post.page_list;
+            let jurriesList = data.post.jurries_list;
+            let pagecount = data.post.pagecount;
+            let reviewed = data.post.reviewed;
+            let count = [];
+            pagelist = pagelist.filter((e) => {
+              if (page_List[e]) {
+                delete page_List[e];
+                pagecount--;
+                count.push(e);
+              } else {
+                return e;
+              }
+            });
+            Object.entries(jurriesList).forEach(([key, value]) => {
+              pagelist = pagelist.filter((e) => {
+                if (value[e]) {
+                  delete value[e];
+                  pagecount--;
+                  count.push(e);
+                  reviewed--;
+                } else {
+                  return e;
+                }
+              });
+            });
+
+            data.post.pagecount = pagecount;
+            data.post.reviewed = reviewed;
+            callback(data, (err) => {
               if (err) {
                 return res.status(200).send({
                   message: JSON.stringify(err, null, 2),
                   type: "error",
                 });
               } else {
-                let page_List = data.post.page_list;
-                let jurriesList = data.post.jurries_list;
-                let pagecount = data.post.pagecount;
-                let reviewed = data.post.reviewed;
-                pagelist = pagelist.filter((e) => {
-                  if (page_List[e]) {
-                    delete page_List[e];
-                    pagecount--;
-                    console.log(e);
-                  } else {
-                    return e;
-                  }
-                });
-                Object.entries(jurriesList).forEach(([key, value]) => {
-                  pagelist = pagelist.filter((e) => {
-                    if (value[e]) {
-                      delete value[e];
-                      pagecount--;
-                      reviewed--;
-                      console.log(e);
-                    } else {
-                      return e;
+                keepKeyLog(
+                  key,
+                  user,
+                  "remove pages",
+                  (lerr) => {
+                    if (lerr) {
+                      // console.error(lerr);
                     }
-                  });
-                });
-
-                data.post.pagecount = pagecount;
-                data.post.reviewed = reviewed;
-                callback(data, (err) => {
-                  if (err) {
-                    return res.status(200).send({
-                      message: JSON.stringify(err, null, 2),
-                      type: "error",
-                    });
-                  } else {
                     return res.status(200).send({
                       message: "Pages removed successfully!",
                       type: "success",
                     });
+                  },
+                  {
+                    data: count,
                   }
-                });
+                );
               }
-            }
-          );
-        },
-        {
-          ip:
-            req.headers["x-forwarded-for"] ||
-            req.ip ||
-            req.headers["x-client-ip"] ||
-            req.socket.remoteAddress ||
-            null,
-          key: mainkey,
+            });
+          }
         }
       );
     } else {

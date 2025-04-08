@@ -409,13 +409,22 @@ function renderLogs(logs) {
         minute: "2-digit",
         second: "2-digit",
       })}<br><strong>user:</strong> ${log.user}<br>` +
-      (log.data.key ? `<strong>Key:</strong> ${log.data.key}<br>` : "") +
-      (log.data.ip ? `<strong>IP:</strong> ${log.data.ip}<br>` : "") +
-      (log.data.host ? `<strong>Host:</strong> ${log.data.host}<br>` : "") +
+      (log?.data?.key ? `<strong>Key:</strong> ${log.data.key}<br>` : "") +
+      (log?.data?.ip ? `<strong>IP:</strong> ${log.data.ip}<br>` : "") +
+      (log?.data?.host ? `<strong>Host:</strong> ${log.data.host}<br>` : "") +
       "</div>";
 
     html += `<div class="changes" id="change-${index}" style="display:none;">`;
-    html += buildChangesTable(log.data.changes);
+    if (log.action == "dashboard") {
+      html += buildChangesTable(log.data.changes);
+    } else {
+      html += `<div class="log-data">`;
+      if (log.data) {
+        html += `<strong>Data:</strong>`;
+        html += `<div>${createNestedTable(log.data)}</div>`;
+      }
+      html += `</div>`;
+    }
     html += `</div>`;
     html += `</div>`;
   });
