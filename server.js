@@ -80,6 +80,7 @@ app.get("/user", gets.user);
 app.get("/create", gets.create);
 app.get("/translate", gets.translate);
 app.get("/tools", gets.tools);
+app.get("/filter", gets.filter);
 // redirect all the post requests post routes
 app.post("/template", posts.template);
 app.post("/dashboard", posts.dashboard);

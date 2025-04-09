@@ -183,7 +183,8 @@ function renderJurryTable(
           if (field === "name") return `<td>${name}</td>`;
           if (field === "stat")
             return `<td><code>${
-              userdata.dynamic[data.stat]?.wikitext || data.stat
+              userdata.dynamic[data.stat]?.wikitext ||
+              userdata.dynamic[data.stat]?.name
             }</code></td>`;
           if (field === "tm") {
             if (data.marks == data.reviewed && data.marks > 0) {

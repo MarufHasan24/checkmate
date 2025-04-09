@@ -63,11 +63,13 @@ subbtn.addEventListener("click", (e) => {
   });
   let dynamicinpcont = document.querySelectorAll(".judgement-option");
   formData.dynamic = {};
-  dynamicinpcont.forEach((e) => {
+  dynamicinpcont.forEach((e, i) => {
     let dinpconts = e.querySelectorAll("input");
-    formData.dynamic[dinpconts[0].value] = {
+
+    formData.dynamic["opt" + i] = {
       wikitext: dinpconts[1].value,
       mark: dinpconts[2].value,
+      name: dinpconts[0].value,
     };
   });
   //console.log(({ data: formData, key: jsonobj.key }))

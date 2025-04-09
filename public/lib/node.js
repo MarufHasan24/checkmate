@@ -434,6 +434,7 @@ function renderLogs(logs) {
 function editathonTable(
   page_list,
   mkey,
+  dynamic,
   startindex = 0,
   translation = null,
   project = "meta.wikimedia"
@@ -443,7 +444,6 @@ function editathonTable(
   const pageKeys = Object.keys(page_list).filter((e) => e);
   if (pageKeys.length) {
     // Loop through each page
-
     pageKeys.forEach((pageKey, i) => {
       const pageData = page_list[pageKey];
       if (pageData) {
@@ -488,7 +488,9 @@ function editathonTable(
               pageData[field]
             )}'>${pageData[field]}</a></td>`;
           } else if (field == "stat") {
-            td = `<td data-label='Status'>${pageData[field]}</td>`;
+            td = `<td data-label='Status'>${
+              dynamic[pageData["stat"]]?.name || ""
+            }</td>`;
           } else if (field == "ec") {
             td = `<td data-label='Edit Count'>${
               translation?.lebel?.counts

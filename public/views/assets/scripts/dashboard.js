@@ -52,9 +52,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     dynamicinpcont.forEach((e) => {
       let inputs = e.querySelectorAll("input");
-      userdata.dynamic[inputs[0].value] = {
+      userdata.dynamic[inputs[0].dataset.acname] = {
         wikitext: inputs[1].value,
         mark: inputs[2].value,
+        name: inputs[0].value,
+        pause: inputs[3].value == "pause" ? true : false,
       };
     });
     initialValues.clear(); // Clear stored values after saving
@@ -122,7 +124,7 @@ const deleteKey = function (key) {
             } else {
               msg({
                 message: "Key deleted successfully",
-                type: "error",
+                type: "warn",
                 duration: 2,
                 redirect: {
                   url: "/",
@@ -136,7 +138,7 @@ const deleteKey = function (key) {
         // User cancelled the prompt
         msg({
           message: "Key not deleted",
-          type: "success",
+          type: "info",
           duration: 3,
         });
       }

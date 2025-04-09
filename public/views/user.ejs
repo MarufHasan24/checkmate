@@ -547,14 +547,15 @@
 <b>Last login:</b> ${new Date(data.lastModified).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}<br>
   <b>Groups:</b> ${data.user.groups.join(", ")}
 </div>`
-        if (data.data && data.data.length > 0 && data.data[0].project) {
+        if (data.data && data.data.length > 0) {
             dashboard.innerHTML += `<div class="projects">
-  <div class="section-title"><i class="fa fa-folder-open"></i> Hosted Projects</div>
+  <div class="section-title"><i class="fa fa-folder-open"></i> Hosted Projects, Total: ${data.data.length}</div>
   ${data.data.map(p => {
-                const lang = p.project.split('.')[0];
-                const domain = p.project.split('.')[1];
-                const icon = projects[domain] ? projects[domain].icon : "fas fa-globe";
-                return `
+                if (p?.project) {
+                    const lang = p.project.split('.')[0];
+                    const domain = p.project.split('.')[1];
+                    const icon = projects[domain] ? projects[domain].icon : "fas fa-globe";
+                    return `
       <div class="project">
         <div class="left">
             <div class="project-flag">
@@ -574,9 +575,15 @@
         </div>
       </div>
     `;
+                } else {
+                    return ``;
+                }
             }).join("")}
 </div>
 `;
+        } else {
+            dashboard.innerHTML += `<div class="projects">
+  <div class="section-title"><i class="fa fa-folder-open"></i> Hosted Projects</div>Nothing to show here.</div>`
         }
         const categories = {
             "Basic Access": [
