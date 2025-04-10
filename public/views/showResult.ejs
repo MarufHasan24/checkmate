@@ -89,7 +89,7 @@
 <body>
     <script>
         const userdata = JSON.parse(validateStr('<%= jsondata %>'));
-        console.log(userdata);
+        document.querySelector("ul.menu").innerHTML += `<li><a href="javascript:void" onclick="deleteKey('<%=key%>')">Delete key</a></li>`
     </script>
     <div class="container">
         <div class="settings">
@@ -306,6 +306,46 @@
         return 0;
     }
     document.getElementById("total_time").innerHTML = timeDifference((Date.parse('<%=data.end_date%>' + ' ' + '<%=data.end_time%>')), "date", Date.parse('<%=data.start_date%>' + ' ' + '<%=data.start_time%>'), true);
+    const deleteKey = function (key) {
+        csprompt(
+            "Delete Key",
+            "Are you sure you want to delete this key? This action cannot be undone. If you are sure you want to delete this key, please type the editathon name.",
+            function (response) {
+                if (response == userdata.title) {
+                    proxyFetch(
+                        "delete",
+                        {
+                            key: key,
+                            user: logindata.username,
+                            bin: true,
+                        },
+                        (data) => {
+                            if (data.error) {
+                                console.error(data.error);
+                            } else {
+                                msg({
+                                    message: "Key deleted successfully",
+                                    type: "warn",
+                                    duration: 2,
+                                    redirect: {
+                                        url: "/",
+                                        timer: 4,
+                                    },
+                                });
+                            }
+                        }
+                    );
+                } else {
+                    // User cancelled the prompt
+                    msg({
+                        message: "Key not deleted",
+                        type: "info",
+                        duration: 3,
+                    });
+                }
+            }
+        );
+    };
 </script>
 
 </html>

@@ -53,6 +53,7 @@ module.exports = {
         let finaldata = JSON.stringify({
           key: key,
           date: date,
+          pass: password,
           name: compname,
           template: template,
           project: project,
@@ -685,6 +686,11 @@ module.exports = {
                       let success = Object.values(data.state).filter(
                         (e) => e.result == "success"
                       );
+                      let lgobj = {};
+                      error.length ? (lgobj.error = error) : null;
+                      info.length ? (lgobj.info = info.length) : null;
+                      warn.length ? (lgobj.warn = warn.length) : null;
+                      success.length ? (lgobj.success = success.length) : null;
                       keepKeyLog(
                         data.key,
                         username,
@@ -696,10 +702,7 @@ module.exports = {
                           return res.status(200).send(data);
                         },
                         {
-                          error: error.length ? error : null,
-                          info: info.length ? info : null,
-                          warn: warn.length ? warn : null,
-                          success: success.length ? success : null,
+                          data: lgobj,
                         }
                       );
                     }
@@ -799,7 +802,8 @@ module.exports = {
                         });
                       },
                       {
-                        data: pdata,
+                        name: page,
+                        state: jdata.state,
                       }
                     );
                   }
@@ -1051,9 +1055,10 @@ module.exports = {
                 table.html = editathonTable(
                   tempagelist,
                   key,
+                  rdata.data.dynamic,
                   startindex,
                   translation,
-                  rdata.data.project
+                  rdata.project
                 );
               } else {
                 table.json = tempagelist;

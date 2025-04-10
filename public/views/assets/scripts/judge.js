@@ -22,20 +22,23 @@ if (stickydiv) {
   for (i in userdata.opts) {
     let div = document.createElement("li");
     let input = document.createElement("button");
-    input.innerHTML = i;
+    input.innerHTML = userdata.opts[i].name;
+    input.dataset.acname = i;
     if (userdata.stat == i) {
       input.className = "radio active";
     } else {
       input.className = "radio";
     }
     input.dataset.mark = userdata.opts[i].mark;
-    div.appendChild(input);
+    if (!userdata.opts[i].pause) {
+      div.appendChild(input);
+    }
     input.addEventListener("click", () => {
       input.className = "radio active";
       saveBtn.disabled = false;
       skipBtn.disabled = true;
       marks.innerHTML = input.dataset.mark;
-      state = input.innerHTML;
+      state = input.dataset.acname;
       let radios = stickydiv.querySelectorAll(".radio");
       radios.forEach((radio) => {
         if (radio !== input) {

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Filter Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <style>
+        .card-content p {
+            margin-bottom: 0.25rem;
+        }
+
+        .slider-wrapper {
+            margin-top: 1rem;
+        }
+
+        #results.grid .card {
+            display: inline-block;
+            width: 45%;
+            margin: 0.5rem;
+            vertical-align: top;
+        }
+
+        #results.list .card {
+            margin-bottom: 1rem;
+        }
+
+        .no-results {
+            text-align: center;
+            margin: 2rem;
+            font-weight: bold;
+            color: #ff3860;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title has-text-centered">Filter page</h1>
+            <div class="box">
+                <div class="columns is-multiline">
+                    <div class="column is-4">
+                        <label class="label">Title</label>
+                        <input id="title" class="input" type="text" placeholder="Find by title">
+                    </div>
+                    <div class="column is-4">
+                        <label class="label">Submitter</label>
+                        <input id="submitter" class="input" type="text" placeholder="Find by submitter">
+                    </div>
+                    <div class="column is-4">
+                        <label class="label">Reviewer</label>
+                        <input id="reviewer" class="input" type="text" placeholder="Find by reviewer">
+                    </div>
+                    <div class="column is-3">
+                        <label class="label">Start date</label>
+                        <input id="startDate" class="input" type="date">
+                    </div>
+                    <div class="column is-3">
+                        <label class="label">End date</label>
+                        <input id="endDate" class="input" type="date">
+                    </div>
+                    <div class="column is-6">
+                        <label class="label">State</label>
+                        <div class="select is-fullwidth">
+                            <select id="state">
+                                <option value="">All</option>
+                                <option value="1">State 1</option>
+                                <option value="2">State 2</option>
+                                <option value="3">State 3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="column is-12 has-text-centered">
+                        <button id="applyFilter" class="button is-link">Apply filter</button>
+                        <button id="toggleView" class="button is-light ml-2">Grid/list</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="results" class="grid"></div>
+            <div id="pagination" class="has-text-centered mt-4"></div>
+        </div>
+    </section>
+
+    <script>
+        const data = {
+            "পর্দা": {
+                sd: 1741972773318,
+                sub: "খাত্তাব হাসান",
+                rev: "রিভিউয়ার ১",
+                stat: "",
+                length: 4273,
+                cd: "2025-03-13T21:35:37Z"
+            },
+            "খালেদ মাশাল": {
+                sd: 1742366036857,
+                sub: "Md Mobashir Hossain",
+                rev: "রিভিউয়ার ২",
+                stat: "",
+                length: 3893,
+                cd: "2025-03-19T06:26:33Z"
+            },
+            "আল-হুর ইবনে ইয়াজিদ আল-তামিমি": {
+                sd: 1742446457487,
+                sub: "Md Mobashir Hossain",
+                rev: "রিভিউয়ার ১",
+                stat: "",
+                length: 5633,
+                cd: "2025-03-20T04:45:51Z"
+            },
+            "সালাহউদ্দিন আইউবি": {
+                sd: 1742446477777,
+                sub: "Md Mobashir Hossain",
+                rev: "রিভিউয়ার ২",
+                stat: "",
+                length: 4500,
+                cd: "2025-03-25T04:45:51Z"
+            },
+            "ইমাম আবু হানিফা": {
+                sd: 1742446499999,
+                sub: "খাত্তাব হাসান",
+                rev: "রিভিউয়ার ৩",
+                stat: "",
+                length: 6000,
+                cd: "2025-03-28T04:45:51Z"
+            }
+        };
+
+        const refs = {
+            title: document.getElementById("title"),
+            submitter: document.getElementById("submitter"),
+            reviewer: document.getElementById("reviewer"),
+            startDate: document.getElementById("startDate"),
+            endDate: document.getElementById("endDate"),
+            results: document.getElementById("results"),
+            pagination: document.getElementById("pagination"),
+            applyBtn: document.getElementById("applyFilter"),
+            viewBtn: document.getElementById("toggleView")
+        };
+
+        let filteredResults = [];
+        let currentPage = 1;
+        const itemsPerPage = 2;
+        let isGrid = true;
+
+        refs.applyBtn.addEventListener("click", () => {
+            currentPage = 1;
+            applyFilter();
+        });
+
+        refs.viewBtn.addEventListener("click", () => {
+            isGrid = !isGrid;
+            refs.results.className = isGrid ? "grid" : "list";
+            renderPaginatedResults();
+        });
+
+        function applyFilter() {
+            const keyword = refs.title.value.toLowerCase();
+            const submitter = refs.submitter.value.toLowerCase();
+            const reviewer = refs.reviewer.value.toLowerCase();
+            const start = refs.startDate.value ? new Date(refs.startDate.value) : null;
+            const end = refs.endDate.value ? new Date(refs.endDate.value) : null;
+            renderPaginatedResults();
+        }
+
+        function renderPaginatedResults() {
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const paginatedData = filteredResults.slice(startIndex, startIndex + itemsPerPage);
+            refs.results.innerHTML = "";
+
+            if (paginatedData.length === 0) {
+                refs.results.innerHTML = `<div class='no-results'>⚠️ no result</div>`;
+                refs.pagination.innerHTML = "";
+                return;
+            }
+
+            paginatedData.forEach(([title, info]) => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+          <div class="card-content">
+            <p class="title is-5">${title}</p>
+            <p><strong>সম্পাদক:</strong> ${info.sub}</p>
+            <p><strong>রিভিউয়ার:</strong> ${info.rev}</p>
+            <p><strong>দৈর্ঘ্য:</strong> ${info.length}</p>
+            <p><strong>তারিখ:</strong> ${new Date(info.cd).toLocaleString()}</p>
+          </div>`;
+                refs.results.appendChild(card);
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+            if (totalPages <= 1) {
+                refs.pagination.innerHTML = "";
+                return;
+            }
+
+            refs.pagination.innerHTML = `
+        <button class="button is-small mr-2" ${currentPage === 1 ? "disabled" : ""} onclick="prevPage()">previous</button>
+        <span>page ${currentPage} / ${totalPages}</span>
+        <button class="button is-small ml-2" ${currentPage === totalPages ? "disabled" : ""} onclick="nextPage()">after</button>
+      `;
+        }
+
+        window.prevPage = () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderPaginatedResults();
+            }
+        };
+        window.nextPage = () => {
+            const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderPaginatedResults();
+            }
+        };
+
+        applyFilter();
+    </script>
+</body>
+
+</html>

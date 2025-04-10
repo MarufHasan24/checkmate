@@ -64,8 +64,6 @@
                     let username = null;
 
                     if (logindata && userdata.adminList.includes(logindata.username)) {
-                        //console.log("Admin")
-                        console.log(logindata && userdata.adminList)
                         document.querySelector("ul.menu").innerHTML += `<li><a href="javascript:void" onclick="deleteKey('<%=key%>')">Delete key</a></li>`;
                     }
                     init(userdata.trns)
@@ -196,6 +194,9 @@
                                                 </p>
                                                 <p><i>Title:</i>
                                                     <%= data["title"]%>
+                                                </p>
+                                                <p><i>Host:</i>
+                                                    <%= data["host"]%>
                                                 </p>
                                             </div>
                                             <!-- Group 1: Page and User Info -->
@@ -493,14 +494,16 @@
                                                     const optionDiv = document.createElement('div');
                                                     const valueDiv = document.createElement('p');
                                                     optionDiv.classList.add('judgement-option');
-                                                    valueDiv.innerHTML = "Name : " + key + " | Mark : " + value.mark;
+                                                    valueDiv.innerHTML = "Name : " + value.name + " | Mark : " + value.mark;
+
                                                     // Add Type input
 
                                                     const typeInput = document.createElement('input');
                                                     typeInput.type = 'text';
                                                     typeInput.className = 'dynamic';
                                                     typeInput.placeholder = 'Type';
-                                                    typeInput.value = key; // 'accept', 'reject', 'neutral'
+                                                    typeInput.value = value.name; // 'accept', 'reject', 'neutral'
+                                                    typeInput.dataset.acname = key; // Store the name of the option in a data attribute
                                                     optionDiv.appendChild(typeInput);
 
                                                     // Add Wikitext input
@@ -518,7 +521,27 @@
                                                     markInput.value = value.mark; // e.g. '1', '-1', '0'
                                                     optionDiv.appendChild(markInput);
 
+                                                    const pauseButton = document.createElement('input');
+                                                    pauseButton.type = 'button';
+                                                    if (value.pause) {
+                                                        optionDiv.classList.add('paused');
+                                                        pauseButton.value = 'Live';
+                                                    } else {
+                                                        pauseButton.value = 'Pause';
+                                                    }
+                                                    pauseButton.className = 'pause-button';
+                                                    pauseButton.addEventListener('click', function () {
+                                                        if (optionDiv.classList.contains('paused')) {
+                                                            optionDiv.classList.remove('paused');
+                                                            pauseButton.value = 'Pause';
+                                                        } else {
+                                                            optionDiv.classList.add('paused');
+                                                            pauseButton.value = 'Live';
+                                                        }
+                                                    });
+                                                    optionDiv.appendChild(pauseButton);
                                                     // Append the optionDiv to the judgementOptions container
+                                                    // add option button
                                                     judgementOptions.appendChild(valueDiv);
                                                     judgementOptions.appendChild(optionDiv);
                                                 }

@@ -200,19 +200,16 @@
                                 };
                             </script>
                             <% } %>
-                                <div class="psudo-card">
-                                    <div class="card medium">
-                                        <h2 class="value">
-                                            <%= data.pagecount %>
-                                        </h2>
-                                        <p class="label">Total Submission</p>
-                                    </div>
-                                    <div id="psudo" class="psudo-card" style="flex-direction: column;">
+                                <div>
+                                    <div id="psudo" class="psudo-card">
                                         <% if((Date.now() < Date.parse(data.end_date + " " + data.end_time)) &&
                                             (Date.parse(data.start_date + " " + data.start_time) < Date.now())) { %>
                                             <a style="background-color: rgb(24, 119, 235); color: white;"
                                                 href="/submit?key=<%=data.key%>">
                                                 <%=trns.lebel.submit%>
+                                            </a>
+                                            <a href="/filter?key=<%=data.key%>">
+                                                <%=trns.lebel.filter || "Filter" %>
                                             </a>
                                             <% } %>
                                     </div>
@@ -283,23 +280,27 @@
                     <% if(data.statistic) { %>
                         <div class="stats">
                             <div class="card medium">
-                                <h2 class="value" id="tsum">
-                                    <%= data.usercount.length %>
+                                <h2 class="value">
+                                    <%= data.pagecount %>
                                 </h2>
-                                <p class="label">Total Submitor</p>
+                                <p class="label">
+                                    <%=trns.lebel["Total Submission"]%>
+                                </p>
                             </div>
                             <div class="card medium">
                                 <h2 class="value">
                                     <%= Object.keys(data.jurries_list).length %>
                                 </h2>
                                 <p class="label">
-                                    Total Jurries
-                                    <span class="detail">Pages per Jurry:
-                                        <strong>
-                                            <%= Math.ceil((Number(data.pagecount) - Number(data.reviewed)) /
-                                                Object.keys(data.jurries_list).length) %>
-                                        </strong>
-                                    </span>
+                                    <%=trns.lebel["Total Jurries"]%>
+                                        <span class="detail">
+                                            <%= trns.lebel["Pages per Jurry"] %>:
+                                                <strong>
+                                                    <%= (Math.ceil((Number(data.pagecount) - Number(data.reviewed)) /
+                                                        Object.keys(data.jurries_list).length)).toString().split("").map(e=>
+                                                        (trns.lebel.counts[e]||e)).join("") %>
+                                                </strong>
+                                        </span>
                                 </p>
                             </div>
 
@@ -307,14 +308,18 @@
                                 <h2 class="value reviewed">
                                     <%= data.reviewed %>
                                 </h2>
-                                <p class="label">Total Reviewed</p>
+                                <p class="label">
+                                    <%=trns.lebel["Total Reviewed"]%>
+                                </p>
                             </div>
 
                             <div class="card medium">
                                 <h2 class="value remaining">
                                     <%= Number(data.pagecount) - Number(data.reviewed) %>
                                 </h2>
-                                <p class="label">Remaining</p>
+                                <p class="label">
+                                    <%=trns.lebel["Remaining"]%>
+                                </p>
                             </div>
                             <% if(data.jurry_name){ %>
                                 <div class="card big">
@@ -343,7 +348,7 @@
                                 let tsum = document.getElementById("tsum");
                                 document.querySelector("#Toggle").addEventListener("click", function () {
                                     let participantDiv = document.getElementById("partipent-cont");
-                                    participantDiv.style.display = (participantDiv.style.display === "none" || participantDiv.style.display === "") ? "block" : "none";
+                                    participantDiv.style.display = (participantDiv.style.display === "none" || participantDiv.style.display === "") ? "grid" : "none";
                                 });
                             </script>
                 </div>
@@ -375,37 +380,44 @@
                         );
                     }
                     function renderTable(participent) {
+                        document.querySelector("#Toggle").innerHTML = `Participents (${Object.keys(participent).length.toString().split("").map(e => {
+                            return transObj?.lebel?.counts[e] || e
+                        }).join("")})`;
+                        ;
                         const container = document.getElementById("partipent-cont");
                         container.innerHTML = "";
-
-                        let table = document.createElement("div");
-                        table.style.display = "flex";
-                        table.style.flexWrap = "wrap";
-                        table.style.gap = "10px";
-                        let entries = Object.entries(participent);
-                        tsum.innerHTML = entries.length;
-                        entries.forEach(([name, data]) => {
-                            let card = document.createElement("div");
-                            card.style.flex = "1 1 300px";
-                            card.style.border = "1px solid #ccc";
-                            card.style.padding = "10px";
-                            card.style.borderRadius = "8px";
-                            card.style.background = "#f9f9f9";
-
+                        // Convert and sort data by marks, then reviewed
+                        const sorted = Object.entries(participent)
+                            .sort((a, b) => {
+                                if (b[1].marks !== a[1].marks) return b[1].marks - a[1].marks;
+                                return b[1].reviewed - a[1].reviewed;
+                            });
+                        sorted.forEach(([name, info], index) => {
+                            const progress = info.total > 0 ? Math.round((info.reviewed / info.total) * 100) : 0;
+                            const card = document.createElement('div');
+                            card.className = 'pcard';
                             card.innerHTML = `
-          <h4>${name}</h4>
-          <p><span><i style="opacity: 0.5;">Total Submissions:</i> <b>${data.total}</b></span>
-          <span><i style="opacity: 0.5;">Reviewed:</i> <b>${data.reviewed}</b></span>
-          <span><i style="opacity: 0.5;">Marks:</i> <b>${data.marks}</b></span></p>
+        <h3>${translateNum(index + 1)} | ${name}</h3>
+        <span><i style="opacity: 0.5;">${transObj.lebel["total"] || "Total"}:</i> <strong>${translateNum(info.total)}</strong></span>
+        <span><i style="opacity: 0.5;">${transObj.lebel["reviewed"] || "Reviewed"
+                                }:</i> <strong>${translateNum(info.reviewed)}</strong></span>
+        <span><i style="opacity: 0.5;">${transObj.lebel["marks"] || "Marks"
+                                }:</i> <strong>${translateNum(info.marks)}</strong></span>
+        <span><i style="opacity: 0.5;">${transObj.lebel["progress"] || "Progress"
+                                }:</i> <strong>${translateNum(progress)}%</strong></span>
+        <div class="progress-bar"><div class="progress" style="width:${progress}%"></div></div>
       `;
-                            table.appendChild(card);
+                            container.appendChild(card);
                         });
-
-                        container.appendChild(table);
                     }
                     document.querySelectorAll(".value").forEach(e => {
                         e.innerHTML = translate(e.textContent, "d")
                     })
+                    function translateNum(num) {
+                        return num.toString().split("").map(e => {
+                            return transObj?.lebel?.counts[e] || e
+                        }).join("");
+                    }
                 </script>
                 <script src="/assets/scripts/editathon.js"></script>
                 <%}%>
