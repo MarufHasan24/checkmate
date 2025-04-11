@@ -1026,13 +1026,25 @@ module.exports = {
               Object.entries(page_list).forEach(([_, value]) => {
                 let { sub, stat } = value;
                 if (!participent[sub]) {
-                  participent[sub] = { total: 0, reviewed: 0, marks: 0 };
+                  participent[sub] = {
+                    total: 0,
+                    reviewed: 0,
+                    marks: 0,
+                    wc: 0,
+                    length: 0,
+                  };
                 }
                 participent[sub].total++;
                 if (stat !== "") {
                   participent[sub].reviewed++;
-                  participent[sub].marks +=
-                    Number(rdata?.data?.dynamic[stat]?.mark) || 0;
+                  let mark = Number(rdata?.data?.dynamic[stat]?.mark) || 0;
+                  if (value.wc && mark > 0) {
+                    participent[sub].wc += Number(value.wc) || 0;
+                  }
+                  if (value.length && mark > 0) {
+                    participent[sub].length += Number(value.length) || 0;
+                  }
+                  participent[sub].marks += mark;
                 }
               });
               let keys = Object.keys(page_list);
@@ -1069,6 +1081,77 @@ module.exports = {
         );
       }
     );
+  },
+  filter: function (req, res) {
+    let key = req.body.key;
+    let title = req.body.title || null;
+    let submitter = req.body.sub || null;
+    let reviewer = req.body.rev || null;
+    let startDate = req.body.sd || null;
+    let endDate = req.body.ed || null;
+    let state = req.body.stat || null;
+    if (!key) {
+      return res.status(200).send({
+        message: "No key provided",
+        type: "error",
+      });
+    } else {
+      readFile(
+        join(__dirname, "private", "db", "files", key + ".json"),
+        (err, rdata) => {
+          if (err) {
+            //console.error(err);
+            return res.status(200).send({
+              message: JSON.stringify(err, null, 2),
+              type: "error",
+            });
+          } else {
+            let filteredData = [];
+
+            if (
+              title ||
+              submitter ||
+              reviewer ||
+              state ||
+              startDate ||
+              endDate
+            ) {
+              let data = rdata.post.page_list;
+              Object.entries(rdata.post.jurries_list).forEach(
+                ([okey, value]) => {
+                  Object.entries(value).forEach(([key, values]) => {
+                    data[key] = values;
+                  });
+                }
+              );
+              filteredData = Object.entries(data).filter(([name, info]) => {
+                const titleMatch =
+                  !title || name.toLowerCase().includes(title.toLowerCase());
+                const submitterMatch =
+                  !submitter ||
+                  info.sub.toLowerCase().includes(submitter.toLowerCase());
+                const reviewerMatch =
+                  !reviewer ||
+                  info.rev.toLowerCase().includes(reviewer.toLowerCase());
+                const dateMatch =
+                  (!startDate || new Date(info.sd) >= startDate) &&
+                  (!endDate || new Date(info.sd) <= endDate);
+                const stateMatch =
+                  !state || state === "all" || info.stat === state;
+                return (
+                  titleMatch &&
+                  submitterMatch &&
+                  reviewerMatch &&
+                  dateMatch &&
+                  stateMatch
+                );
+              });
+            }
+            return res.status(200).send(filteredData);
+          }
+        }
+      );
+    }
   },
   //sub set of dashboard
   dashboardbr: function (req, res) {

@@ -200,7 +200,7 @@
                                 };
                             </script>
                             <% } %>
-                                <div>
+                                <div style="display: flex;align-items: center;justify-content: center;">
                                     <div id="psudo" class="psudo-card">
                                         <% if((Date.now() < Date.parse(data.end_date + " " + data.end_time)) &&
                                             (Date.parse(data.start_date + " " + data.start_time) < Date.now())) { %>
@@ -339,7 +339,8 @@
                             <div class="stats" style="padding: 0px 5px;">
                                 <h2 id="Toggle"
                                     style='color: #fff; width: 100%;text-align:center; cursor: pointer;margin: 0;padding: 20px;'>
-                                    Participents</h2>
+                                    <%=trns.lebel["Participents"]%><b id="count"></b>
+                                </h2>
                                 <div id="partipent-cont" style="display: none; width: 96%;">
                                 </div>
                             </div>
@@ -380,29 +381,57 @@
                         );
                     }
                     function renderTable(participent) {
-                        document.querySelector("#Toggle").innerHTML = `Participents (${Object.keys(participent).length.toString().split("").map(e => {
+                        document.querySelector("#Toggle #count").innerHTML = `(${Object.keys(participent).length.toString().split("").map(e => {
                             return transObj?.lebel?.counts[e] || e
                         }).join("")})`;
                         ;
                         const container = document.getElementById("partipent-cont");
                         container.innerHTML = "";
                         // Convert and sort data by marks, then reviewed
-                        const sorted = Object.entries(participent)
-                            .sort((a, b) => {
-                                if (b[1].marks !== a[1].marks) return b[1].marks - a[1].marks;
-                                return b[1].reviewed - a[1].reviewed;
-                            });
+                        const sorted = Object.entries(participent).sort((a, b) => {
+                            const resultType = userdata?.make_result;
+                            // Convert all values safely to numbers
+                            const aWC = Number(a[1]?.wc) || 0;
+                            const bWC = Number(b[1]?.wc) || 0;
+                            const aLength = Number(a[1]?.length) || 0;
+                            const bLength = Number(b[1]?.length) || 0;
+                            const aMarks = Number(a[1]?.marks) || 0;
+                            const bMarks = Number(b[1]?.marks) || 0;
+                            const aReviewed = Number(a[1]?.reviewed) || 0;
+                            const bReviewed = Number(b[1]?.reviewed) || 0;
+                            if (resultType === "Word Count") {
+                                if (bWC !== aWC) return bWC - aWC;
+                                return bReviewed - aReviewed;
+                            } else if (resultType === "Byte Count") {
+                                if (bLength !== aLength) return bLength - aLength;
+                                return bReviewed - aReviewed;
+                            } else {
+                                if (bMarks !== aMarks) return bMarks - aMarks;
+                                return bReviewed - aReviewed;
+                            }
+                        });
+
+
                         sorted.forEach(([name, info], index) => {
                             const progress = info.total > 0 ? Math.round((info.reviewed / info.total) * 100) : 0;
                             const card = document.createElement('div');
                             card.className = 'pcard';
+                            let lebel = transObj.lebel["marks"] || "Marks";
+                            let data = info.marks;
+                            if (userdata?.make_result == "Word Count") {
+                                lebel = transObj.lebel.wc || "Word Count";
+                                data = info.wc;
+                            } else if (userdata?.make_result == "Byte Count") {
+                                lebel = transObj.lebel.length || "Byte Count";
+                                data = info.length;
+                            }
                             card.innerHTML = `
         <h3>${translateNum(index + 1)} | ${name}</h3>
         <span><i style="opacity: 0.5;">${transObj.lebel["total"] || "Total"}:</i> <strong>${translateNum(info.total)}</strong></span>
         <span><i style="opacity: 0.5;">${transObj.lebel["reviewed"] || "Reviewed"
                                 }:</i> <strong>${translateNum(info.reviewed)}</strong></span>
-        <span><i style="opacity: 0.5;">${transObj.lebel["marks"] || "Marks"
-                                }:</i> <strong>${translateNum(info.marks)}</strong></span>
+        <span><i style="opacity: 0.5;">${lebel
+                                }:</i> <strong>${translateNum(data)}</strong></span>
         <span><i style="opacity: 0.5;">${transObj.lebel["progress"] || "Progress"
                                 }:</i> <strong>${translateNum(progress)}%</strong></span>
         <div class="progress-bar"><div class="progress" style="width:${progress}%"></div></div>

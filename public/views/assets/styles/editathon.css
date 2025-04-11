@@ -2,12 +2,15 @@
 .stats,
 .settings {
     display: flex;
-    flex-wrap: wrap;
     gap: 20px;
     justify-content: space-around;
     padding: 20px;
     background-color: rgba(var(--tilt-rgb), 0.5);
 
+}
+
+.settings {
+    flex-wrap: nowrap;
 }
 
 /* Individual stat card */
@@ -30,6 +33,11 @@
 
 .card.medium {
     max-width: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .card.small {
@@ -271,7 +279,14 @@ iframe.countdown {
     background-color: var(--tilt);
 }
 
-@media (min-width: 640px) {
+@media (max-width: 750px) {
+    .settings {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 640px) {
     .card.countdown {
         margin: 0;
     }
@@ -325,6 +340,19 @@ iframe.countdown {
 
     .psudo-card {
         flex-direction: row-reverse;
+    }
+
+    .stats,
+    .settings {
+        gap: 5px;
+    }
+
+    .card.medium {
+        width: calc(100% - 40px);
+        max-width: min(120px, 100%);
+        margin: 0 auto;
+        padding: 5px;
+        justify-content: center;
     }
 }
 

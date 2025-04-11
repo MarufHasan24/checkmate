@@ -5,35 +5,260 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Filter Page</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <style>
-        .card-content p {
-            margin-bottom: 0.25rem;
-        }
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"> -->
+    <% if(data) { %>
+        <title>
+            <%=data.title%> - Checkmate Filter Page
+        </title>
+        <% } else { %>
+            <title>Checkmate Filter Page</title>
+            <% } %>
+                <!-- Preload Important Assets -->
+                <link rel="preload" href="/assets/styles/common.css" as="style">
+                <link rel="preload" href="/assets/scripts/tools.js" as="script">
+                <link rel="stylesheet" href="/assets/styles/common.css">
 
-        .slider-wrapper {
-            margin-top: 1rem;
-        }
-
-        #results.grid .card {
-            display: inline-block;
-            width: 45%;
-            margin: 0.5rem;
-            vertical-align: top;
-        }
-
-        #results.list .card {
-            margin-bottom: 1rem;
-        }
-
-        .no-results {
-            text-align: center;
-            margin: 2rem;
-            font-weight: bold;
-            color: #ff3860;
-        }
-    </style>
+                <!-- Load Scripts Efficiently -->
+                <script src="/assets/scripts/tools.js"></script>
+                <script src="/assets/scripts/extraTools.js"></script>
+                <header>
+                    <% if(data) { %>
+                        <h1>
+                            <%=data.title%>
+                        </h1>
+                        <ul class="menu">
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/dashboard?key=<%= key %>">Dashboard</a></li>
+                            <li><a href="/editathon?key=<%= key %>">Editathon</a></li>
+                            <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                        </ul>
+                        <% } else { %>
+                            <p>Enter Editathon's key first</p>
+                            <ul class="menu">
+                                <li><a href="/">Home</a></li>
+                                <li><a href="javascript:void" onclick="history.back()">Go back</a></li>
+                            </ul>
+                            <% } %>
+                </header>
 </head>
+<style>
+    /* General layout */
+    .section {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        background: linear-gradient(to bottom right, #f0f4ff, #ffffff);
+    }
+
+    /* Title */
+    .title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        text-shadow: 1px 1px 0 #ffffff;
+    }
+
+    /* Filter box */
+    .box {
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+        padding: 2rem;
+        width: calc(98% - 4rem);
+        margin: 1%;
+    }
+
+    /* Labels */
+    .label {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        color: #34495e;
+    }
+
+    .columns.is-multiline {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+
+
+    .column {
+        flex-grow: 1;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .column.buttons {
+        flex: 1 1 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+        gap: 1rem;
+    }
+
+    /* Inputs */
+    .input,
+    .select select {
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        padding: 0.75rem;
+        font-size: 1rem;
+        background-color: #fdfdfd;
+        transition: border 0.3s, box-shadow 0.3s;
+    }
+
+    select {
+        width: 100%;
+    }
+
+    .input:focus,
+    .select select:focus {
+        border-color: #6c63ff;
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+    }
+
+    /* Buttons */
+    .button {
+        padding: 10px 20px;
+        font-weight: 700;
+        width: 150px;
+        border-radius: 8px;
+        transition: all 0.25s ease-in-out;
+    }
+
+    h3 a {
+        color: rgba(var(--tilt-light), 1);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .button.is-link {
+        background: linear-gradient(135deg, #6c63ff, #5a54e3);
+        color: #fff;
+        border: none;
+    }
+
+    .button.is-link:hover {
+        background: linear-gradient(135deg, #5a54e3, #4c45d2);
+    }
+
+    .button.is-light {
+        background-color: #f0f0f0;
+        color: #363636;
+    }
+
+    .button.is-light:hover {
+        background-color: #e1e1e1;
+    }
+
+    #results {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        transition: all 0.2s ease-in-out;
+    }
+
+    #results .card {
+        flex: 1 1 25%;
+        min-width: 180px;
+    }
+
+    #results .card-content {
+        padding: 1rem;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        overflow-wrap: break-word;
+    }
+
+    #results .card-content .content {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+        align-items: center;
+        font-size: 1rem;
+        color: #34495e;
+        margin: 0.5rem 0;
+        padding: 0.5rem;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    #results.grid .card-content .content {
+        flex-direction: column;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    #results.grid {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    /* No results */
+    .no-results {
+        width: 100%;
+        text-align: center;
+        font-size: 1.3rem;
+        color: #7f8c8d;
+        padding: 2rem 0;
+        background-color: #fefefe;
+        border-radius: 12px;
+        border: 1px dashed #ccc;
+    }
+
+
+    /* Animations */
+    input,
+    select,
+    .button {
+        transition: all 0.2s ease;
+    }
+
+    input:hover,
+    select:hover {
+        border-color: #aaa;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .columns .column {
+            margin-bottom: 1.25rem;
+        }
+
+        .title {
+            font-size: 1.75rem;
+        }
+
+        .box {
+            padding: 2rem;
+        }
+    }
+
+    @keyframes change {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    }
+</style>
 
 <body>
     <section class="section">
@@ -41,50 +266,58 @@
             <h1 class="title has-text-centered">Filter page</h1>
             <div class="box">
                 <div class="columns is-multiline">
-                    <div class="column is-4">
+                    <div class="column">
                         <label class="label">Title</label>
                         <input id="title" class="input" type="text" placeholder="Find by title">
                     </div>
-                    <div class="column is-4">
+                    <div class="column">
                         <label class="label">Submitter</label>
                         <input id="submitter" class="input" type="text" placeholder="Find by submitter">
                     </div>
-                    <div class="column is-4">
+                    <div class="column">
                         <label class="label">Reviewer</label>
                         <input id="reviewer" class="input" type="text" placeholder="Find by reviewer">
                     </div>
-                    <div class="column is-3">
-                        <label class="label">Start date</label>
-                        <input id="startDate" class="input" type="date">
-                    </div>
-                    <div class="column is-3">
-                        <label class="label">End date</label>
-                        <input id="endDate" class="input" type="date">
-                    </div>
-                    <div class="column is-6">
+                    <div class="column">
                         <label class="label">State</label>
-                        <div class="select is-fullwidth">
+                        <div class="select">
                             <select id="state">
-                                <option value="">All</option>
-                                <option value="1">State 1</option>
-                                <option value="2">State 2</option>
-                                <option value="3">State 3</option>
+                                <option value="all">All</option>
                             </select>
                         </div>
                     </div>
-                    <div class="column is-12 has-text-centered">
+                    <div class="column">
+                        <label class="label">Start date</label>
+                        <input id="startDate" class="input" type="date">
+                    </div>
+                    <div class="column">
+                        <label class="label">End date</label>
+                        <input id="endDate" class="input" type="date">
+                    </div>
+                    <div class="column buttons">
                         <button id="applyFilter" class="button is-link">Apply filter</button>
+                        <button id="resetFilter" class="button is-light">Reset</button>
+                        <button id="export" class="button is-link">Export</button>
                         <button id="toggleView" class="button is-light ml-2">Grid/list</button>
                     </div>
                 </div>
             </div>
 
-            <div id="results" class="grid"></div>
-            <div id="pagination" class="has-text-centered mt-4"></div>
+            <div id="results-container"></div>
         </div>
     </section>
 
     <script>
+        const state = document.getElementById("state");
+        const userdata = JSON.parse(validateStr('<%= jsondata %>'));
+        const key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
+        let storedData = JSON.parse(localStorage.getItem(key));
+        for (const key in userdata.dynamic) {
+            const option = document.createElement("option");
+            option.value = key;
+            option.textContent = userdata.dynamic[key].name;
+            state.appendChild(option);
+        }
         const data = {
             "পর্দা": {
                 sd: 1741972773318,
@@ -134,94 +367,132 @@
             reviewer: document.getElementById("reviewer"),
             startDate: document.getElementById("startDate"),
             endDate: document.getElementById("endDate"),
-            results: document.getElementById("results"),
+            results: document.getElementById("results-container"),
             pagination: document.getElementById("pagination"),
             applyBtn: document.getElementById("applyFilter"),
-            viewBtn: document.getElementById("toggleView")
+            viewBtn: document.getElementById("toggleView"),
+            resetBtn: document.getElementById("resetFilter"),
+            exportBtn: document.getElementById("export")
         };
 
-        let filteredResults = [];
-        let currentPage = 1;
-        const itemsPerPage = 2;
         let isGrid = true;
-
+        let filteredResults = []
         refs.applyBtn.addEventListener("click", () => {
-            currentPage = 1;
             applyFilter();
         });
-
         refs.viewBtn.addEventListener("click", () => {
             isGrid = !isGrid;
             refs.results.className = isGrid ? "grid" : "list";
-            renderPaginatedResults();
+            renderPaginatedResults(filteredResults);
         });
-
+        refs.resetBtn.addEventListener("click", () => {
+            refs.title.value = "";
+            refs.submitter.value = "";
+            refs.reviewer.value = "";
+            refs.startDate.value = "";
+            refs.endDate.value = "";
+            state.value = "all";
+            renderPaginatedResults([]);
+        });
+        refs.exportBtn.addEventListener("click", () => {
+            downloadCSV(userdata.filteredResults);
+        });
         function applyFilter() {
             const keyword = refs.title.value.toLowerCase();
             const submitter = refs.submitter.value.toLowerCase();
             const reviewer = refs.reviewer.value.toLowerCase();
             const start = refs.startDate.value ? new Date(refs.startDate.value) : null;
             const end = refs.endDate.value ? new Date(refs.endDate.value) : null;
-            renderPaginatedResults();
+            const selectedState = state.value;
+            window.scrollTo(0, 0);
+            proxyFetch("filter", {
+                key: "<%= key %>",
+                title: keyword,
+                sub: submitter,
+                rev: reviewer,
+                sd: start ? start.toISOString() : "",
+                ed: end ? end.toISOString() : "",
+                stat: selectedState
+            }, (data) => {
+                if (data.message) {
+                    msg(data)
+                } else {
+                    filteredResults = data;
+                    renderPaginatedResults(data);
+                }
+            })
         }
+        function renderPaginatedResults(filteredResults = []) {
+            refs.results.innerHTML = "<h3>Total queries (" + filteredResults.length + ")</h3>";
+            //<div id='results' class='" + (isGrid ? "grid" : "list") + "'></div>
+            let results = document.createElement("div");
+            results.id = "results";
+            results.className = isGrid ? "grid" : "list";
+            refs.results.appendChild(results);
 
-        function renderPaginatedResults() {
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const paginatedData = filteredResults.slice(startIndex, startIndex + itemsPerPage);
-            refs.results.innerHTML = "";
-
-            if (paginatedData.length === 0) {
+            if (filteredResults.length === 0) {
                 refs.results.innerHTML = `<div class='no-results'>⚠️ no result</div>`;
-                refs.pagination.innerHTML = "";
-                return;
             }
-
-            paginatedData.forEach(([title, info]) => {
+            filteredResults.forEach(([title, info], i) => {
                 const card = document.createElement("div");
+                let condition = userdata?.jurries?.includes(storedData?.username) && (storedData?.username == info.rev) || !info.rev;
                 card.className = "card";
                 card.innerHTML = `
           <div class="card-content">
-            <p class="title is-5">${title}</p>
-            <p><strong>সম্পাদক:</strong> ${info.sub}</p>
-            <p><strong>রিভিউয়ার:</strong> ${info.rev}</p>
-            <p><strong>দৈর্ঘ্য:</strong> ${info.length}</p>
-            <p><strong>তারিখ:</strong> ${new Date(info.cd).toLocaleString()}</p>
+            <h3>${i + 1} | <a href="/${condition ? "judge" : "editathon"}?key=${"<%=key%>"}${condition ? `&user=${storedData?.username}&page=${encodeURIComponent(title)}` : ""}">${title}</a></h3>
+            <div class="content">
+            <span><i>Submitter:</i> <b>${info.sub}</b></span>
+            <span><i>Reviewer:</i> <b>${info.rev || "N/A"}</b></span>` +
+                    (Number(info.wc) > 0 ? `<span><i>Word count:</i> <b>${info.wc || 0}</b></span>` : "") +
+                    (Number(info.length) > 0 ? `<span><i>Byte count:</i> <b>${Number(info.length || 0).toLocaleString()}</b></span>` : "") +
+                    `<span><i>Subbmission Date:</i> <b>${new Date(info.sd).toLocaleString()}</b></span>
+            </div>
           </div>`;
-                refs.results.appendChild(card);
+                results.appendChild(card);
             });
-
-            renderPagination();
         }
+        function downloadCSV(jsonArray) {
+            const rows = [];
+            const headers = ['title', 'date', 'sub', 'rev', 'stat', 'length', 'sd'];
+            rows.push(headers.join(','));
 
-        function renderPagination() {
-            const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
-            if (totalPages <= 1) {
-                refs.pagination.innerHTML = "";
-                return;
+            for (const title in data) {
+                const row = data[title];
+                const values = [
+                    JSON.stringify(title),
+                    new Date(row.sd).toLocaleString(),
+                    JSON.stringify(row.sub),
+                    JSON.stringify(row.rev),
+                    JSON.stringify(row.stat),
+                    row.length,
+                ];
+                rows.push(values.join(','));
             }
 
-            refs.pagination.innerHTML = `
-        <button class="button is-small mr-2" ${currentPage === 1 ? "disabled" : ""} onclick="prevPage()">previous</button>
-        <span>page ${currentPage} / ${totalPages}</span>
-        <button class="button is-small ml-2" ${currentPage === totalPages ? "disabled" : ""} onclick="nextPage()">after</button>
-      `;
+            // UTF-8 BOM to ensure correct display in Excel and other editors
+            const BOM = '\uFEFF';
+            const csvData = BOM + rows.join('\n');
+            const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "-filter.csv";
+            a.click();
+            URL.revokeObjectURL(url);
         }
-
         window.prevPage = () => {
             if (currentPage > 1) {
                 currentPage--;
-                renderPaginatedResults();
+                renderPaginatedResults(filteredResults);
             }
         };
         window.nextPage = () => {
             const totalPages = Math.ceil(filteredResults.length / itemsPerPage);
             if (currentPage < totalPages) {
                 currentPage++;
-                renderPaginatedResults();
+                renderPaginatedResults(filteredResults);
             }
         };
-
-        applyFilter();
     </script>
 </body>
 

@@ -87,6 +87,7 @@ app.post("/dashboard", posts.dashboard);
 app.post("/delete", posts.delete);
 app.post("/submit", posts.submit);
 app.post("/judge", posts.judge);
+app.post("/filter", posts.filter);
 app.post("/remove", posts.remove);
 app.post("/comment", posts.comment);
 app.post("/get-rows", posts.getRows);
