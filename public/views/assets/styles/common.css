@@ -13,7 +13,6 @@ h1,
 h2,
 h3 {
     font-family: "bangla-bold", "anam", "Arial", sans-serif;
-    font-display: swap;
     font-weight: 700;
 }
 
@@ -21,7 +20,6 @@ p,
 div {
     font-size: 1rem;
     font-family: "bangla", "exo", "Arial", sans-serif;
-    font-display: swap;
 }
 
 div a {
@@ -48,38 +46,44 @@ footer {
 
 @font-face {
     font-family: "exo";
-    font-display: swap;
     src: url("../fonts/exo.ttf");
 }
 
 @font-face {
     font-family: "anam";
-    font-display: swap;
     src: url("../fonts/anm.ttf");
 }
 
 @font-face {
     font-family: "bangla-bold";
-    font-display: swap;
     src: url("../fonts/AnekBold.ttf");
 }
 
 @font-face {
     font-family: "bangla";
-    font-display: swap;
     src: url("../fonts/AnekSemiBold.ttf");
 }
 
 @font-face {
     font-family: "bangla-thin";
-    font-display: swap;
     src: url("../fonts/AnekLight.ttf");
 }
 
 @font-face {
     font-family: "bana";
-    font-display: swap;
     src: url("../fonts/AnekA.ttf");
+}
+
+i,
+em {
+    font-family: "bangla-thin", "exo", "Arial", sans-serif;
+    font-weight: 400;
+}
+
+b,
+strong {
+    font-family: "bangla-bold", "exo", "Arial", sans-serif;
+    font-weight: 700;
 }
 
 /* menu */
@@ -91,7 +95,6 @@ ul.menu {
     display: flex;
     justify-content: space-around;
     font-family: exo, 'Times New Roman', Times, serif;
-    font-display: swap;
     flex-direction: row;
     flex-wrap: wrap;
 }
@@ -104,6 +107,7 @@ ul.menu li {
 ul.menu a {
     color: #fff;
     text-decoration: none;
+    overflow: hidden;
 }
 
 ul.menu a:hover {
@@ -166,7 +170,6 @@ a {
     color: #fff;
     font-weight: 700;
     font-family: "bana", "exo", "Arial", sans-serif;
-    font-display: swap;
 }
 
 a:hover {

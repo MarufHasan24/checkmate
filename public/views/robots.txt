@@ -2,18 +2,17 @@
 User-agent: *
 Disallow: /admin/
 Disallow: /private/
-Disallow: /config.json
 
 # Prevent search engines from indexing login and user-specific pages
-Disallow: /login/
-Disallow: /user/
-Disallow: /judge/
-Disallow: /result/
+Disallow: /login
+Disallow: /user
+Disallow: /judge
+Disallow: /result
 
 # Allow indexing of general public pages
 Allow: /public/
 Allow: /editathon/
-Allow: /dashboard/
+Allow: /dashboard
 
 # Sitemap URL to help search engines find the pages they should index
 Sitemap: https://checkmate.toolforge.org/sitemap.xml

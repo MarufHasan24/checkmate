@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
   delete userdata?.trns;
   document.querySelector(".save").addEventListener("click", function () {
     inputs.forEach((e) => {
-      const key = e.dataset.properties.toLowerCase().replace(/\s+/g, "_");
+      const key = e?.dataset?.properties?.toLowerCase()?.replace(/\s+/g, "_");
       userdata[key] = e.value;
       //console.log(key, e.value);
     });
