@@ -42,6 +42,12 @@
                 </header>
 </head>
 <style>
+    h1,
+    h2 {
+        text-align: center;
+        width: 100%;
+    }
+
     /* General layout */
     .section {
         padding-top: 3rem;
@@ -168,15 +174,16 @@
     }
 
     #results .card {
-        flex: 1 1 25%;
+        flex: 1 1 22%;
         min-width: 180px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
     }
 
     #results .card-content {
         padding: 1rem;
         background-color: #ffffff;
         border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
         overflow-wrap: break-word;
     }
@@ -245,19 +252,6 @@
             padding: 2rem;
         }
     }
-
-    @keyframes change {
-        0% {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-    }
 </style>
 
 <body>
@@ -318,49 +312,6 @@
             option.textContent = userdata.dynamic[key].name;
             state.appendChild(option);
         }
-        const data = {
-            "পর্দা": {
-                sd: 1741972773318,
-                sub: "খাত্তাব হাসান",
-                rev: "রিভিউয়ার ১",
-                stat: "",
-                length: 4273,
-                cd: "2025-03-13T21:35:37Z"
-            },
-            "খালেদ মাশাল": {
-                sd: 1742366036857,
-                sub: "Md Mobashir Hossain",
-                rev: "রিভিউয়ার ২",
-                stat: "",
-                length: 3893,
-                cd: "2025-03-19T06:26:33Z"
-            },
-            "আল-হুর ইবনে ইয়াজিদ আল-তামিমি": {
-                sd: 1742446457487,
-                sub: "Md Mobashir Hossain",
-                rev: "রিভিউয়ার ১",
-                stat: "",
-                length: 5633,
-                cd: "2025-03-20T04:45:51Z"
-            },
-            "সালাহউদ্দিন আইউবি": {
-                sd: 1742446477777,
-                sub: "Md Mobashir Hossain",
-                rev: "রিভিউয়ার ২",
-                stat: "",
-                length: 4500,
-                cd: "2025-03-25T04:45:51Z"
-            },
-            "ইমাম আবু হানিফা": {
-                sd: 1742446499999,
-                sub: "খাত্তাব হাসান",
-                rev: "রিভিউয়ার ৩",
-                stat: "",
-                length: 6000,
-                cd: "2025-03-28T04:45:51Z"
-            }
-        };
-
         const refs = {
             title: document.getElementById("title"),
             submitter: document.getElementById("submitter"),
@@ -374,9 +325,8 @@
             resetBtn: document.getElementById("resetFilter"),
             exportBtn: document.getElementById("export")
         };
-
         let isGrid = true;
-        let filteredResults = []
+        let filteredResults = [];
         refs.applyBtn.addEventListener("click", () => {
             applyFilter();
         });
@@ -423,7 +373,7 @@
             })
         }
         function renderPaginatedResults(filteredResults = []) {
-            refs.results.innerHTML = "<h3>Total queries (" + filteredResults.length + ")</h3>";
+            refs.results.innerHTML = "<h2 style='width:100%;text align center;'>Total queries (" + filteredResults.length + ")</h2>";
             //<div id='results' class='" + (isGrid ? "grid" : "list") + "'></div>
             let results = document.createElement("div");
             results.id = "results";
@@ -439,10 +389,12 @@
                 card.className = "card";
                 card.innerHTML = `
           <div class="card-content">
-            <h3>${i + 1} | <a href="/${condition ? "judge" : "editathon"}?key=${"<%=key%>"}${condition ? `&user=${storedData?.username}&page=${encodeURIComponent(title)}` : ""}">${title}</a></h3>
+            <h3> <a href="/${condition ? "judge" : "editathon"}?key=${"<%=key%>"}${condition ? `&user=${storedData?.username}&page=${encodeURIComponent(title)}` : ""}">${title}</a></h3>
             <div class="content">
             <span><i>Submitter:</i> <b>${info.sub}</b></span>
-            <span><i>Reviewer:</i> <b>${info.rev || "N/A"}</b></span>` +
+            <span><i>Reviewer:</i> <b>${info.rev || "N/A"}</b></span>
+            <span><i>Status:</i> <b>${info.stat ? userdata?.dynamic[info.stat]?.name || "N/A" : "N/A"}</b></span>
+            ` +
                     (Number(info.wc) > 0 ? `<span><i>Word count:</i> <b>${info.wc || 0}</b></span>` : "") +
                     (Number(info.length) > 0 ? `<span><i>Byte count:</i> <b>${Number(info.length || 0).toLocaleString()}</b></span>` : "") +
                     `<span><i>Subbmission Date:</i> <b>${new Date(info.sd).toLocaleString()}</b></span>
