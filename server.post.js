@@ -608,7 +608,7 @@ module.exports = {
                                     ],
                                     place: "prepend",
                                   },
-                                  (err, edata) => {
+                                  (err) => {
                                     if (err) {
                                       state[e] = {
                                         result: "error",
@@ -945,7 +945,7 @@ module.exports = {
                 place: "append",
                 title: "user talk:" + req.body.submitter,
               },
-              (err, edata) => {
+              (err) => {
                 if (err) {
                   return res.status(200).send({
                     message: JSON.stringify(err, null, 2),
@@ -958,9 +958,7 @@ module.exports = {
                       console.error(klerr);
                     }
                     return res.status(200).send({
-                      message:
-                        "Message sent successfully. return body: <br>" +
-                        JSON.stringify(edata, null, 2),
+                      message: "Commented successfully!",
                       type: "success",
                       redirect: null,
                     });
@@ -1350,8 +1348,7 @@ module.exports = {
                                       req.body.reason
                                     ),
                                 },
-                                (err, data) => {
-                                  console.log(err, data);
+                                (err) => {
                                   if (err) {
                                     return res.status(200).send({
                                       message: JSON.stringify(err, null, 2),
@@ -1525,7 +1522,7 @@ module.exports = {
                   text: tableString,
                   place: "append",
                 },
-                (err, edata) => {
+                (err) => {
                   if (err) {
                     return res.status(200).send({
                       message: JSON.stringify(err, null, 2),
@@ -1540,7 +1537,7 @@ module.exports = {
                         text: judgeString,
                         place: "append",
                       },
-                      (err, edata) => {
+                      (err) => {
                         if (err) {
                           return res.status(200).send({
                             message: JSON.stringify(err, null, 2),
@@ -1555,7 +1552,7 @@ module.exports = {
                               text: detailes,
                               place: "append",
                             },
-                            (err, edata) => {
+                            (err) => {
                               if (err) {
                                 return res.status(200).send({
                                   message: JSON.stringify(err, null, 2),

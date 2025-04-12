@@ -763,16 +763,22 @@ module.exports = {
             });
           } else {
             if (user && !rdata.data.jurries.split(",").includes(user)) {
-              res.render("error.ejs", {
-                status: 403,
-                error:
-                  "You are not allowed to judge this page. Please contact the host.",
-                redirect: {
-                  url: "/editathon?key=" + key,
-                  name: "Editathon",
-                },
-                deletable: false,
-              });
+              if (req?.query?.page) {
+                res.redirect(
+                  "https://" +
+                    rdata.project +
+                    ".org/wiki/" +
+                    encodeURIComponent(req?.query?.page)
+                );
+              } else {
+                res.render("error.ejs", {
+                  status: 400,
+                  error:
+                    "You are not a judge. Please contact the Host or Co-Host.",
+                  redirect: null,
+                  deletable: false,
+                });
+              }
             } else {
               let pagelist = rdata.post.page_list;
               let list = Object.keys(pagelist);
