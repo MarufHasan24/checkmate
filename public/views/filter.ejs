@@ -385,11 +385,10 @@
             }
             filteredResults.forEach(([title, info], i) => {
                 const card = document.createElement("div");
-                let condition = userdata?.jurries?.includes(storedData?.username) && (storedData?.username == info.rev) || !info.rev;
                 card.className = "card";
                 card.innerHTML = `
           <div class="card-content">
-            <h3> <a href="/${condition ? "judge" : "editathon"}?key=${"<%=key%>"}${condition ? `&user=${storedData?.username}&page=${encodeURIComponent(title)}` : ""}">${title}</a></h3>
+            <h3> <a href="/judge?key=${"<%=key%>"}&judge=${storedData?.username}&page=${encodeURIComponent(title)}">${title}</a></h3>
             <div class="content">
             <span><i>Submitter:</i> <b>${info.sub}</b></span>
             <span><i>Reviewer:</i> <b>${info.rev || "N/A"}</b></span>

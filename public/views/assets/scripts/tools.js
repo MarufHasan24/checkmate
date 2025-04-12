@@ -213,7 +213,11 @@ const msg = function ({
       }
     }, 1000);
   };
-
+  document.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("popup")) {
+      removePopup();
+    }
+  });
   // Handle redirection with timer or button
   if (redirect) {
     if (typeof redirect.timer === "number" && redirect.timer > 0) {
