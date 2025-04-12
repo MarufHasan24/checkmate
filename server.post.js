@@ -1134,8 +1134,8 @@ module.exports = {
                   !reviewer ||
                   info.rev.toLowerCase().includes(reviewer.toLowerCase());
                 const dateMatch =
-                  (!startDate || new Date(info.sd) >= startDate) &&
-                  (!endDate || new Date(info.sd) <= endDate);
+                  (!startDate || info.sd >= new Date(startDate).getTime()) &&
+                  (!endDate || info.sd <= new Date(endDate).getTime());
                 const stateMatch =
                   !state || state === "all" || info.stat === state;
                 return (

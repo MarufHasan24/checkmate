@@ -1,4 +1,3 @@
-
 # Checkmate: A Visual Editor for Administering Competitions
 
 ## 📌 Project Overview
@@ -83,6 +82,8 @@ The application will be accessible at `http://localhost:8000` (or your configure
 │   ├── dashboard.ejs     # User dashboard
 │   ├── deletePage.ejs    # Page deletion UI
 │   ├── editathon.ejs     # Main Editathon page
+|   ├── editathon.log.ejs # Editathon log page
+│   ├── filter.ejs        # Filter submissions
 │   ├── error.ejs         # Error page
 │   ├── favicon.ico       # Site favicon
 │   ├── google*.html      # Google site verification
@@ -96,8 +97,6 @@ The application will be accessible at `http://localhost:8000` (or your configure
 │   ├── submit.ejs        # Submission page
 │   ├── template.ejs      # Base template
 │   ├── underConst.html   # Under construction page
-├── .gitignore            # Git ignore file
-├── config.json           # Configuration file (hidden for security)
 ├── package-lock.json     # Package lock file
 ├── package.json          # Project dependencies
 ├── server.get.js         # Handles GET requests
