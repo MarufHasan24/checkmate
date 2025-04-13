@@ -506,6 +506,9 @@
 
         const formatDate = (raw) => {
             const d = new Date(raw);
+            if (isNaN(d.getTime())) {
+                return "Unknown date";
+            }
             return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
         }
 
@@ -547,15 +550,23 @@
 <b>Last login:</b> ${new Date(data.lastModified).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}<br>
   <b>Groups:</b> ${data.user.groups.join(", ")}
 </div>`
-        if (data.data && data.data.length > 0) {
-            dashboard.innerHTML += `<div class="projects">
-  <div class="section-title"><i class="fa fa-folder-open"></i> Hosted Projects, Total: ${data.data.length}</div>
-  ${data.data.map(p => {
-                if (p?.project) {
-                    const lang = p.project.split('.')[0];
-                    const domain = p.project.split('.')[1];
-                    const icon = projects[domain] ? projects[domain].icon : "fas fa-globe";
-                    return `
+        // make total count of roles from data.data
+        const totalCount = Object.values(data.data).reduce((acc, p) => {
+            if (p?.role) {
+                return acc + p.role.length;
+            }
+            return acc;
+        }, 0);
+
+        dashboard.innerHTML += `<div class="projects">
+  <div class="section-title"><i class="fa fa-folder-open"></i> Total Projects, Total: ${totalCount}</div>
+  ${Object.entries(data.data).map(([key, value]) => {
+            let p = value;
+            if (p?.project) {
+                const lang = p.project.split('.')[0];
+                const domain = p.project.split('.')[1];
+                const icon = projects[domain] ? projects[domain].icon : "fas fa-globe";
+                return `
       <div class="project">
         <div class="left">
             <div class="project-flag">
@@ -563,28 +574,50 @@
             <span>${languageFlags[lang] ? languageFlags[lang].name : ""}</span>
           </div>
           <div class="project-info">
-            <div class="project-name">${p.name}</div>
-            <div class="project-meta">${formatDate(p.date)}</div>
-            <div class="key-box" onclick="navigator.clipboard.writeText('${p.key}')">Key: ${p.key}</div>
+            <div class="project-name">${p.title}</div>
+          ${p.role.map((r) => {
+                    return `<div class="type"><b style="text-transform: capitalize;">${r}</b> : ${formatDate(p[r])}</div>`;
+                }).join("")}
+            <div class="project-meta">
+              <span>${p.project}</span>
+            </div>
+            <div class="key-box" onclick="navigator.clipboard.writeText('${key}')">Key: ${key}</div>
             <div class="badge-type" onclick="window.open('https://${p.project}.org/', '_blank')">${projects[domain].label || "Unknown"}</div>
           </div>
         </div>
         <div class="project-actions">
           <i class="fa ${icon} icon"></i>
-          <button class="btn" onclick="window.open('/editathon?key=${p.key}', '_blank')">Visit</button>
+          <button class="btn" onclick="window.open('/editathon?key=${key}', '_blank')">Visit</button>
         </div>
       </div>
     `;
-                } else {
-                    return ``;
-                }
-            }).join("")}
+            } else {
+                return ` <div class="project">
+        <div class="left">
+            <div class="project-flag">
+          <img class="flag" src="${fallbackFlag}" />
+            <span>Unknown</span>
+          </div>
+          <div class="project-info">
+            <div class="project-name">${p.title || "Unknown"}</div>
+          ${p.role.map((r) => {
+                    return `<div class="type"><b style="text-transform: capitalize;">${r}</b> : ${formatDate(p[r])}</div>`;
+                }).join("")}
+            <div class="project-meta">
+              <span>Unknown</span>
+            </div>
+            <div class="key-box" onclick="navigator.clipboard.writeText('${key}')">Key: ${key}</div>
+          </div>
+        </div>
+        <div class="project-actions">
+          <i class="fa fas fa-globe icon"></i>
+          <button class="btn" onclick="window.open('/editathon?key=${key}', '_blank')">Visit</button>
+        </div>
+      </div>`;
+            }
+        }).join("")}
 </div>
 `;
-        } else {
-            dashboard.innerHTML += `<div class="projects">
-  <div class="section-title"><i class="fa fa-folder-open"></i> Hosted Projects</div>Nothing to show here.</div>`
-        }
         const categories = {
             "Basic Access": [
                 {

@@ -11,6 +11,7 @@ const {
   editathonTable,
   readUser,
   keepKeyLog,
+  updateUser,
 } = require("./public/lib/node.js");
 const {
   getinfo,
@@ -50,83 +51,87 @@ module.exports = {
         // Parse the template data from the file
         let tempdata = rawdata[template];
         // Create the final data object to be saved
-        let finaldata = JSON.stringify({
-          key: key,
-          date: date,
-          pass: password,
-          name: compname,
-          template: template,
-          project: project,
-        });
-        updateFileOwn(userdata.username, finaldata, (err) => {
-          if (err) {
-            //console.error(err);
-          } else {
-            // Write user data to a specific file
-            writeFile(
-              join(__dirname, "private", "db", "files", key + ".json"),
-              JSON.stringify({
-                key: key,
-                pass: password,
-                template: tempdata.file,
-                host: userdata.username,
-                date: date,
-                name: compname,
-                project: project,
-                data: {},
-                post: {},
-              }),
-              (err) => {
-                if (err) {
-                  //console.error(err);
-                } else {
-                  // Read the company list data from a JSON file
-                  readFile(
-                    join(__dirname, "private", "querylist.json"),
-                    (err, existingData) => {
-                      if (err) {
-                        //console.error(err);
-                      } else {
-                        // Parse the existing data
-                        // Parse the existing data from a JSON string into a JavaScript object
-                        const parsedData = existingData;
-                        parsedData.key[key] = {
-                          name: compname,
-                          host: userdata.username,
-                          date: date,
-                          project: project,
-                        };
-                        // Write the updated data back to the JSON file
-                        writeFile(
-                          join(__dirname, "private", "querylist.json"),
-                          JSON.stringify(parsedData),
-                          (err) => {
-                            if (err) {
-                              //console.error(err);
-                            } else {
-                              // Send a success response
-                              res.send({
-                                result: "Success",
-                                data: uriEncript({
-                                  key,
-                                  password,
-                                  template: tempdata,
-                                  expire: Date.now() + 20 * 60 * 1000,
-                                  name: compname,
-                                  project: project,
-                                }),
-                              });
+
+        updateFileOwn(
+          userdata.username,
+          {
+            key: key,
+            date: date,
+            title: compname,
+            project: project,
+            role: "host",
+          },
+          (err) => {
+            if (err) {
+              //console.error(err);
+            } else {
+              // Write user data to a specific file
+              writeFile(
+                join(__dirname, "private", "db", "files", key + ".json"),
+                JSON.stringify({
+                  key: key,
+                  pass: password,
+                  template: tempdata.file,
+                  host: userdata.username,
+                  date: date,
+                  name: compname,
+                  project: project,
+                  data: {},
+                  post: {},
+                }),
+                (err) => {
+                  if (err) {
+                    //console.error(err);
+                  } else {
+                    // Read the company list data from a JSON file
+                    readFile(
+                      join(__dirname, "private", "querylist.json"),
+                      (err, existingData) => {
+                        if (err) {
+                          //console.error(err);
+                        } else {
+                          // Parse the existing data
+                          // Parse the existing data from a JSON string into a JavaScript object
+                          const parsedData = existingData;
+                          parsedData.key[key] = {
+                            name: compname,
+                            host: userdata.username,
+                            date: date,
+                            project: project,
+                          };
+                          // Write the updated data back to the JSON file
+                          writeFile(
+                            join(__dirname, "private", "querylist.json"),
+                            JSON.stringify(parsedData),
+                            (err) => {
+                              if (err) {
+                                //console.error(err);
+                              } else {
+                                // Send a success response
+                                res.send({
+                                  result: "Success",
+                                  data: uriEncript({
+                                    key,
+                                    password,
+                                    template: tempdata,
+                                    expire: Date.now() + 20 * 60 * 1000,
+                                    name: compname,
+                                    project: project,
+                                    username: userdata.username,
+                                  }),
+                                });
+                              }
                             }
-                          }
-                        );
+                          );
+                        }
                       }
-                    }
-                  );
+                    );
+                  }
                 }
-              }
-            );
+              );
+            }
           }
-        });
+        );
       }
     });
   },
@@ -369,7 +374,7 @@ module.exports = {
     }
   },
   submit: function (req, res) {
-    let { body, devider, username, performer } = req.body;
+    let { body, devider, username, performer, key } = req.body;
     devider = devider || ";";
     username = username.replace(/\t/g, "");
     const renderArray = (str) => {
@@ -394,7 +399,7 @@ module.exports = {
       }
     };
     updateFile(
-      join(__dirname, "private", "db", "files", req.body.key + ".json"),
+      join(__dirname, "private", "db", "files", key + ".json"),
       (err, oldata, callback) => {
         if (err) {
           console.error(err);
@@ -439,275 +444,313 @@ module.exports = {
                   type: "error",
                 });
               } else {
-                function iloop(i, icallback) {
-                  if (i < body.length) {
-                    if (oldata.post.page_list) {
-                      let e = body[i];
-                      if (!oldata.post.page_list[e]) {
-                        let finalobj = {
-                          sd: Date.now(),
-                          sub: username,
-                          rev: "",
-                          stat: "",
-                        };
-                        if (
-                          wordcount || //wikitext page section + page info
-                          editcount || // user section edit
-                          lastcontrib || // user section last contributation date
-                          precondition || // same with word count + page info
-                          permission || // according to permit, page section + creatorLookOut
-                          creationdate // page section withg permission + creatorLookOut
-                        ) {
-                          getinfo(
-                            e,
-                            oldata.data.base_component,
-                            (err, data) => {
-                              if (err.length) {
-                                // Creating a circular reference
-                                err[0].self = err[0]; // Circular reference
-                                const beautifiedJSON =
-                                  removeCircularReferences(err);
-                                state[e] = {
-                                  result: "error",
-                                  time: Date.now(),
-                                  cause:
-                                    typeof err === "object"
-                                      ? beautifiedJSON
-                                      : err,
-                                };
-                              } else {
-                                let cause = [];
-                                if (
-                                  precondition.date_condition ||
-                                  precondition.wordlimit ||
-                                  precondition.byteLimit
-                                ) {
-                                  if (precondition.date_condition) {
-                                    const creationDate = new Date(
-                                      data.cdata.creation
-                                    );
-                                    const conditionDate = new Date(
-                                      precondition.date_condition
-                                    );
-                                    precondition.date_condition,
-                                      precondition.wordlimit;
-                                    if (
-                                      !isNaN(creationDate) &&
-                                      !isNaN(conditionDate)
-                                    ) {
-                                      if (
-                                        precondition.when === "after" &&
-                                        creationDate < conditionDate
-                                      ) {
-                                        cause.push(
-                                          `<b>${e} has been created on ${creationDate}. According to the editathon's rules, you can only submit pages created after ${conditionDate}.</b>`
-                                        );
-                                      } else if (
-                                        precondition.when === "before" &&
-                                        creationDate > conditionDate
-                                      ) {
-                                        cause.push(
-                                          `<b>${e} has been created on ${creationDate}. According to the editathon's rules, you can only submit pages created before ${conditionDate}.</b>`
-                                        );
-                                      }
-                                    } else {
-                                      cause.push(
-                                        `<b>Invalid date detected. Please check the data.</b>`
-                                      );
-                                    }
-                                  }
-                                  if (precondition.wordlimit > 0) {
-                                    if (
-                                      data.pdata.wordcount <
-                                      precondition.wordlimit
-                                    ) {
-                                      cause.push(
-                                        `<b>${e} has only ${data.pdata.wordcount} words. According to the editathon's rules, a submission must have at least ${precondition.wordlimit} words.</b>`
-                                      );
-                                    }
-                                  }
-                                  if (precondition.byteLimit > 0) {
-                                    if (
-                                      data.cdata.length < precondition.byteLimit
-                                    ) {
-                                      cause.push(
-                                        `<b>${e} is only ${data.cdata.length} bytes. According to the editathon's rules, a submission must have at least ${precondition.byteLimit} bytes.</b>`
-                                      );
-                                    }
-                                  }
-                                }
-                                if (
-                                  permission == "only creator" &&
-                                  data.cdata.creator !== username
-                                ) {
-                                  cause.push(
-                                    `<b>${
-                                      data.cdata.creator
-                                    } has created ${e} in${new Date(
-                                      data.cdata.creation
-                                    )}. According to the editathon's rules you can only submit pages you have created!</b> `
-                                  );
-                                } else if (
-                                  permission == "anyone but creator" &&
-                                  data.cdata.creator == username
-                                ) {
-                                  cause.push(
-                                    `You has created <b>${e}</b> in ${new Date(
-                                      data.cdata.creation
-                                    ).toDateString()}. According to the editathon's Rules you can only submit pages, that you have not created!`
-                                  );
-                                }
-                                if (cause.length > 0) {
-                                  state[e] = {
-                                    result: "info",
-                                    time: Date.now(),
-                                    cause: cause.join("<br>"),
-                                    data: data,
-                                  };
-                                } else {
-                                  state[e] = {
-                                    result: "success",
-                                    time: Date.now(),
-                                    cause: `<b>${e}</b> has been submited successfully`,
-                                    data: data,
-                                  };
-                                  creationdate
-                                    ? (finalobj["cd"] = data.cdata.creation)
-                                    : null;
-                                  editcount
-                                    ? (finalobj["ec"] = data.udata.editcount)
-                                    : null;
-                                  wordcount
-                                    ? (finalobj["wc"] = data.pdata.wordcount)
-                                    : null;
-                                  precondition.byteLimit > 0
-                                    ? (finalobj.length = data.cdata.length)
-                                    : null;
-                                  oldata.post.page_list[e] = finalobj;
-                                  pagecount++;
-                                }
-                              }
-                              if (state[e].result == "success") {
-                                let talkpage = "";
-                                if (e.includes(":")) {
-                                  let Array = e.split(":");
-                                  Array[0] = Array[0].length
-                                    ? Array[0] + " talk"
-                                    : "Talk";
-                                  talkpage = Array.join(":");
-                                } else {
-                                  talkpage = "Talk:" + e;
-                                }
-                                editPage(
-                                  udata.user.oauth,
-                                  oldata.project,
-                                  {
-                                    title: talkpage,
-                                    text: oldata.data[
-                                      "windowinp-input16-text1"
-                                    ],
-                                    place: "prepend",
-                                  },
-                                  (err) => {
-                                    if (err) {
+                updateUser(
+                  join(
+                    __dirname,
+                    "private",
+                    "user",
+                    "usr-" + encodeURIComponent(username) + ".json"
+                  ),
+                  key,
+                  {
+                    role: "participent",
+                    project: oldata.project,
+                    title: oldata.name,
+                  },
+                  (callback) => {
+                    if (callback) {
+                      return res.status(200).send({
+                        message: JSON.stringify(callback, null, 2),
+                        type: "error",
+                      });
+                    } else {
+                      function iloop(i, icallback) {
+                        if (i < body.length) {
+                          if (oldata.post.page_list) {
+                            let e = body[i];
+                            if (!oldata.post.page_list[e]) {
+                              let finalobj = {
+                                sd: Date.now(),
+                                sub: username,
+                                rev: "",
+                                stat: "",
+                              };
+                              if (
+                                wordcount || //wikitext page section + page info
+                                editcount || // user section edit
+                                lastcontrib || // user section last contributation date
+                                precondition || // same with word count + page info
+                                permission || // according to permit, page section + creatorLookOut
+                                creationdate // page section withg permission + creatorLookOut
+                              ) {
+                                getinfo(
+                                  e,
+                                  oldata.data.base_component,
+                                  (err, data) => {
+                                    if (err.length) {
+                                      // Creating a circular reference
+                                      err[0].self = err[0]; // Circular reference
+                                      const beautifiedJSON =
+                                        removeCircularReferences(err);
                                       state[e] = {
                                         result: "error",
                                         time: Date.now(),
-                                        cause: JSON.stringify(err, null, 2),
+                                        cause:
+                                          typeof err === "object"
+                                            ? beautifiedJSON
+                                            : err,
                                       };
+                                    } else {
+                                      let cause = [];
+                                      if (
+                                        precondition.date_condition ||
+                                        precondition.wordlimit ||
+                                        precondition.byteLimit
+                                      ) {
+                                        if (precondition.date_condition) {
+                                          const creationDate = new Date(
+                                            data.cdata.creation
+                                          );
+                                          const conditionDate = new Date(
+                                            precondition.date_condition
+                                          );
+                                          precondition.date_condition,
+                                            precondition.wordlimit;
+                                          if (
+                                            !isNaN(creationDate) &&
+                                            !isNaN(conditionDate)
+                                          ) {
+                                            if (
+                                              precondition.when === "after" &&
+                                              creationDate < conditionDate
+                                            ) {
+                                              cause.push(
+                                                `<b>${e} has been created on ${creationDate}. According to the editathon's rules, you can only submit pages created after ${conditionDate}.</b>`
+                                              );
+                                            } else if (
+                                              precondition.when === "before" &&
+                                              creationDate > conditionDate
+                                            ) {
+                                              cause.push(
+                                                `<b>${e} has been created on ${creationDate}. According to the editathon's rules, you can only submit pages created before ${conditionDate}.</b>`
+                                              );
+                                            }
+                                          } else {
+                                            cause.push(
+                                              `<b>Invalid date detected. Please check the data.</b>`
+                                            );
+                                          }
+                                        }
+                                        if (precondition.wordlimit > 0) {
+                                          if (
+                                            data.pdata.wordcount <
+                                            precondition.wordlimit
+                                          ) {
+                                            cause.push(
+                                              `<b>${e} has only ${data.pdata.wordcount} words. According to the editathon's rules, a submission must have at least ${precondition.wordlimit} words.</b>`
+                                            );
+                                          }
+                                        }
+                                        if (precondition.byteLimit > 0) {
+                                          if (
+                                            data.cdata.length <
+                                            precondition.byteLimit
+                                          ) {
+                                            cause.push(
+                                              `<b>${e} is only ${data.cdata.length} bytes. According to the editathon's rules, a submission must have at least ${precondition.byteLimit} bytes.</b>`
+                                            );
+                                          }
+                                        }
+                                      }
+                                      if (
+                                        permission == "only creator" &&
+                                        data.cdata.creator !== username
+                                      ) {
+                                        cause.push(
+                                          `<b>${
+                                            data.cdata.creator
+                                          } has created ${e} in${new Date(
+                                            data.cdata.creation
+                                          )}. According to the editathon's rules you can only submit pages you have created!</b> `
+                                        );
+                                      } else if (
+                                        permission == "anyone but creator" &&
+                                        data.cdata.creator == username
+                                      ) {
+                                        cause.push(
+                                          `You has created <b>${e}</b> in ${new Date(
+                                            data.cdata.creation
+                                          ).toDateString()}. According to the editathon's Rules you can only submit pages, that you have not created!`
+                                        );
+                                      }
+                                      if (cause.length > 0) {
+                                        state[e] = {
+                                          result: "info",
+                                          time: Date.now(),
+                                          cause: cause.join("<br>"),
+                                          data: data,
+                                        };
+                                      } else {
+                                        state[e] = {
+                                          result: "success",
+                                          time: Date.now(),
+                                          cause: `<b>${e}</b> has been submited successfully`,
+                                          data: data,
+                                        };
+                                        creationdate
+                                          ? (finalobj["cd"] =
+                                              data.cdata.creation)
+                                          : null;
+                                        editcount
+                                          ? (finalobj["ec"] =
+                                              data.udata.editcount)
+                                          : null;
+                                        wordcount
+                                          ? (finalobj["wc"] =
+                                              data.pdata.wordcount)
+                                          : null;
+                                        precondition.byteLimit > 0
+                                          ? (finalobj.length =
+                                              data.cdata.length)
+                                          : null;
+                                        oldata.post.usercount.includes(username)
+                                          ? null
+                                          : oldata.post.usercount.push(
+                                              username
+                                            );
+                                        oldata.post.page_list[e] = finalobj;
+                                        pagecount++;
+                                      }
+                                    }
+                                    if (state[e].result == "success") {
+                                      let talkpage = "";
+                                      if (e.includes(":")) {
+                                        let Array = e.split(":");
+                                        Array[0] = Array[0].length
+                                          ? Array[0] + " talk"
+                                          : "Talk";
+                                        talkpage = Array.join(":");
+                                      } else {
+                                        talkpage = "Talk:" + e;
+                                      }
+                                      editPage(
+                                        udata.user.oauth,
+                                        oldata.project,
+                                        {
+                                          title: talkpage,
+                                          text: oldata.data[
+                                            "windowinp-input16-text1"
+                                          ],
+                                          place: "prepend",
+                                        },
+                                        (err) => {
+                                          if (err) {
+                                            state[e] = {
+                                              result: "error",
+                                              time: Date.now(),
+                                              cause: JSON.stringify(
+                                                err,
+                                                null,
+                                                2
+                                              ),
+                                            };
+                                          } else {
+                                            i++;
+                                            iloop(i, icallback);
+                                          }
+                                        }
+                                      );
                                     } else {
                                       i++;
                                       iloop(i, icallback);
                                     }
+                                  },
+                                  {
+                                    wordcount,
+                                    editcount,
+                                    lastcontrib,
+                                    precondition,
+                                    permission,
+                                    creationdate,
+                                    username,
                                   }
                                 );
                               } else {
+                                state[e] = {
+                                  result: "success",
+                                  time: Date.now(),
+                                  cause: `<b>${e}</b> has been submited successfully`,
+                                };
+                                oldata.post.usercount.includes(username)
+                                  ? null
+                                  : oldata.post.usercount.push(username);
+                                oldata.post.page_list[e] = finalobj;
+                                pagecount++;
                                 i++;
                                 iloop(i, icallback);
                               }
-                            },
-                            {
-                              wordcount,
-                              editcount,
-                              lastcontrib,
-                              precondition,
-                              permission,
-                              creationdate,
-                              username,
+                            } else {
+                              state[e] = {
+                                result: "warn",
+                                time: Date.now(),
+                                cause: `<b>${e}</b> has been submited by User:${oldata.post.page_list[e].sub} already.`,
+                              };
+                              i++;
+                              iloop(i, icallback);
                             }
-                          );
-                        } else {
-                          state[e] = {
-                            result: "success",
-                            time: Date.now(),
-                            cause: `<b>${e}</b> has been submited successfully`,
-                          };
-                          oldata.post.usercount.includes(username)
-                            ? null
-                            : oldata.post.usercount.push(username);
-                          oldata.post.page_list[e] = finalobj;
-                          pagecount++;
-                          i++;
-                          iloop(i, icallback);
-                        }
-                      } else {
-                        state[e] = {
-                          result: "warn",
-                          time: Date.now(),
-                          cause: `<b>${e}</b> has been submited by User:${oldata.post.page_list[e].sub} already.`,
-                        };
-                        i++;
-                        iloop(i, icallback);
-                      }
-                    }
-                  } else {
-                    oldata.post.pagecount = pagecount;
-                    icallback(oldata, { key: req.body.key, state });
-                  }
-                }
-                iloop(i, (oldata, data) => {
-                  callback(oldata, (err) => {
-                    if (err) {
-                      return res.status(200).send({
-                        message: JSON.stringify(err, null, 2),
-                        type: "error",
-                      });
-                    } else {
-                      // filter satate object in warn, info, error and success catagories
-                      let error = Object.values(data.state).filter(
-                        (e) => e.result == "error"
-                      );
-                      let info = Object.values(data.state).filter(
-                        (e) => e.result == "info"
-                      );
-                      let warn = Object.values(data.state).filter(
-                        (e) => e.result == "warn"
-                      );
-                      let success = Object.values(data.state).filter(
-                        (e) => e.result == "success"
-                      );
-                      let lgobj = {};
-                      error.length ? (lgobj.error = error) : null;
-                      info.length ? (lgobj.info = info.length) : null;
-                      warn.length ? (lgobj.warn = warn.length) : null;
-                      success.length ? (lgobj.success = success.length) : null;
-                      keepKeyLog(
-                        data.key,
-                        username,
-                        "submit",
-                        (klerr) => {
-                          if (klerr) {
-                            console.error(klerr);
                           }
-                          return res.status(200).send(data);
-                        },
-                        {
-                          data: lgobj,
+                        } else {
+                          oldata.post.pagecount = pagecount;
+                          icallback(oldata, { key: req.body.key, state });
                         }
-                      );
+                      }
+                      iloop(i, (oldata, data) => {
+                        callback(oldata, (err) => {
+                          if (err) {
+                            return res.status(200).send({
+                              message: JSON.stringify(err, null, 2),
+                              type: "error",
+                            });
+                          } else {
+                            let lgobj = {};
+                            let error = Object.values(data.state).filter(
+                              (e) => e.result == "error"
+                            );
+                            let info = Object.values(data.state).filter(
+                              (e) => e.result == "info"
+                            );
+                            let warn = Object.values(data.state).filter(
+                              (e) => e.result == "warn"
+                            );
+                            let success = Object.values(data.state).filter(
+                              (e) => e.result == "success"
+                            );
+                            error.length ? (lgobj.error = error) : null;
+                            info.length ? (lgobj.info = info.length) : null;
+                            warn.length ? (lgobj.warn = warn.length) : null;
+                            success.length
+                              ? (lgobj.success = success.length)
+                              : null;
+                            keepKeyLog(
+                              data.key,
+                              username,
+                              "submit",
+                              (klerr) => {
+                                if (klerr) {
+                                  console.error(klerr);
+                                }
+                                return res.status(200).send(data);
+                              },
+                              {
+                                data: lgobj,
+                              }
+                            );
+                          }
+                        });
+                      });
                     }
-                  });
-                });
+                  }
+                );
               }
             }
           );
