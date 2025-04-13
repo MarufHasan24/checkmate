@@ -23,15 +23,27 @@ const templatekey = Buffer.from(
  * @param {string} data - The data to be written to the file.
  * @param {function} callback - The callback function to be called after the operation is complete.
  */
-function writeFileOwn(filePath, user, callback) {
+function writeFileOwn(filePath, user, callback, Data = {}) {
   let date = new Date().toISOString();
   // File does not exist, create it with primary data
   const primaryData = {
     createdAt: date, // Timestamp for when the file was created
     user: user, // User who created the file
-    data: [], // Array to store data
+    data: {}, // Array to store data
+    status: {
+      active: true, // Status indicating if the file is active
+      blocked: [],
+    }, // Status of the file
     lastModified: date, // Timestamp for when the file was last modified
   };
+  if (Data) {
+    primaryData.data[Data.key] = {
+      role: [Data.userData.role],
+      project: Data.userData.project,
+      title: Data.userData.title,
+      [Data.userData.role]: date,
+    }; // Add the provided data to the primary data
+  }
   fs.writeFile(filePath, JSON.stringify(primaryData), (err) => {
     if (err) {
       console.error(err); // Log any errors
@@ -71,12 +83,17 @@ function updateFileOwn(username, data, callback) {
               } else {
                 const parsedData = JSON.parse(existingData); // Parse the existing data
                 parsedData.lastModified = date;
-                parsedData.data.push(JSON.parse(data)); // Add the provided data to the existing data
+                parsedData.data[data.key] = {
+                  role: [data.role],
+                  project: data.project,
+                  title: data.title,
+                  [data.role]: date,
+                };
                 fs.writeFile(filePath, JSON.stringify(parsedData), (err) => {
                   if (err) {
                     callback(err); // Log any errors
                   } else {
-                    callback(); // Call the callback function if successful
+                    callback(null); // Call the callback function if successful
                   }
                 });
               }
@@ -84,7 +101,7 @@ function updateFileOwn(username, data, callback) {
           }
         },
         {
-          ...JSON.parse(data),
+          ...data,
           ...stats,
         }
       );
@@ -780,6 +797,71 @@ function readDirectoryThenFiles(directory, callback, readall = true) {
     }
   });
 }
+function updateUser(path, key, userData, callback) {
+  let filePath = path;
+  let date = new Date().toISOString();
+  fs.stat(filePath, (err, stats) => {
+    if (err) {
+      // File doesn't exist, create new
+      writeFileOwn(
+        filePath,
+        {},
+        (err) => {
+          if (err) return callback(err);
+          return callback(null);
+        },
+        { userData, key }
+      );
+    } else {
+      fs.readFile(filePath, "utf8", (err, fileContent) => {
+        if (err) return callback(err);
+        let parsedData;
+        try {
+          parsedData = JSON.parse(fileContent);
+          // Parse nested stringified JSON (if needed)
+          if (typeof parsedData.user === "string") {
+            parsedData.user = JSON.parse(parsedData.user);
+          }
+          parsedData.data = parsedData.data || {};
+          // Check if already a participant
+          if (
+            parsedData?.data[key] &&
+            parsedData?.data[key].role?.includes(userData.role) // check spelling!
+          ) {
+            return callback(null); // already participant, no update
+          }
+          // If user exists, update role and participation
+          if (parsedData.data[key]) {
+            parsedData.data[key].role = parsedData.data[key].role || [];
+            parsedData.data[key].project = userData.project;
+            parsedData.data[key].title = userData.title;
+            parsedData.data[key].role.push(userData.role);
+            parsedData.data[key][userData.role] = date;
+          } else {
+            // New user entry
+            parsedData.data[key] = {
+              role: [userData.role],
+              project: userData.project,
+              title: userData.title,
+              [userData.role]: date,
+            };
+          }
+          fs.writeFile(
+            filePath,
+            JSON.stringify(parsedData),
+            "utf8",
+            (writeErr) => {
+              if (writeErr) return callback(writeErr);
+              return callback(null);
+            }
+          );
+        } catch (parseErr) {
+          return callback(parseErr);
+        }
+      });
+    }
+  });
+}
 module.exports = {
   writeFileOwn,
   updateFileOwn,
@@ -798,4 +880,5 @@ module.exports = {
   stat: fs.stat,
   join,
   keepKeyLog,
+  updateUser,
 };
