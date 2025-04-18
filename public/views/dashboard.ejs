@@ -138,7 +138,7 @@
                                             document.getElementById('countdown').onload = function () {
                                                 // Access the countdown function inside the iframe's content window
                                                 this.contentWindow.countdown(
-                                                    Date.parse('<%=data.end_date%>' + ' ' + '<%=data.end_time%>'), Date.parse('<%=data.start_date%>' + ' ' + '<%=data.start_time%>')
+                                                    Date.parse('<%=data.end_date%>T<%=data.end_time%>:00Z'), Date.parse('<%=data.start_date%>T<%=data.start_time%>:00Z')
                                                     , window.transObj.lebel.counts);
                                             };
                                         </script>

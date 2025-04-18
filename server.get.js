@@ -190,7 +190,7 @@ module.exports = {
                   (req.session?.callback ? "/" + req.session.callback : ""),
                 (lerr) => {
                   if (lerr) {
-                    //console.error(lerr);
+                    console.error(lerr);
                   }
                   updateFile(filePath, (err, data, callback) => {
                     if (err) {

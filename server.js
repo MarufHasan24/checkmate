@@ -1,6 +1,7 @@
 // Import dependencies
 const express = require("express");
 const session = require("express-session");
+const { join } = require("path");
 require("dotenv").config();
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
@@ -14,16 +15,26 @@ const CONFIG = {
 const app = express();
 const PORT = parseInt(process.env.PORT, 10) || 8000; // IMPORTANT!!
 const crypto = require("crypto");
-const gets = require("./server.get.js");
-const posts = require("./server.post.js");
+const gets = require(join(__dirname, "server.get.js"));
+const posts = require(join(__dirname, "server.post.js"));
 
 // Build express app
 app.set("views", __dirname + "/public/views");
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public/views"));
+app.use(express.json());
+app.use(
+  session({
+    secret: crypto
+      .createHash(CONFIG.algorithm)
+      .update(CONFIG.key)
+      .digest("base64"),
+    saveUninitialized: false, // Only save sessions when necessary
+    resave: false, // Avoid resaving unchanged sessions
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser(CONFIG.key.split(".").join(CONFIG.algorithm)));
 passport.use(
@@ -49,16 +60,6 @@ passport.serializeUser(function (user, done) {
 passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
-app.use(
-  session({
-    secret: crypto
-      .createHash(CONFIG.algorithm)
-      .update(CONFIG.key)
-      .digest("base64"),
-    saveUninitialized: false, // Only save sessions when necessary
-    resave: false, // Avoid resaving unchanged sessions
-  })
-);
 // redirect all the get requests get routes
 app.get("/", gets.index);
 app.get("/login", gets.login);
@@ -77,9 +78,9 @@ app.get("/admin", gets.admin.index);
 app.get("/admin/log", gets.admin.log);
 app.get("/admin/permit", gets.admin.permit);
 app.get("/user", gets.user);
-app.get("/create", gets.create);
+/* app.get("/create", gets.create);
 app.get("/translate", gets.translate);
-app.get("/tools", gets.tools);
+app.get("/tools", gets.tools); */
 app.get("/filter", gets.filter);
 // redirect all the post requests post routes
 app.post("/template", posts.template);
