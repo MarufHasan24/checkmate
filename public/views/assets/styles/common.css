@@ -44,6 +44,14 @@ footer {
     width: calc(100% -10px);
 }
 
+input[disabled] {
+    background-color: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+    border: 1px solid #ccc !important;
+    box-shadow: none;
+}
+
 @font-face {
     font-family: "exo";
     src: url("../fonts/exo.ttf");

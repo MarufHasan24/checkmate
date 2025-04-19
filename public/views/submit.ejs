@@ -37,6 +37,7 @@
     <% if(data) { %>
         <script>
             const userdata = JSON.parse(validateStr('<%=jsondata%>'));
+            console.log(userdata);
         </script>
         <% } %>
             <% if(key) { %>
@@ -48,7 +49,7 @@
                         </div>
                         <div>
                             <label for="Submitter">Submitter</label>
-                            <input type="text" id="Submitter" value="">
+                            <input type="text" id="Submitter" value="" disabled>
                         </div>
                         <div>
                             <label for="limit">Limit</label>
@@ -102,12 +103,18 @@
         const loadCont = document.getElementById("loader-container");
         const estime = document.getElementById("estime");
         loader.style.width = "0%";
-
         let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
         let data = JSON.parse(localStorage.getItem(key));
         let namespaces = userdata?.allowed_namespaces?.split(",").join("|") || "*";
         if ((data && data.username) || user) {
-            Submitter.value = (data?.username) || user;
+            let username = data?.username || user;
+            Submitter.value = username;
+            console.log(userdata?.jurries.split(","), (username))
+            if (userdata?.jurries.split(",")?.includes(username)) {
+                Submitter.disabled = false;
+            } else {
+                Submitter.disabled = true;
+            }
             submitbtn.addEventListener("click", (e) => {
                 e.preventDefault();
                 //console.log(JSON.stringify({ body: value.value, key: '<%=key%>' }));
