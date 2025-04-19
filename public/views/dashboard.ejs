@@ -159,12 +159,12 @@
                                             </div> -->
                                             <div class="card small">
                                                 <h2>
-                                                    <%=Object.keys(data.jurries_list).length%>
+                                                    <%=data.jurries.split(",").length%>
                                                 </h2>
                                                 <p>Total Jurries. Page/Jurries have to review is about :
                                                     <b>
                                                         <%=Math.ceil((Number(data.pagecount) - Number(data.reviewed))
-                                                            /Object.keys(data.jurries_list).length)%>
+                                                            /data.jurries.split(",").length)%>
                                                     </b>
                                                 </p>
                                             </div>
@@ -182,7 +182,10 @@
                                             </div>
                                             <div class="card big">
                                                 <h3>Jurries review count</h3>
+                                                <h4>Current Jurries</h4>
                                                 <ul id="reviewCount"></ul>
+                                                <h4>Ex jurries</h4>
+                                                <ul id="reviewCountex"></ul>
                                             </div>
                                             <!-- Group 0: Basic -->
                                             <div class="card medium">
@@ -307,9 +310,14 @@
                                                 </p>
                                             </div>
                                             <script>
-                                                document.getElementById("reviewCount").innerHTML = (Object.entries(userdata.jurries_list).map(e => {
-                                                    return `<li><a target='_blank' href='https://${userdata.base_component}.org/wiki/user:${e[0]}' title='User:${e[0]}'>${e[0]} : ${Object.keys(e[1]).length}</a></li>`
-                                                }).join(""));
+                                                let currentJurries = userdata.jurries.split(",");
+                                                Object.entries(userdata.jurries_list).forEach(e => {
+                                                    if (currentJurries.includes(e[0])) {
+                                                        document.getElementById("reviewCount").innerHTML += `<li><a target='_blank' href='https://${userdata.base_component}.org/wiki/user:${e[0]}' title='User:${e[0]}'>${e[0]} : ${Object.keys(e[1]).length}</a></li>`
+                                                    } else {
+                                                        document.getElementById("reviewCountex").innerHTML += `<li><a target='_blank' href='https://${userdata.base_component}.org/wiki/user:${e[0]}' title='User:${e[0]}'>${e[0]} : ${Object.keys(e[1]).length}</a></li>`
+                                                    }
+                                                })
                                             </script>
                                         </div>
                                         <div class="savecancle">

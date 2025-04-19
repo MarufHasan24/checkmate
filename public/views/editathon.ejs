@@ -283,7 +283,7 @@
                             </div>
                             <div class="card medium">
                                 <h2 class="value">
-                                    <%= Object.keys(data.jurries_list).length %>
+                                    <%= data.jurries.split(",").length %>
                                 </h2>
                                 <p class="label">
                                     <%=trns.lebel["Total Jurries"]%>
@@ -291,7 +291,7 @@
                                             <%= trns.lebel["Pages per Jurry"] %>:
                                                 <strong>
                                                     <%= (Math.ceil((Number(data.pagecount) - Number(data.reviewed)) /
-                                                        Object.keys(data.jurries_list).length)).toString().split("").map(e=>
+                                                        data.jurries.split(",").length)).toString().split("").map(e=>
                                                         (trns.lebel.counts[e]||e)).join("") %>
                                                 </strong>
                                         </span>
