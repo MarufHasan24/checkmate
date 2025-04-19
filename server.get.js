@@ -125,7 +125,7 @@ module.exports = {
     res.redirect(req.baseUrl + "/oauth-callback");
   },
   oauth: function (req, res, next) {
-    passport.authenticate("mediawiki", function (err, usr) {
+    /* passport.authenticate("mediawiki", function (err, usr) {
       if (err) {
         return next(err);
       }
@@ -140,7 +140,7 @@ module.exports = {
           let temp = usr._json;
           delete usr._json;
           let user = { ...temp, ...usr };
-          /* Start 
+          /* Start  */
     let usr = require("./private/data.json");
     delete usr._raw;
     let temp = { ...usr._json };
@@ -231,9 +231,9 @@ module.exports = {
               );
             }
           });
-        }
+        /* }
       });
-    })(req, res, next);
+    })(req, res, next); */
   },
   template: function (req, res) {
     if (req.query && req.query.data) {
