@@ -13,6 +13,7 @@ Disallow: /result
 Allow: /public/
 Allow: /editathon/
 Allow: /dashboard
+Allow: /submit
 
 # Sitemap URL to help search engines find the pages they should index
 Sitemap: https://checkmate.toolforge.org/sitemap.xml

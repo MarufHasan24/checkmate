@@ -92,6 +92,44 @@ function updateFileOwn(username, data, callback) {
   });
 }
 /**
+ * Reads the contents of a file.
+ *
+ * @param {string} path - The path to the file.
+ * @param {function} callback - The callback function to be called after the operation is complete.
+ */
+function readFile(path, callback) {
+  fs.readFile(path, "utf8", (err, data) => {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null, JSON.parse(data));
+    }
+  });
+}
+/**
+ * Writes data to a file.
+ *
+ * @param {string} path - The path to the file.
+ * @param {string} data - The data to be written to the file.
+ * @param {function} callback - The callback function to be called after the operation is complete.
+ */
+function writeFile(path, data, callback) {
+  fs.writeFile(
+    path,
+    data,
+    {
+      flag: "w+",
+    },
+    (err) => {
+      if (err) {
+        callback(err);
+      } else {
+        callback(null);
+      }
+    }
+  );
+}
+/**
  * Updates an existing file with the provided data.
  *
  * @param {string} path - The path to the file.
@@ -124,85 +162,6 @@ function updateFile(path, callback, newPath) {
       });
     }
   });
-}
-/**
- * Reads the contents of a file.
- *
- * @param {string} path - The path to the file.
- * @param {function} callback - The callback function to be called after the operation is complete.
- */
-function readFile(path, callback) {
-  fs.readFile(path, "utf8", (err, data) => {
-    if (err) {
-      callback(err);
-    } else {
-      callback(null, JSON.parse(data));
-    }
-  });
-}
-/**
- * Reads a user's JSON file and ensures that any nested JSON string in `user` is correctly parsed.
- * If `user` is found to be a string, it is parsed again and the file is updated.
- *
- * @param {string} user - The username whose data file is to be read.
- * @param {function} callback - The callback function to return the parsed data or an error.
- */
-function readUser(path, callback) {
-  let filePath = path;
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) {
-      return callback(err);
-    } else {
-      let parsedData;
-      try {
-        parsedData = JSON.parse(data);
-        // Check if parsedData.user is a string and needs to be parsed again
-        if (typeof parsedData.user === "string") {
-          console.log(parsedData.user);
-          parsedData.user = JSON.parse(parsedData.user);
-          fs.writeFile(
-            filePath,
-            JSON.stringify(parsedData),
-            "utf8",
-            (writeErr) => {
-              if (writeErr) {
-                return callback(writeErr);
-              } else {
-                callback(null, parsedData);
-              }
-            }
-          );
-        } else {
-          callback(null, parsedData);
-        }
-      } catch (parseErr) {
-        return callback(parseErr);
-      }
-    }
-  });
-}
-/**
- * Writes data to a file.
- *
- * @param {string} path - The path to the file.
- * @param {string} data - The data to be written to the file.
- * @param {function} callback - The callback function to be called after the operation is complete.
- */
-function writeFile(path, data, callback) {
-  fs.writeFile(
-    path,
-    data,
-    {
-      flag: "w+",
-    },
-    (err) => {
-      if (err) {
-        callback(err);
-      } else {
-        callback(null);
-      }
-    }
-  );
 }
 /**
  * Deletes a file.
@@ -324,6 +283,47 @@ function jsonToTable(json) {
     }
   }
   return html;
+}
+/**
+ * Reads a user's JSON file and ensures that any nested JSON string in `user` is correctly parsed.
+ * If `user` is found to be a string, it is parsed again and the file is updated.
+ *
+ * @param {string} user - The username whose data file is to be read.
+ * @param {function} callback - The callback function to return the parsed data or an error.
+ */
+function readUser(path, callback) {
+  let filePath = path;
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      return callback(err);
+    } else {
+      let parsedData;
+      try {
+        parsedData = JSON.parse(data);
+        // Check if parsedData.user is a string and needs to be parsed again
+        if (typeof parsedData.user === "string") {
+          console.log(parsedData.user);
+          parsedData.user = JSON.parse(parsedData.user);
+          fs.writeFile(
+            filePath,
+            JSON.stringify(parsedData),
+            "utf8",
+            (writeErr) => {
+              if (writeErr) {
+                return callback(writeErr);
+              } else {
+                callback(null, parsedData);
+              }
+            }
+          );
+        } else {
+          callback(null, parsedData);
+        }
+      } catch (parseErr) {
+        return callback(parseErr);
+      }
+    }
+  });
 }
 function generateTables(json) {
   let html = "";

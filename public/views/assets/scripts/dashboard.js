@@ -56,7 +56,6 @@ document.addEventListener("DOMContentLoaded", function () {
         wikitext: inputs[1].value,
         mark: inputs[2].value,
         name: inputs[0].value,
-        pause: inputs[3].value == "pause" ? true : false,
       };
     });
     initialValues.clear(); // Clear stored values after saving
@@ -74,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.error) {
           console.error(data.error);
         } else {
-          window.location.reload();
+          msg(data);
         }
       }
     );
