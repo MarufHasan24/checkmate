@@ -528,26 +528,6 @@
                                                     markInput.placeholder = 'Mark';
                                                     markInput.value = value.mark; // e.g. '1', '-1', '0'
                                                     optionDiv.appendChild(markInput);
-
-                                                    const pauseButton = document.createElement('input');
-                                                    pauseButton.type = 'button';
-                                                    if (value.pause) {
-                                                        optionDiv.classList.add('paused');
-                                                        pauseButton.value = 'Live';
-                                                    } else {
-                                                        pauseButton.value = 'Pause';
-                                                    }
-                                                    pauseButton.className = 'pause-button';
-                                                    pauseButton.addEventListener('click', function () {
-                                                        if (optionDiv.classList.contains('paused')) {
-                                                            optionDiv.classList.remove('paused');
-                                                            pauseButton.value = 'Pause';
-                                                        } else {
-                                                            optionDiv.classList.add('paused');
-                                                            pauseButton.value = 'Live';
-                                                        }
-                                                    });
-                                                    optionDiv.appendChild(pauseButton);
                                                     // Append the optionDiv to the judgementOptions container
                                                     // add option button
                                                     judgementOptions.appendChild(valueDiv);

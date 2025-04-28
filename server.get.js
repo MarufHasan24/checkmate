@@ -125,7 +125,7 @@ module.exports = {
     res.redirect(req.baseUrl + "/oauth-callback");
   },
   oauth: function (req, res, next) {
-    /* passport.authenticate("mediawiki", function (err, usr) {
+    passport.authenticate("mediawiki", function (err, usr) {
       if (err) {
         return next(err);
       }
@@ -140,7 +140,7 @@ module.exports = {
           let temp = usr._json;
           delete usr._json;
           let user = { ...temp, ...usr };
-          /* Start  */
+          /* Start 
     let usr = require("./private/data.json");
     delete usr._raw;
     let temp = { ...usr._json };
@@ -231,9 +231,9 @@ module.exports = {
               );
             }
           });
-        /* }
+        }
       });
-    })(req, res, next); */
+    })(req, res, next);
   },
   template: function (req, res) {
     if (req.query && req.query.data) {
@@ -762,16 +762,12 @@ module.exports = {
               redirect: null,
             });
           } else {
+            let Judge = true;
             if (user && !rdata.data.jurries.split(",").includes(user)) {
               if (req?.query?.page) {
-                res.redirect(
-                  "https://" +
-                    rdata.project +
-                    ".org/wiki/" +
-                    encodeURIComponent(req?.query?.page)
-                );
+                Judge = false;
               } else {
-                res.render("error.ejs", {
+                return res.render("error.ejs", {
                   status: 400,
                   error:
                     "You are not a judge. Please contact the Host or Co-Host.",
@@ -1263,7 +1259,7 @@ module.exports = {
   translate: function (req, res) {
     res.sendFile(`${__dirname}/public/views/underConst.html`);
   },
-  create: function (req, res) {
+  troubleSh: function (req, res) {
     res.sendFile(`${__dirname}/public/views/underConst.html`);
   },
   tools: function (req, res) {

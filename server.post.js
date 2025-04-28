@@ -140,7 +140,6 @@ module.exports = {
       "jurries_list",
       "page_list",
     ];
-
     // Create an empty object to store the filtered data
     let post = {};
     let newData = {};
@@ -221,7 +220,14 @@ module.exports = {
                 if (klerr) {
                   console.error(klerr);
                 }
-                return res.status(200).send({ error: null });
+                return res.status(200).send({
+                  message: "Data updated successfully",
+                  type: "success",
+                  redirect: {
+                    url: "/dashboard?key=" + key,
+                    timer: 3,
+                  },
+                });
               },
               {
                 host: data.host,
@@ -883,7 +889,7 @@ module.exports = {
                 });
               } else {
                 keepKeyLog(
-                  key,
+                  mainkey,
                   user,
                   "remove pages",
                   (lerr) => {

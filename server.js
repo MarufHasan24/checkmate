@@ -23,6 +23,7 @@ app.set("views", __dirname + "/public/views");
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public/views"));
 app.use(express.json());
+app.use(cookieParser(CONFIG.key.split(".").join(CONFIG.algorithm)));
 app.use(
   session({
     secret: crypto
@@ -36,7 +37,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser(CONFIG.key.split(".").join(CONFIG.algorithm)));
 passport.use(
   new MediaWikiStrategy(
     {
@@ -63,8 +63,8 @@ passport.deserializeUser(function (obj, done) {
 // redirect all the get requests get routes
 app.get("/", gets.index);
 app.get("/login", gets.login);
-app.get("/template", gets.template);
 app.get("/oauth-callback", gets.oauth);
+app.get("/template", gets.template);
 app.get("/query", gets.query);
 app.get("/dashboard", gets.dashboard);
 app.get("/logout", gets.logout);
