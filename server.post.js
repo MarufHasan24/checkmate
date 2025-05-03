@@ -394,6 +394,7 @@ module.exports = {
             str
               .trim()
               .split(devider)
+              .forEach((e) => normalizeMediaWikiTitle(e.trim()))
               .filter((e) => e)
           )
         );
@@ -1900,4 +1901,22 @@ function getTranslation(session, langcode, callback) {
       }
     );
   }
+}
+function normalizeMediaWikiTitle(rawTitle) {
+  if (typeof rawTitle !== "string") return null;
+  // 1. Replace underscores with spaces
+  let title = rawTitle.replace(/_/g, " ");
+  // 2. Trim leading and trailing whitespace
+  title = title.trim();
+  // 3. Collapse multiple internal whitespace characters
+  title = title.replace(/\s+/g, " ");
+  // 4. Normalize to Unicode NFC
+  title = title.normalize("NFC");
+  // 5. encode URI and decode it again to remove any special characters
+  title = decodeURIComponent(encodeURIComponent(title));
+  // 6. Check for illegal characters (based on MediaWiki's blacklist)
+  if (/[#<>[\]|{}]/.test(title)) {
+    return null; // Invalid title
+  }
+  return title;
 }
