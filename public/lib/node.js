@@ -71,7 +71,13 @@ function updateFileOwn(username, data, callback) {
               } else {
                 const parsedData = JSON.parse(existingData); // Parse the existing data
                 parsedData.lastModified = date;
-                parsedData.data.push(JSON.parse(data)); // Add the provided data to the existing data
+                parsedData.data = parsedData.data || {}; // Ensure data is an object
+                parsedData.data[data.key] = {
+                  project: data.project,
+                  title: data.name,
+                  host: data.date,
+                  role: ["host"],
+                }; // Add the new data to the existing data
                 fs.writeFile(filePath, JSON.stringify(parsedData), (err) => {
                   if (err) {
                     callback(err); // Log any errors
