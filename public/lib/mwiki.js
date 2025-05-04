@@ -84,7 +84,8 @@ const getinfo = function (title, project, callback, options = {}) {
     let creatorC =
       options.permission ||
       options.precondition.byteLimit ||
-      options.creationdate
+      options.creationdate ||
+      options.nameOfCreator
         ? title
         : null;
     let userC =
