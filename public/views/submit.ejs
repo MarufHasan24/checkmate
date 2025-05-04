@@ -55,6 +55,10 @@
                             <label for="limit">Limit</label>
                             <input type="number" id="limit" value="10" min="5" max="100">
                         </div>
+                        <div>
+                            <label for="noc">In the name of creator</label>
+                            <input type="checkbox" id="noc" value="noc">
+                        </div>
                     </div>
                     <label for="value">Your Page list</label>
                     <textarea id="value" rows="2" placeholder="Enter your page list..."></textarea>
@@ -102,6 +106,7 @@
         const loader = document.getElementById("loader");
         const loadCont = document.getElementById("loader-container");
         const estime = document.getElementById("estime");
+        const noc = document.getElementById("noc");
         loader.style.width = "0%";
         let key = "IOt0opzjmObdTqewC/FGm5PHNmV+7QuhbHmox5bpfFE=";
         let data = JSON.parse(localStorage.getItem(key));
@@ -129,7 +134,8 @@
                     wordcount: userdata.make_result !== "Page Count",
                     editcount: userdata.user_edit_count,
                     performer: (data?.username) || user,
-                    creator: undefined
+                    creator: undefined,
+                    nameOfCreator: noc.checked,
                 }
                 let length = value.value.split(devider.value).length;
                 console.log(length);

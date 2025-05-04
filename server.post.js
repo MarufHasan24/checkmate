@@ -375,7 +375,7 @@ module.exports = {
     }
   },
   submit: function (req, res) {
-    let { body, devider, username, performer } = req.body;
+    let { body, devider, username, performer, nameOfCreator } = req.body;
     devider = devider || ";";
     username = username.replace(/\t/g, "");
     const renderArray = (str) => {
@@ -394,7 +394,7 @@ module.exports = {
             str
               .trim()
               .split(devider)
-              .forEach((e) => normalizeMediaWikiTitle(e.trim()))
+              .map((e) => normalizeMediaWikiTitle(e.trim()))
               .filter((e) => e)
           )
         );
@@ -463,7 +463,8 @@ module.exports = {
                           lastcontrib || // user section last contributation date
                           precondition || // same with word count + page info
                           permission || // according to permit, page section + creatorLookOut
-                          creationdate // page section withg permission + creatorLookOut
+                          creationdate || // page section withg permission + creatorLookOut
+                          nameOfCreator // page section withg permission + creatorLookOut
                         ) {
                           getinfo(
                             e,
@@ -543,6 +544,10 @@ module.exports = {
                                     }
                                   }
                                 }
+                                if (nameOfCreator) {
+                                  username = data.cdata.creator;
+                                  finalobj.sub = username;
+                                }
                                 if (
                                   permission == "only creator" &&
                                   data.cdata.creator !== username
@@ -596,15 +601,7 @@ module.exports = {
                               }
                               if (state[e].result == "success") {
                                 let talkpage = "";
-                                if (e.includes(":")) {
-                                  let Array = e.split(":");
-                                  Array[0] = Array[0].length
-                                    ? Array[0] + " talk"
-                                    : "Talk";
-                                  talkpage = Array.join(":");
-                                } else {
-                                  talkpage = "Talk:" + e;
-                                }
+                                talkpage = "Talk:" + e;
                                 editPage(
                                   udata.user.oauth,
                                   oldata.project,
@@ -641,6 +638,7 @@ module.exports = {
                               permission,
                               creationdate,
                               username,
+                              nameOfCreator,
                             }
                           );
                         } else {

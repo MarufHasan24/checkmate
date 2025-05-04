@@ -171,7 +171,11 @@ module.exports = {
                       httpOnly: true,
                     });
                     req.session.user = user;
-                    res.redirect(req.baseUrl + "/");
+                    return res.render("callback.ejs", {
+                      user,
+                      jsonuser: JSON.stringify(user),
+                      url: encodeURIComponent(req.session?.callback || ""),
+                    });
                   });
                 },
                 {

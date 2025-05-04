@@ -108,7 +108,7 @@ function readFile(path, callback) {
     if (err) {
       callback(err);
     } else {
-      callback(null, JSON.parse(data));
+      callback(null, JSON.parse(data || "{}")); // Parse the data and call the callback function
     }
   });
 }
