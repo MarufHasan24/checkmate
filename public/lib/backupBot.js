@@ -17,6 +17,7 @@ const logActivity = (message) => {
   const timestamp = new Date().toISOString();
   fs.appendFileSync(LOG_FILE, `${timestamp} - ${message}\n`);
 };
+let errCount = 0;
 fs.readdir(fileDir, (err, files) => {
   if (err) {
     console.error("❌ Error reading file folder:", err);
@@ -28,7 +29,6 @@ fs.readdir(fileDir, (err, files) => {
     return logActivity("No files to backup.");
   } else {
     console.log(`🛑 ${files.length} files to backup.`);
-    let errCount = 0;
     files.forEach((file) => {
       const filePath = join(fileDir, file);
       const backupPath = join(backupDir, file);
