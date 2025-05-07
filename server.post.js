@@ -2019,7 +2019,7 @@ const getLoadAverage = () => {
 // Function to log activity
 const logActivity = (message) => {
   const timestamp = new Date().toISOString();
-  fs.appendFileSync(LOG_FILE, `\n\n ${timestamp} - ${message}\n`);
+  fs.appendFileSync(LOG_FILE, `${timestamp} - ${message}\n`);
 };
 // Run the backup bot
 const runBackupBot = () => {
@@ -2031,7 +2031,7 @@ const runBackupBot = () => {
         if (err) {
           logActivity("Error starting backup bot: " + err.message);
         } else {
-          logActivity("Backup bot started successfully.");
+          logActivity("Backup bot executed successfully.");
         }
       });
     } else {
@@ -2045,7 +2045,7 @@ const monitorServerAndRunBackup = (res) => {
 
   const checkLoadAndBackup = () => {
     const currentLoad = getLoadAverage();
-
+    logActivity("Current load average:", currentLoad);
     // If the server is "unbusy" (load is below threshold)
     if (currentLoad < LOAD_LIMIT) {
       logActivity("Server is unbusy. Running the backup bot...");
