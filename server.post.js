@@ -18,6 +18,7 @@ const {
   wikitable,
   isAdmin,
 } = require("./public/lib/mwiki.js");
+const { exec, execSync } = require("child_process");
 // Routes to handle POST requests
 module.exports = {
   template: function (req, res) {
@@ -446,6 +447,7 @@ module.exports = {
                   type: "error",
                 });
               } else {
+                let tasks = [];
                 function iloop(i, icallback) {
                   if (i < body.length) {
                     if (oldata.post.page_list) {
@@ -602,29 +604,9 @@ module.exports = {
                               if (state[e].result == "success") {
                                 let talkpage = "";
                                 talkpage = "Talk:" + e;
-                                editPage(
-                                  udata.user.oauth,
-                                  oldata.project,
-                                  {
-                                    title: talkpage,
-                                    text: oldata.data[
-                                      "windowinp-input16-text1"
-                                    ],
-                                    place: "prepend",
-                                  },
-                                  (err, edata) => {
-                                    if (err) {
-                                      state[e] = {
-                                        result: "error",
-                                        time: Date.now(),
-                                        cause: JSON.stringify(err, null, 2),
-                                      };
-                                    } else {
-                                      i++;
-                                      iloop(i, icallback);
-                                    }
-                                  }
-                                );
+                                tasks.push(talkpage);
+                                i++;
+                                iloop(i, icallback);
                               } else {
                                 i++;
                                 iloop(i, icallback);
@@ -696,6 +678,21 @@ module.exports = {
                       info.length ? (lgobj.info = info.length) : null;
                       warn.length ? (lgobj.warn = warn.length) : null;
                       success.length ? (lgobj.success = success.length) : null;
+                      runTasks(
+                        {
+                          oauth: udata.user.oauth,
+                          titles: tasks,
+                          text: oldata.data["windowinp-input16-text1"],
+                          place: "prepend",
+                          project: oldata.project,
+                        },
+                        (err) => {
+                          if (err) {
+                            console.error(err);
+                          } else {
+                          }
+                        }
+                      );
                       keepKeyLog(
                         data.key,
                         username,
@@ -1853,6 +1850,63 @@ module.exports = {
       });
     }
   },
+  autoReview: function (req, res) {
+    let { pagelist, demoReviewer, key, user } = req.body;
+    if (key && user && pagelist) {
+      updateFile(
+        join(__dirname, "private", "db", "files", key + ".json"),
+        (err, rdata, callback) => {
+          if (err) {
+            return res.status(200).send({
+              message: JSON.stringify(err, null, 2),
+              type: "error",
+            });
+          } else {
+            let pages = pagelist.split(",");
+            pages.forEach((page) => {
+              if (rdata.post.page_list[page]) {
+                rdata.post.page_list[page].rev = demoReviewer;
+                rdata.post.page_list[page].stat = "autoReviewed";
+              }
+            });
+            callback(rdata, (err) => {
+              if (err) {
+                return res.status(200).send({
+                  message: JSON.stringify(err, null, 2),
+                  type: "error",
+                });
+              } else {
+                keepKeyLog(
+                  key,
+                  user,
+                  "autoReview",
+                  (lerr) => {
+                    if (lerr) {
+                      console.error(lerr);
+                    }
+                    return res.status(200).send({
+                      message:
+                        "<b>" +
+                        pages.length +
+                        "</b> pages are auto reviewed successfully.",
+                      type: "success",
+                      redirect: null,
+                    });
+                  },
+                  { page: pages.join(","), type: "autoReview" }
+                );
+              }
+            });
+          }
+        }
+      );
+    } else {
+      return res.status(200).send({
+        message: "Missing key, user or page",
+        type: "error",
+      });
+    }
+  },
 };
 function removeCircularReferences(obj) {
   const seen = new WeakSet();
@@ -1917,4 +1971,26 @@ function normalizeMediaWikiTitle(rawTitle) {
     return null; // Invalid title
   }
   return title;
+}
+function runTasks(tasks, callback) {
+  let path = join(__dirname, "private", "db", "tasks", Date.now() + ".json");
+  writeFile(path, JSON.stringify(tasks), (err) => {
+    if (err) {
+      console.error("Error writing tasks:", err);
+      return callback(err);
+    } else {
+      console.log("Tasks written successfully.");
+      let workerPath = join(__dirname, "public", "lib", "bot.js");
+      exec(`pgrep -f ${workerPath}`, (error, stdout) => {
+        if (error || !stdout.trim()) {
+          // Not running
+          console.log("🚀 Starting worker...");
+          execSync(`node ${workerPath}`, { stdio: "inherit" });
+        } else {
+          console.log("⏳ Worker already running.");
+        }
+      });
+      return callback(null, tasks);
+    }
+  });
 }
