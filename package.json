@@ -11,6 +11,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "bot": "node public/lib/bot.js",
     "test": "nodemon test-server.js",
     "build": "npm install && npm run lint",
     "lint": "eslint . --fix"

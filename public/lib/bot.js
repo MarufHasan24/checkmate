@@ -56,7 +56,6 @@ readNextTask();
 function Task(data, callback) {
   let state = {};
   let error = [];
-
   function iloop(i) {
     if (i >= data.titles.length) {
       // All done
@@ -85,7 +84,6 @@ function Task(data, callback) {
       }, 10000);
     });
   }
-
   function attemptEdit(title, retryCount, done) {
     editPage(
       data.oauth,

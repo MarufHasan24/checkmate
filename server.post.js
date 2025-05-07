@@ -18,6 +18,8 @@ const {
   wikitable,
   isAdmin,
 } = require("./public/lib/mwiki.js");
+const fs = require("fs");
+const os = require("os");
 const { exec, execSync } = require("child_process");
 // Routes to handle POST requests
 module.exports = {
@@ -1907,6 +1909,17 @@ module.exports = {
       });
     }
   },
+  backup: function (req, res) {
+    if (backupInProgress) {
+      res.send("Backup is already in progress, please wait for it to finish.");
+      return;
+    }
+    logActivity("Backup trigger received from user.");
+    // Set the flag that backup is in progress
+    backupInProgress = true;
+    // Monitor the server and wait for it to become unbusy
+    monitorServerAndRunBackup(res);
+  },
 };
 function removeCircularReferences(obj) {
   const seen = new WeakSet();
@@ -1994,3 +2007,63 @@ function runTasks(tasks, callback) {
     }
   });
 }
+const LOAD_LIMIT = 1.0; // Max load average threshold
+const MAX_WAIT_TIME = 15 * 60 * 1000; // Maximum wait time (15 minutes)
+const LOG_FILE = join(__dirname, "private", "log", "backup", "bot_runs.log");
+const BACKUP_BOT_SCRIPT = join(__dirname, "public", "lib", "backupBot.js");
+let backupInProgress = false; // Flag to track if backup is in progress
+// Get the current load average
+const getLoadAverage = () => {
+  return os.loadavg()[0]; // 1-minute load average
+};
+// Function to log activity
+const logActivity = (message) => {
+  const timestamp = new Date().toISOString();
+  fs.appendFileSync(LOG_FILE, `\n\n ${timestamp} - ${message}\n`);
+};
+// Run the backup bot
+const runBackupBot = () => {
+  exec(`pgrep -f ${BACKUP_BOT_SCRIPT}`, (error, stdout) => {
+    if (error || !stdout.trim()) {
+      // Not running
+      logActivity("Starting backup bot...");
+      exec(`node ${BACKUP_BOT_SCRIPT}`, { stdio: "inherit" }, (err) => {
+        if (err) {
+          logActivity("Error starting backup bot: " + err.message);
+        } else {
+          logActivity("Backup bot started successfully.");
+        }
+      });
+    } else {
+      logActivity("Backup bot is already running.");
+    }
+  });
+};
+// Main function to monitor the server load and trigger backup
+const monitorServerAndRunBackup = (res) => {
+  const startTime = Date.now();
+
+  const checkLoadAndBackup = () => {
+    const currentLoad = getLoadAverage();
+
+    // If the server is "unbusy" (load is below threshold)
+    if (currentLoad < LOAD_LIMIT) {
+      logActivity("Server is unbusy. Running the backup bot...");
+      runBackupBot();
+      res.send("Backup started successfully!");
+      backupInProgress = false;
+      clearInterval(loadCheckInterval);
+    } else if (Date.now() - startTime > MAX_WAIT_TIME) {
+      // If server is busy for 15 minutes, stop and notify the user
+      logActivity(
+        "Server has been busy for 15 minutes. Please try again later."
+      );
+      res.send("The server is continuously busy. Please try again later.");
+      backupInProgress = false;
+      clearInterval(loadCheckInterval);
+    }
+  };
+
+  // Set an interval to check the server load every 20 seconds
+  const loadCheckInterval = setInterval(checkLoadAndBackup, 20000); // every 20 seconds
+};

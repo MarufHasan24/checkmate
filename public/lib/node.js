@@ -3,7 +3,7 @@ const crypto = require("crypto");
 
 // Import the 'fs' module, which provides an API for interacting with the file system.
 const fs = require("node:fs");
-const { join } = require("node:path");
+const { join, resolve, dirname } = require("node:path");
 // Define the algorithm to be used for encryption and decryption.
 const algorithm = "aes-256-ecb"; // AES encryption with a 256-bit key in ECB mode
 
@@ -112,29 +112,41 @@ function readFile(path, callback) {
     }
   });
 }
+
 /**
- * Writes data to a file.
+ * Safely writes data to a file by first writing to a temp file and then moving it.
  *
- * @param {string} path - The path to the file.
- * @param {string} data - The data to be written to the file.
- * @param {function} callback - The callback function to be called after the operation is complete.
+ * @param {string} filePath - The final destination file path.
+ * @param {string|Buffer} data - The data to write.
+ * @param {function} callback - Callback with (err) after completion.
  */
-function writeFile(path, data, callback) {
-  fs.writeFile(
-    path,
-    data,
-    {
-      flag: "w+",
-    },
-    (err) => {
-      if (err) {
-        callback(err);
-      } else {
+function writeFile(filePath, data, callback) {
+  const tempName = `.tmp-${crypto.randomUUID()}-${Date.now()}`;
+  const tempPath = join(dirname(filePath), tempName);
+  try {
+    const normalizedPath = resolve(filePath);
+    fs.writeFile(tempPath, data, (writeErr) => {
+      if (writeErr) return callback(writeErr);
+      fs.rename(tempPath, normalizedPath, (renameErr) => {
+        // Cleanup temp file on failure
+        if (renameErr) {
+          console.error(`Failed to rename temp file: ${renameErr}`);
+          fs.copyFile(tempPath, normalizedPath, (copyErr) => {
+            if (copyErr) {
+              console.error(`Failed to copy temp file: ${copyErr}`);
+            }
+            fs.unlink(tempPath, () => {}); // Best-effort cleanup
+            return callback(renameErr);
+          });
+        }
         callback(null);
-      }
-    }
-  );
+      });
+    });
+  } catch (err) {
+    callback(err);
+  }
 }
+
 /**
  * Updates an existing file with the provided data.
  *
