@@ -2017,9 +2017,9 @@ const getLoadAverage = () => {
   return os.loadavg()[0]; // 1-minute load average
 };
 // Function to log activity
-const logActivity = (message) => {
+const logActivity = (...message) => {
   const timestamp = new Date().toISOString();
-  fs.appendFileSync(LOG_FILE, `${timestamp} - ${message}\n`);
+  fs.appendFileSync(LOG_FILE, `${timestamp} - ${message.join(" ")}\n`);
 };
 // Run the backup bot
 const runBackupBot = () => {
