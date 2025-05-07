@@ -11,6 +11,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "bot": "node public/lib/bot.js",
     "test": "nodemon test-server.js",
     "build": "npm install && npm run lint",
     "lint": "eslint . --fix"
@@ -27,8 +28,7 @@
     "oauth-1.0a": "^2.2.6",
     "passport": "^0.4.1",
     "passport-mediawiki-oauth": "^0.1.0",
-    "request": "^2.88.2",
-    "request-promise-native": "^1.0.9"
+    "request": "^2.88.2"
   },
   "devDependencies": {
     "eslint": "^8.53.0",

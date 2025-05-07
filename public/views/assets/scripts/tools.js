@@ -3,7 +3,12 @@ const validateStr = function (string) {
   textArea.innerHTML = string;
   return textArea.value.replace(/(\r\n|\n|\r|\s\s+)/gm, "");
 };
-const proxyFetch = function (href, data, callback, method = "POST") {
+const proxyFetch = function (
+  href,
+  data = {},
+  callback = function () {},
+  method = "POST"
+) {
   fetch("/" + href, {
     method: method,
     headers: {

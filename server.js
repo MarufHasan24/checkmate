@@ -98,6 +98,7 @@ app.post("/permit", posts.adminP);
 app.post("/result", posts.makeResult);
 app.post("/language", posts.language);
 app.post("/lock", posts.pagelock);
+app.post("/backup", posts.backup);
 // 404 handler - Place this AFTER all routes
 app.use(function (req, res) {
   return res.render("error.ejs", {
@@ -107,5 +108,6 @@ app.use(function (req, res) {
     deletable: false,
   });
 });
+
 // Start server
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
