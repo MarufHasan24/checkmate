@@ -20,7 +20,12 @@ const {
 } = require("./public/lib/mwiki.js");
 const fs = require("fs");
 const os = require("os");
-const { exec, execSync } = require("child_process");
+const { exec, execSync, spawn } = require("child_process");
+const LOAD_LIMIT = 4; // Max load average threshold for backup
+const MAX_WAIT_TIME = 15 * 60 * 1000; // Maximum wait time (15 minutes)
+const LOG_FILE = join(__dirname, "private", "log", "backup", "bot_runs.log");
+const BACKUP_BOT_SCRIPT = join(__dirname, "public", "lib", "backupBot.js");
+let backupInProgress = false; // Flag to track if backup is in progress
 // Routes to handle POST requests
 module.exports = {
   template: function (req, res) {
@@ -2007,37 +2012,80 @@ function runTasks(tasks, callback) {
     }
   });
 }
-const LOAD_LIMIT = 1.0; // Max load average threshold
-const MAX_WAIT_TIME = 15 * 60 * 1000; // Maximum wait time (15 minutes)
-const LOG_FILE = join(__dirname, "private", "log", "backup", "bot_runs.log");
-const BACKUP_BOT_SCRIPT = join(__dirname, "public", "lib", "backupBot.js");
-let backupInProgress = false; // Flag to track if backup is in progress
 // Get the current load average
 const getLoadAverage = () => {
   return os.loadavg()[0]; // 1-minute load average
 };
-// Function to log activity
+
 const logActivity = (...message) => {
+  const MAX_LOGS = 250;
+  const MAX_AGE_DAYS = 30;
   const timestamp = new Date().toISOString();
-  fs.appendFileSync(LOG_FILE, `${timestamp} - ${message.join(" ")}\n`);
+  const newLog = `${timestamp} - ${message.join(" ")}\n`;
+
+  // Ensure log file exists and read existing logs
+  let logs = [];
+  if (fs.existsSync(LOG_FILE)) {
+    logs = fs.readFileSync(LOG_FILE, "utf-8").split("\n").filter(Boolean);
+  }
+
+  const now = new Date();
+  logs = logs.filter((line) => {
+    const match = line.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z)/);
+    if (!match) return false;
+    const logDate = new Date(match[1]);
+    const ageDays = (now - logDate) / (1000 * 60 * 60 * 24);
+    return ageDays <= MAX_AGE_DAYS;
+  });
+
+  logs.push(newLog.trim());
+
+  // Enforce max log count
+  if (logs.length > MAX_LOGS) {
+    logs = logs.slice(-MAX_LOGS);
+  }
+
+  fs.writeFileSync(LOG_FILE, logs.join("\n") + "\n");
 };
 // Run the backup bot
 const runBackupBot = () => {
+  function logActivity(message) {
+    console.log(`[${new Date().toISOString()}] ${message}`);
+  }
+
   exec(`pgrep -f ${BACKUP_BOT_SCRIPT}`, (error, stdout) => {
-    if (error || !stdout.trim()) {
-      // Not running
-      logActivity("Starting backup bot...");
-      exec(`node ${BACKUP_BOT_SCRIPT}`, { stdio: "inherit" }, (err) => {
-        if (err) {
-          logActivity("Error starting backup bot: " + err.message);
+    const pid = stdout.trim();
+
+    if (!error && pid) {
+      logActivity(`Backup bot is running. PID: ${pid}`);
+      // Try to stop it
+      const killProcess = spawn("kill", [pid]);
+
+      killProcess.on("close", (code) => {
+        if (code === 0) {
+          logActivity("Stopped running backup bot. Starting fresh...");
+          startBot();
         } else {
-          logActivity("Backup bot executed successfully.");
+          logActivity(`Failed to stop backup bot. Exit code: ${code}`);
         }
       });
     } else {
-      logActivity("Backup bot is already running.");
+      logActivity("Backup bot not running. Starting now...");
+      startBot();
     }
   });
+
+  function startBot() {
+    const botProcess = spawn("node", [BACKUP_BOT_SCRIPT], { stdio: "inherit" });
+
+    botProcess.on("error", (err) => {
+      logActivity("Error starting backup bot: " + err.message);
+    });
+
+    botProcess.on("exit", (code) => {
+      logActivity(`Backup bot exited with code ${code}`);
+    });
+  }
 };
 // Main function to monitor the server load and trigger backup
 const monitorServerAndRunBackup = (res) => {
@@ -2050,7 +2098,7 @@ const monitorServerAndRunBackup = (res) => {
     if (currentLoad < LOAD_LIMIT) {
       logActivity("Server is unbusy. Running the backup bot...");
       runBackupBot();
-      res.send("Backup started successfully!");
+      res.send("Backup done successfully!");
       backupInProgress = false;
       clearInterval(loadCheckInterval);
     } else if (Date.now() - startTime > MAX_WAIT_TIME) {

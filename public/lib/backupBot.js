@@ -32,6 +32,10 @@ fs.readdir(fileDir, (err, files) => {
     files.forEach((file) => {
       const filePath = join(fileDir, file);
       const backupPath = join(backupDir, file);
+      //delete the old backup file if it exists
+      if (fs.existsSync(backupPath)) {
+        fs.unlinkSync(backupPath);
+      }
       fs.copyFile(filePath, backupPath, (err) => {
         if (err) {
           errCount++;
