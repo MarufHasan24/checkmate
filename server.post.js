@@ -2049,10 +2049,6 @@ const logActivity = (...message) => {
 };
 // Run the backup bot
 const runBackupBot = () => {
-  function logActivity(message) {
-    console.log(`[${new Date().toISOString()}] ${message}`);
-  }
-
   exec(`pgrep -f ${BACKUP_BOT_SCRIPT}`, (error, stdout) => {
     const pid = stdout.trim();
 
@@ -2076,7 +2072,9 @@ const runBackupBot = () => {
   });
 
   function startBot() {
-    const botProcess = spawn("node", [BACKUP_BOT_SCRIPT], { stdio: "inherit" });
+    const botProcess = execSync(`node ${BACKUP_BOT_SCRIPT}`, {
+      stdio: "inherit",
+    });
 
     botProcess.on("error", (err) => {
       logActivity("Error starting backup bot: " + err.message);
