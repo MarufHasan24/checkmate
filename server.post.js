@@ -1908,17 +1908,6 @@ module.exports = {
       });
     }
   },
-  backup: function (req, res) {
-    if (backupInProgress) {
-      res.send("Backup is already in progress, please wait for it to finish.");
-      return;
-    }
-    logActivity("Backup trigger received from user.");
-    // Set the flag that backup is in progress
-    backupInProgress = true;
-    // Monitor the server and wait for it to become unbusy
-    monitorServerAndRunBackup(res);
-  },
 };
 function removeCircularReferences(obj) {
   const seen = new WeakSet();

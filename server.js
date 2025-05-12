@@ -6,7 +6,6 @@ require("dotenv").config();
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
 const MediaWikiStrategy = require("passport-mediawiki-oauth").OAuthStrategy;
-const { createClient } = require("redis");
 const CONFIG = {
   consumer_key: process.env.CONSUMER_KEY,
   consumer_secret: process.env.CONSUMER_SECRET,
@@ -61,71 +60,53 @@ passport.serializeUser(function (user, done) {
 passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
-const redisClient = createClient();
-redisClient.on("error", (err) => console.error("Redis Client Error", err));
-redisClient
-  .connect()
-  .then(() => {
-    console.log("Redis client connected successfully");
-    // Middleware to pass redis to all route handlers
-    app.use((req, res, next) => {
-      req.redis = redisClient;
-      next();
-    });
-
-    // redirect all the get requests get routes
-    app.get("/", gets.index);
-    app.get("/login", gets.login);
-    app.get("/oauth-callback", gets.oauth);
-    app.get("/template", gets.template);
-    app.get("/query", gets.query);
-    app.get("/dashboard", gets.dashboard);
-    app.get("/logout", gets.logout);
-    app.get("/editathon", gets.editathon);
-    app.get("/editathon/log", gets.editathonLog);
-    app.get("/submit", gets.submit);
-    app.get("/judge", gets.judge);
-    app.get("/remove", gets.remove);
-    app.get("/result", gets.result);
-    app.get("/admin", gets.admin.index);
-    app.get("/admin/log", gets.admin.log);
-    app.get("/admin/permit", gets.admin.permit);
-    app.get("/user", gets.user);
-    /* app.get("/create", gets.create);
+// redirect all the get requests get routes
+app.get("/", gets.index);
+app.get("/login", gets.login);
+app.get("/oauth-callback", gets.oauth);
+app.get("/template", gets.template);
+app.get("/query", gets.query);
+app.get("/dashboard", gets.dashboard);
+app.get("/logout", gets.logout);
+app.get("/editathon", gets.editathon);
+app.get("/editathon/log", gets.editathonLog);
+app.get("/submit", gets.submit);
+app.get("/judge", gets.judge);
+app.get("/remove", gets.remove);
+app.get("/result", gets.result);
+app.get("/admin", gets.admin.index);
+app.get("/admin/log", gets.admin.log);
+app.get("/admin/permit", gets.admin.permit);
+app.get("/user", gets.user);
+/* app.get("/create", gets.create);
 app.get("/translate", gets.translate);
 app.get("/tools", gets.tools); */
-    app.get("/filter", gets.filter);
-    // redirect all the post requests post routes
-    app.post("/template", posts.template);
-    app.post("/dashboard", posts.dashboard);
-    app.post("/delete", posts.delete);
-    app.post("/submit", posts.submit);
-    app.post("/judge", posts.judge);
-    app.post("/filter", posts.filter);
-    app.post("/remove", posts.remove);
-    app.post("/comment", posts.comment);
-    app.post("/get-rows", posts.getRows);
-    app.post("/dashboard/br", posts.dashboardbr);
-    app.post("/elemination", posts.elemination);
-    app.post("/permit", posts.adminP);
-    app.post("/result", posts.makeResult);
-    app.post("/language", posts.language);
-    app.post("/lock", posts.pagelock);
-    app.post("/backup", posts.backup);
-    // 404 handler - Place this AFTER all routes
-    app.use(function (req, res) {
-      return res.render("error.ejs", {
-        status: 404,
-        error: "Looks like you've made a wrong move and checkmate!",
-        redirect: null,
-        deletable: false,
-      });
-    });
-
-    // Start server
-    app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
-  })
-  .catch((err) => {
-    console.error("Redis client connection failed", err);
-    process.exit(1); // Exit the process if Redis connection fails
+app.get("/filter", gets.filter);
+// redirect all the post requests post routes
+app.post("/template", posts.template);
+app.post("/dashboard", posts.dashboard);
+app.post("/delete", posts.delete);
+app.post("/submit", posts.submit);
+app.post("/judge", posts.judge);
+app.post("/filter", posts.filter);
+app.post("/remove", posts.remove);
+app.post("/comment", posts.comment);
+app.post("/get-rows", posts.getRows);
+app.post("/dashboard/br", posts.dashboardbr);
+app.post("/elemination", posts.elemination);
+app.post("/permit", posts.adminP);
+app.post("/result", posts.makeResult);
+app.post("/language", posts.language);
+app.post("/lock", posts.pagelock);
+// 404 handler - Place this AFTER all routes
+app.use(function (req, res) {
+  return res.render("error.ejs", {
+    status: 404,
+    error: "Looks like you've made a wrong move and checkmate!",
+    redirect: null,
+    deletable: false,
   });
+});
+
+// Start server
+app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
