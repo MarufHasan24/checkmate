@@ -1,108 +1,71 @@
 const fs = require("fs");
 const path = require("path");
-const { editPage } = require("./mwiki.js"); // Assuming editPage is a function that edits a page
+const { editPage } = require("./mwiki.js");
 
 const TASK_DIR = path.join(__dirname, "..", "..", "private", "db", "tasks");
 
 function readNextTask() {
   fs.readdir(TASK_DIR, (err, files) => {
-    if (err) {
-      console.error("❌ Error reading task folder:", err);
-      return;
-    }
+    if (err) return console.error("❌ Error reading task folder:", err);
 
-    const tasks = files.filter((file) => file.endsWith(".json"));
-    if (tasks.length === 0) {
-      console.log("🛑 No tasks left. Worker exiting.");
-      return;
-    }
+    const tasks = files.filter((f) => f.endsWith(".json"));
+    if (tasks.length === 0)
+      return console.log("🛑 No tasks left. Worker exiting.");
 
-    const fileName = tasks[0];
-    const filePath = path.join(TASK_DIR, fileName);
+    const file = tasks[0];
+    const filePath = path.join(TASK_DIR, file);
 
     fs.readFile(filePath, "utf8", (err, data) => {
-      if (err) {
-        console.error(`❌ Failed to read task "${fileName}":`, err);
-        return readNextTask(); // continue with next
-      }
+      if (err) return readNextTask();
 
       let task;
       try {
         task = JSON.parse(data);
-      } catch (parseErr) {
-        console.error(`❌ Invalid JSON in "${fileName}":`, parseErr);
-        // Optionally delete invalid task to unblock queue
-        return fs.unlink(filePath, () => readNextTask());
+      } catch {
+        fs.unlink(filePath, () => readNextTask());
+        return;
       }
-      Task(task, (err, result) => {
-        if (err) {
-          console.error(`❌ Task failed:`, err);
-          // Optionally log error to a file or database
-        } else {
-          console.log(`✅ Task completed:`, result);
-          fs.unlink(filePath, (err) => {
-            if (err) console.error(`❌ Failed to delete ${fileName}:`, err);
-            readNextTask(); // process next
-          });
-        }
+
+      Task(task, (err) => {
+        fs.unlink(filePath, () => readNextTask());
       });
     });
   });
 }
 
-// Start the worker
-readNextTask();
-
 function Task(data, callback) {
-  let state = {};
-  let error = [];
-  function iloop(i) {
-    if (i >= data.titles.length) {
-      // All done
-      const result =
-        error.length > 0
-          ? {
-              result: "error",
-              time: Date.now(),
-              cause: JSON.stringify(error, null, 2),
-            }
-          : { result: "success", time: Date.now(), cause: null };
-      return callback(error.length > 0 ? error : null, result);
-    }
+  let i = 0;
+  const error = [];
 
-    const title = data.titles[i];
-    attemptEdit(title, 0, (err, editResult) => {
-      state[title] = {
-        result: err ? "error" : "success",
-        time: Date.now(),
-        cause: err ? JSON.stringify(err, null, 2) : null,
-      };
-      if (err) error.push(title);
-
-      setTimeout(() => {
-        iloop(i + 1); // Wait 10s after any attempt
-      }, 10000);
-    });
-  }
-  function attemptEdit(title, retryCount, done) {
+  function attemptEdit(title, retryCount, cb) {
     editPage(
       data.oauth,
       data.project,
-      {
-        title: title,
-        text: data.text,
-        place: data.place,
-      },
-      (err, result) => {
+      { title, text: data.text, place: data.place },
+      (err) => {
         if (err && retryCount < 2) {
-          console.warn(`⚠️ Error editing "${title}". Retrying in 15s...`);
-          return setTimeout(() => {
-            attemptEdit(title, retryCount + 1, done);
-          }, 15000);
+          console.warn(`Retrying ${title}...`);
+          return setTimeout(
+            () => attemptEdit(title, retryCount + 1, cb),
+            15000
+          );
         }
-        done(err, result);
+        cb(err);
       }
     );
   }
-  iloop(0);
+
+  function loop() {
+    if (i >= data.titles.length) return callback(error.length ? error : null);
+
+    const title = data.titles[i++];
+    attemptEdit(title, 0, (err) => {
+      if (err) error.push(title);
+      setTimeout(loop, 10000);
+    });
+  }
+
+  loop();
 }
+
+readNextTask();

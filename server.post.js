@@ -18,14 +18,7 @@ const {
   wikitable,
   isAdmin,
 } = require("./public/lib/mwiki.js");
-const fs = require("fs");
-const os = require("os");
-const { exec, execSync, spawn } = require("child_process");
-const LOAD_LIMIT = 4; // Max load average threshold for backup
-const MAX_WAIT_TIME = 15 * 60 * 1000; // Maximum wait time (15 minutes)
-const LOG_FILE = join(__dirname, "private", "log", "backup", "bot_runs.log");
-const BACKUP_BOT_SCRIPT = join(__dirname, "public", "lib", "backupBot.js");
-let backupInProgress = false; // Flag to track if backup is in progress
+const { exec } = require("child_process");
 // Routes to handle POST requests
 module.exports = {
   template: function (req, res) {
@@ -1914,17 +1907,6 @@ module.exports = {
       });
     }
   },
-  backup: function (req, res) {
-    if (backupInProgress) {
-      res.send("Backup is already in progress, please wait for it to finish.");
-      return;
-    }
-    logActivity("Backup trigger received from user.");
-    // Set the flag that backup is in progress
-    backupInProgress = true;
-    // Monitor the server and wait for it to become unbusy
-    monitorServerAndRunBackup(res);
-  },
 };
 function removeCircularReferences(obj) {
   const seen = new WeakSet();
@@ -1991,125 +1973,36 @@ function normalizeMediaWikiTitle(rawTitle) {
   return title;
 }
 function runTasks(tasks, callback) {
-  let path = join(__dirname, "private", "db", "tasks", Date.now() + ".json");
-  writeFile(path, JSON.stringify(tasks), (err) => {
+  const taskFile = join(
+    __dirname,
+    "private",
+    "db",
+    "tasks",
+    Date.now() + ".json"
+  );
+
+  writeFile(taskFile, JSON.stringify(tasks), (err) => {
     if (err) {
-      console.error("Error writing tasks:", err);
+      console.error("❌ Failed to write task:", err);
       return callback(err);
-    } else {
-      console.log("Tasks written successfully.");
-      let workerPath = join(__dirname, "public", "lib", "bot.js");
-      exec(`pgrep -f ${workerPath}`, (error, stdout) => {
-        if (error || !stdout.trim()) {
-          // Not running
-          console.log("🚀 Starting worker...");
-          execSync(`node ${workerPath}`, { stdio: "inherit" });
-        } else {
-          console.log("⏳ Worker already running.");
-        }
-      });
-      return callback(null, tasks);
     }
+
+    console.log("✅ Task saved to:", taskFile);
+
+    const workerScript = join(__dirname, "public", "lib", "bot.js");
+
+    const cmd = `toolforge jobs run run-tasks --command "node ${workerScript}"`;
+
+    exec(cmd, (err, stdout, stderr) => {
+      if (err) {
+        console.error("❌ Failed to queue job:", err.message);
+        console.error("stderr:", stderr);
+        return callback(err);
+      }
+
+      console.log("🚀 Job started via Toolforge jobs.");
+      console.log("stdout:", stdout);
+      return callback(null, tasks);
+    });
   });
 }
-// Get the current load average
-const getLoadAverage = () => {
-  return os.loadavg()[0]; // 1-minute load average
-};
-
-const logActivity = (...message) => {
-  const MAX_LOGS = 250;
-  const MAX_AGE_DAYS = 30;
-  const timestamp = new Date().toISOString();
-  const newLog = `${timestamp} - ${message.join(" ")}\n`;
-
-  // Ensure log file exists and read existing logs
-  let logs = [];
-  if (fs.existsSync(LOG_FILE)) {
-    logs = fs.readFileSync(LOG_FILE, "utf-8").split("\n").filter(Boolean);
-  }
-
-  const now = new Date();
-  logs = logs.filter((line) => {
-    const match = line.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z)/);
-    if (!match) return false;
-    const logDate = new Date(match[1]);
-    const ageDays = (now - logDate) / (1000 * 60 * 60 * 24);
-    return ageDays <= MAX_AGE_DAYS;
-  });
-
-  logs.push(newLog.trim());
-
-  // Enforce max log count
-  if (logs.length > MAX_LOGS) {
-    logs = logs.slice(-MAX_LOGS);
-  }
-
-  fs.writeFileSync(LOG_FILE, logs.join("\n") + "\n");
-};
-// Run the backup bot
-const runBackupBot = () => {
-  exec(`pgrep -f ${BACKUP_BOT_SCRIPT}`, (error, stdout) => {
-    const pid = stdout.trim();
-
-    if (!error && pid) {
-      logActivity(`Backup bot is running. PID: ${pid}`);
-      // Try to stop it
-      const killProcess = spawn("kill", [pid]);
-
-      killProcess.on("close", (code) => {
-        if (code === 0) {
-          logActivity("Stopped running backup bot. Starting fresh...");
-          startBot();
-        } else {
-          logActivity(`Failed to stop backup bot. Exit code: ${code}`);
-        }
-      });
-    } else {
-      logActivity("Backup bot not running. Starting now...");
-      startBot();
-    }
-  });
-
-  function startBot() {
-    const botProcess = execSync(`node ${BACKUP_BOT_SCRIPT}`, {
-      stdio: "inherit",
-    });
-
-    botProcess.on("error", (err) => {
-      logActivity("Error starting backup bot: " + err.message);
-    });
-
-    botProcess.on("exit", (code) => {
-      logActivity(`Backup bot exited with code ${code}`);
-    });
-  }
-};
-// Main function to monitor the server load and trigger backup
-const monitorServerAndRunBackup = (res) => {
-  const startTime = Date.now();
-
-  const checkLoadAndBackup = () => {
-    const currentLoad = getLoadAverage();
-    logActivity("Current load average:", currentLoad);
-    // If the server is "unbusy" (load is below threshold)
-    if (currentLoad < LOAD_LIMIT) {
-      logActivity("Server is unbusy. Running the backup bot...");
-      runBackupBot();
-      res.send("Backup done successfully!");
-      backupInProgress = false;
-      clearInterval(loadCheckInterval);
-    } else if (Date.now() - startTime > MAX_WAIT_TIME) {
-      // If server is busy for 15 minutes, stop and notify the user
-      logActivity(
-        "Server has been busy for 15 minutes. Please try again later."
-      );
-      res.send("The server is continuously busy. Please try again later.");
-      backupInProgress = false;
-      clearInterval(loadCheckInterval);
-    }
-  };
-
-  // Set an interval to check the server load every 20 seconds
-  const loadCheckInterval = setInterval(checkLoadAndBackup, 20000); // every 20 seconds
-};
