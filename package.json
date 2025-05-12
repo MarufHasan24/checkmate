@@ -28,6 +28,7 @@
     "oauth-1.0a": "^2.2.6",
     "passport": "^0.4.1",
     "passport-mediawiki-oauth": "^0.1.0",
+    "redis": "^5.0.1",
     "request": "^2.88.2"
   },
   "devDependencies": {
