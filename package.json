@@ -17,7 +17,6 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "compression": "^1.8.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
@@ -28,7 +27,6 @@
     "oauth-1.0a": "^2.2.6",
     "passport": "^0.4.1",
     "passport-mediawiki-oauth": "^0.1.0",
-    "redis": "^5.0.1",
     "request": "^2.88.2"
   },
   "devDependencies": {

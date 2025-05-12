@@ -19,7 +19,6 @@ const {
   isAdmin,
 } = require("./public/lib/mwiki.js");
 const { exec } = require("child_process");
-let backupInProgress = false; // Flag to track if backup is in progress
 // Routes to handle POST requests
 module.exports = {
   template: function (req, res) {
