@@ -22,11 +22,11 @@
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.0",
-    "jsdom": "^26.0.0",
     "oauth": "^0.10.0",
     "oauth-1.0a": "^2.2.6",
     "passport": "^0.4.1",
     "passport-mediawiki-oauth": "^0.1.0",
+    "redis": "^5.5.6",
     "request": "^2.88.2"
   },
   "devDependencies": {

@@ -22,7 +22,11 @@ const posts = require(join(__dirname, "server.post.js"));
 app.set("views", __dirname + "/public/views");
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public/views"));
-app.use(express.json());
+app.use(
+  express.json({
+    limit: "50mb",
+  })
+);
 app.use(cookieParser(CONFIG.key.split(".").join(CONFIG.algorithm)));
 app.use(
   session({

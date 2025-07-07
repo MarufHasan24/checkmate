@@ -112,7 +112,6 @@ function readFile(path, callback) {
     }
   });
 }
-
 /**
  * Safely writes data to a file by first writing to a temp file and then moving it.
  *
@@ -120,33 +119,62 @@ function readFile(path, callback) {
  * @param {string|Buffer} data - The data to write.
  * @param {function} callback - Callback with (err) after completion.
  */
+// Per-file queue map
+const fileQueues = new Map();
 function writeFile(filePath, data, callback) {
-  const tempName = `.tmp-${crypto.randomUUID()}-${Date.now()}`;
-  const tempPath = join(dirname(filePath), tempName);
-  try {
-    const normalizedPath = resolve(filePath);
-    fs.writeFile(tempPath, data, (writeErr) => {
-      if (writeErr) return callback(writeErr);
-      fs.rename(tempPath, normalizedPath, (renameErr) => {
-        // Cleanup temp file on failure
-        if (renameErr) {
-          console.error(`Failed to rename temp file: ${renameErr}`);
-          fs.copyFile(tempPath, normalizedPath, (copyErr) => {
-            if (copyErr) {
-              console.error(`Failed to copy temp file: ${copyErr}`);
-            }
-            fs.unlink(tempPath, () => {}); // Best-effort cleanup
-            return callback(renameErr);
-          });
-        }
-        callback(null);
-      });
-    });
-  } catch (err) {
-    callback(err);
+  const fullPath = resolve(filePath);
+  const queue = fileQueues.get(fullPath) || [];
+
+  // Enqueue the write
+  queue.push({ data, callback });
+  if (!fileQueues.has(fullPath)) {
+    fileQueues.set(fullPath, queue);
+    processQueue(fullPath);
   }
 }
+function processQueue(filePath) {
+  const queue = fileQueues.get(filePath);
+  if (!queue || queue.length === 0) {
+    fileQueues.delete(filePath);
+    return;
+  }
 
+  const { data, callback } = queue[0];
+  const tempName = `.tmp-${crypto.randomUUID()}-${Date.now()}`;
+  const tempPath = join(dirname(filePath), tempName);
+
+  fs.writeFile(tempPath, data, (writeErr) => {
+    if (writeErr) {
+      fs.unlink(tempPath, () => {}); // Best-effort cleanup
+      queue.shift();
+      callback(writeErr);
+      return processQueue(filePath);
+    }
+
+    fs.rename(tempPath, filePath, (renameErr) => {
+      if (!renameErr) {
+        queue.shift();
+        callback(null);
+        return processQueue(filePath);
+      }
+
+      // Rename failed — fallback to copy + delete temp
+      console.error(`Rename failed: ${renameErr}`);
+      fs.copyFile(tempPath, filePath, (copyErr) => {
+        fs.unlink(tempPath, () => {}); // Clean up temp file
+
+        queue.shift();
+        if (copyErr) {
+          console.error(`Fallback copy failed: ${copyErr}`);
+          callback(copyErr);
+        } else {
+          callback(null);
+        }
+        processQueue(filePath);
+      });
+    });
+  });
+}
 /**
  * Updates an existing file with the provided data.
  *
@@ -748,6 +776,18 @@ function readDirectoryThenFiles(directory, callback, readall = true) {
     }
   });
 }
+/*
+ * This function generates a Time-based One-Time Password (TOTP) using the current date and time.
+ *
+ * returns a string representation of the TOTP in base 36.
+ */
+function totp() {
+  const now = new Date();
+  const time = now.getHours() * 60 + Math.floor(now.getMinutes() / 15) * 15;
+  return Number(
+    now.toISOString().split("T")[0].replaceAll("-", "") + time
+  ).toString(36);
+}
 module.exports = {
   writeFileOwn,
   updateFileOwn,
@@ -766,4 +806,5 @@ module.exports = {
   stat: fs.stat,
   join,
   keepKeyLog,
+  totp,
 };

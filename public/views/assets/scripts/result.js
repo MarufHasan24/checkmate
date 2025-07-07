@@ -174,11 +174,11 @@ function renderJurryTable(
   let words = 0;
   Object.entries(jresult).forEach(([name, data], i) => {
     let bgColor = "";
+    bytes += data?.length || 0;
+    words += data?.wc || 0;
     tableHTML += `<tr style="${bgColor}">
       ${selectedFields
         .map((field) => {
-          bytes += data?.length || 0;
-          words += data?.wc || 0;
           if (field === "serial") return `<td>${index}</td>`;
           if (field === "name") return `<td>${name}</td>`;
           if (field === "stat")

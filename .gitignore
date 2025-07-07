@@ -5,10 +5,8 @@ private/
 **.sh
 data.txt
 # Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+*fake*
+*.json
 
 # Other files and folders
 .settings/

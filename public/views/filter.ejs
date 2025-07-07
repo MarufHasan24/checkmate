@@ -277,6 +277,8 @@
                         <div class="select">
                             <select id="state">
                                 <option value="all">All</option>
+                                <option value="none">Not-Judged</option>
+                                <option value="locked">Locked</option>
                             </select>
                         </div>
                     </div>
@@ -393,6 +395,7 @@
             <span><i>Submitter:</i> <b>${info.sub}</b></span>
             <span><i>Reviewer:</i> <b>${info.rev || "N/A"}</b></span>
             <span><i>Status:</i> <b>${info.stat ? userdata?.dynamic[info.stat]?.name || "N/A" : "N/A"}</b></span>
+            ${(info?.lock && info?.lock?.length > 0) ? "<span><i>Locked:</i> <b>" + info?.lock + "</b></span>" : null}
             ` +
                     (Number(info.wc) > 0 ? `<span><i>Word count:</i> <b>${info.wc || 0}</b></span>` : "") +
                     (Number(info.length) > 0 ? `<span><i>Byte count:</i> <b>${Number(info.length || 0).toLocaleString()}</b></span>` : "") +

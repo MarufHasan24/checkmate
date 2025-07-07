@@ -51,6 +51,10 @@ const editPage = function (oauth, project, data, callback) {
     return callback(null, {
       message: "Missing title",
       type: "error",
+      code: "missing_title",
+      error: true,
+      data,
+      url: apiUrl,
     });
   } else {
     getCsrfToken(oauth, apiUrl, (token) => {
@@ -101,12 +105,17 @@ const getinfo = function (title, project, callback, options = {}) {
         if (cerror) {
           errors.push(cerror);
         }
-        userinfo(userC, apiUrl, (uerror, udata) => {
-          if (uerror) {
-            errors.push(errors);
-          }
-          callback(errors, { pdata, cdata, udata });
-        });
+        userinfo(
+          userC,
+          apiUrl,
+          (uerror, udata) => {
+            if (uerror) {
+              errors.push(errors);
+            }
+            callback(errors, { pdata, cdata, udata });
+          },
+          project
+        );
       });
     });
   }
@@ -188,7 +197,13 @@ function wikitable(html) {
 }
 function pageinfo(title, url, callback) {
   if (!title) {
-    callback(null, null);
+    callback({
+      message: "No title provided",
+      code: "missing_title",
+      error: true,
+      title,
+      url,
+    });
   } else {
     let params = {
       action: "parse",
@@ -222,7 +237,16 @@ function pageinfo(title, url, callback) {
 }
 function creatorLookOut(title, url, callback) {
   if (!title) {
-    callback(null, null);
+    callback(
+      {
+        message: "No title provided",
+        code: "missing_title",
+        error: true,
+        title,
+        url,
+      },
+      null
+    );
   } else {
     let params = {
       action: "query",
@@ -240,18 +264,19 @@ function creatorLookOut(title, url, callback) {
         if (error) {
           callback(error, null);
         } else {
+          console.log(data.query.pages[0]);
           let fdata = data?.query?.pages[0];
-          if (fdata.missing) {
+          if (fdata.missing || fdata.invalid) {
             callback(fdata, null);
           } else {
-            var revision = fdata.revisions[0],
-              result = {
-                creator: revision.user,
-                creation: revision.timestamp,
-                summary: revision.comment,
-                tags: revision.tags,
-                length: fdata.length,
-              };
+            let revision = fdata?.revisions[0];
+            let result = {
+              creator: revision.user,
+              creation: revision.timestamp,
+              summary: revision.comment,
+              tags: revision.tags,
+              length: fdata.length,
+            };
             callback(null, result);
           }
         }
@@ -259,7 +284,7 @@ function creatorLookOut(title, url, callback) {
     );
   }
 }
-function userinfo(username, apiUrl, callback) {
+function userinfo(username, apiUrl, callback, project) {
   if (!username) {
     callback(null, null);
   } else {
@@ -327,7 +352,13 @@ function userinfo(username, apiUrl, callback) {
 }
 function userIsAdmin(username, langcode, callback) {
   if (!username) {
-    callback(null, null);
+    callback({
+      message: "No username provided",
+      code: "missing_username",
+      error: true,
+      username,
+      langcode,
+    });
   } else {
     let params = {
       action: "query",
@@ -365,7 +396,6 @@ function userIsAdmin(username, langcode, callback) {
 }
 //dependencies
 function getCsrfToken(oauthdata, url, callback) {
-  console.log("getting CSRF...");
   let params = {
     action: "query",
     meta: "tokens",

@@ -11,6 +11,7 @@ const {
   editathonTable,
   readUser,
   keepKeyLog,
+  totp,
 } = require("./public/lib/node.js");
 const {
   getinfo,
@@ -18,7 +19,7 @@ const {
   wikitable,
   isAdmin,
 } = require("./public/lib/mwiki.js");
-const { exec } = require("child_process");
+const request = require("request");
 // Routes to handle POST requests
 module.exports = {
   template: function (req, res) {
@@ -172,15 +173,15 @@ module.exports = {
             rdata.post = {};
           }
           rdata.post = {
-            pagecount: rdata.post.pagecount ?? 0,
-            usercount: rdata.post.usercount ?? [],
-            reviewed: rdata.post.reviewed ?? 0,
+            pagecount: rdata?.post?.pagecount ?? 0,
+            usercount: rdata?.post?.usercount ?? [],
+            reviewed: rdata?.post?.reviewed ?? 0,
             jurries_list: {
-              ...rdata.post.jurries_list, // Preserve existing jurors
+              ...(rdata?.post?.jurries_list ?? {}), // Preserve existing jurors
             },
-            page_list: rdata.post.page_list ?? {},
+            page_list: rdata?.post?.page_list ?? {},
           };
-          if (data.jurries != rdata.data.jurries) {
+          if (data.jurries != rdata.data?.jurries) {
             const newJurries = data.jurries
               .split(",")
               .map((j) => j.trim())
@@ -191,7 +192,7 @@ module.exports = {
               }
             });
           }
-          const oldData = JSON.parse(JSON.stringify(rdata.data)); // Deep copy of old data
+          const oldData = JSON.parse(JSON.stringify(rdata.data || {})); // Deep copy of old data
           // Compare and track changes before merging
           for (const [key, value] of Object.entries(data)) {
             if (JSON.stringify(oldData[key]) !== JSON.stringify(value)) {
@@ -407,6 +408,20 @@ module.exports = {
         if (err) {
           console.error(err);
         } else {
+          if (
+            !(
+              new Date(`${oldata.data.start_date} ${oldata.data.start_time}`) <
+                new Date() &&
+              new Date() <
+                new Date(`${oldata.data.end_date} ${oldata.data.end_time}`)
+            ) &&
+            performer !== "Maruf"
+          ) {
+            return res.status(200).send({
+              message: "Be in the time frame to submit",
+              type: "error",
+            });
+          }
           let state = {};
           body = renderArray(body);
           let pagecount = Number(oldata.post.pagecount);
@@ -678,33 +693,34 @@ module.exports = {
                       info.length ? (lgobj.info = info.length) : null;
                       warn.length ? (lgobj.warn = warn.length) : null;
                       success.length ? (lgobj.success = success.length) : null;
-                      runTasks(
+                      sendTasks(
                         {
                           oauth: udata.user.oauth,
                           titles: tasks,
                           text: oldata.data["windowinp-input16-text1"],
                           place: "prepend",
                           project: oldata.project,
+                          user: performer,
                         },
                         (err) => {
                           if (err) {
                             console.error(err);
                           } else {
+                            keepKeyLog(
+                              data.key,
+                              username,
+                              "submit",
+                              (klerr) => {
+                                if (klerr) {
+                                  console.error(klerr);
+                                }
+                                return res.status(200).send(data);
+                              },
+                              {
+                                data: lgobj,
+                              }
+                            );
                           }
-                        }
-                      );
-                      keepKeyLog(
-                        data.key,
-                        username,
-                        "submit",
-                        (klerr) => {
-                          if (klerr) {
-                            console.error(klerr);
-                          }
-                          return res.status(200).send(data);
-                        },
-                        {
-                          data: lgobj,
                         }
                       );
                     }
@@ -1139,7 +1155,14 @@ module.exports = {
                   (!startDate || info.sd >= new Date(startDate).getTime()) &&
                   (!endDate || info.sd <= new Date(endDate).getTime());
                 const stateMatch =
-                  !state || state === "all" || info.stat === state;
+                  !state ||
+                  state === "all" ||
+                  info.stat === state ||
+                  (state === "none" && info.stat === "") ||
+                  (state === "locked" &&
+                    info?.lock &&
+                    info?.lock?.length > 0 &&
+                    info.stat.length < 1);
                 return (
                   titleMatch &&
                   submitterMatch &&
@@ -1911,19 +1934,15 @@ module.exports = {
 function removeCircularReferences(obj) {
   const seen = new WeakSet();
 
-  return JSON.stringify(
-    obj,
-    function (key, value) {
-      if (typeof value === "object" && value !== null) {
-        if (seen.has(value)) {
-          return; // Omit circular reference
-        }
-        seen.add(value);
+  return JSON.stringify(obj, function (key, value) {
+    if (typeof value === "object" && value !== null) {
+      if (seen.has(value)) {
+        return; // Omit circular reference
       }
-      return value;
-    },
-    2
-  ); // 2 spaces for indentation
+      seen.add(value);
+    }
+    return value;
+  });
 }
 function getTranslation(session, langcode, callback) {
   if (session && session.trans && session.trans.langcode == langcode) {
@@ -1972,37 +1991,109 @@ function normalizeMediaWikiTitle(rawTitle) {
   }
   return title;
 }
-function runTasks(tasks, callback) {
-  const taskFile = join(
-    __dirname,
-    "private",
-    "db",
-    "tasks",
-    Date.now() + ".json"
-  );
-
-  writeFile(taskFile, JSON.stringify(tasks), (err) => {
+function sendTasks(task, callback, type = "task") {
+  if (task) {
+    request.post(
+      {
+        url:
+          "https://checkmatebata.com/api/task" /*  "http://localhost:8000/api/" */ +
+          type,
+        json: true,
+        body: task,
+        headers: {
+          "x-totp": totp(),
+        },
+      },
+      (err, res, body) => {
+        if (err) {
+          return callback(err);
+        }
+        if (res.statusCode !== 200) {
+          return callback(new Error("Failed to send task"));
+        }
+        return callback(null, body);
+      }
+    );
+  } else {
+    return callback("Task not found");
+  }
+}
+/* send all files saved in ./private/db/files when server is not busy and in every 15 minutes */
+sendFiles = function (callback) {
+  readFile(join(__dirname, "private", "querylist.json"), (err, rdata) => {
     if (err) {
-      console.error("❌ Failed to write task:", err);
+      console.error("Error reading query list:", err);
       return callback(err);
     }
+    let keys = Object.keys(rdata.key);
+    if (keys.length === 0) {
+      //console.log("No files to send.");
+      return callback(null, "No files to send.");
+    } else {
+      console.log("Sending files:", keys);
+      function Iloop(i) {
+        if (i >= keys.length) {
+          return callback(null, "All files sent successfully.");
+        } else {
+          let key = keys[i];
+          readFile(
+            join(__dirname, "private", "db", "files", key + ".json"),
+            (err, data) => {
+              if (err) {
+                console.error(`Error reading file ${key}:`, err);
+                return Iloop(i + 1);
+              } else {
+                stat(filePath, (err, stats) => {
+                  if (err) {
+                    console.error(`Error stating file ${key}:`, err);
+                    return Iloop(i + 1);
+                  }
 
-    console.log("✅ Task saved to:", taskFile);
-
-    const workerScript = join(__dirname, "public", "lib", "bot.js");
-
-    const cmd = `toolforge jobs run run-tasks --command "node ${workerScript}"`;
-
-    exec(cmd, (err, stdout, stderr) => {
-      if (err) {
-        console.error("❌ Failed to queue job:", err.message);
-        console.error("stderr:", stderr);
-        return callback(err);
+                  const now = Date.now();
+                  const modifiedTime = stats.mtimeMs;
+                  const fifteenMinutes = 15 * 60 * 1000;
+                  if (now - modifiedTime > fifteenMinutes) {
+                    // Skip file not modified recently
+                    return Iloop(i + 1);
+                  }
+                  try {
+                    sendTasks(
+                      {
+                        key: key,
+                        data: removeCircularReferences(data),
+                      },
+                      (err, response) => {
+                        if (err) {
+                          console.error(`Error sending file ${key}:`, err);
+                        } else {
+                          // console.log(`File ${key} sent successfully:`, response);
+                        }
+                      },
+                      "backup"
+                    );
+                  } catch (parseErr) {
+                    console.error(`Error parsing file ${key}:`, parseErr);
+                  }
+                  Iloop(i + 1);
+                });
+              }
+            }
+          );
+        }
       }
-
-      console.log("🚀 Job started via Toolforge jobs.");
-      console.log("stdout:", stdout);
-      return callback(null, tasks);
-    });
+    }
+    Iloop(0);
   });
-}
+};
+
+//now loop every 15 minutes
+setInterval(() => {
+  console.log("Checking for files to send...");
+  sendFiles((err, message) => {
+    if (err) {
+      console.error("Error sending files:", err);
+    } else {
+      console.log(message);
+    }
+  });
+}, 15 * 60 * 1000); // 15 minutes in milliseconds
