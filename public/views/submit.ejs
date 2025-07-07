@@ -114,11 +114,12 @@
         if ((data && data.username) || user) {
             let username = data?.username || user;
             Submitter.value = username;
-            console.log(userdata?.jurries.split(","), (username))
             if (userdata?.jurries.split(",")?.includes(username)) {
                 Submitter.disabled = false;
+                noc.disabled = false;
             } else {
                 Submitter.disabled = true;
+                noc.disabled = true;
             }
             submitbtn.addEventListener("click", (e) => {
                 e.preventDefault();

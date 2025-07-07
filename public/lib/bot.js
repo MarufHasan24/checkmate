@@ -68,4 +68,4 @@ function Task(data, callback) {
   loop();
 }
 
-readNextTask();
+module.exports = readNextTask;

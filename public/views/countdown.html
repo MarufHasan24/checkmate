@@ -110,6 +110,9 @@
         document.addEventListener("DOMContentLoaded", function () {
             const video = document.getElementById("hcvedio")
             countdown = function (endDate, startDate, trns) {
+                console.log("Countdown started");
+                console.log("End Date:", endDate);
+                console.log("Start Date:", startDate);
                 document.querySelectorAll(".label").forEach((e) => {
                     e.innerHTML = trns[e.textContent]
                 })
